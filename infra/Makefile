@@ -22,7 +22,7 @@ apply:
 .PHONY: apply
 
 destroy:
-	$(DOCKER_TF) -chdir=environments/$(ENV) destroy
+	$(DOCKER_TF) -chdir=environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
 
 validate:
