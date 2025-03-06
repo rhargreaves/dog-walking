@@ -1,0 +1,8 @@
+services:
+  acceptance-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.acceptance
+    container_name: acceptance-test
+    environment:
+      - API_HOST=api.uat.dog-walking.roberthargreaves.com
