@@ -62,6 +62,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
       - name: Run acceptance tests
         run: make test
         env:
