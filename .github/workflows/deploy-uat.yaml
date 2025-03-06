@@ -3,9 +3,6 @@ name: Deploy UAT and Run Tests
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'infra/**'
-      - 'test/acceptance/**'
   workflow_dispatch:
 
 permissions:
