@@ -11,6 +11,11 @@ jobs:
   destroy-uat:
     name: Destroy UAT
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+    env:
+      ENV: uat
 
     steps:
       - name: Checkout code
