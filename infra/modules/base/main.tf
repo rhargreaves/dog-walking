@@ -5,8 +5,6 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name = "${var.environment}-vpc"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -18,8 +16,6 @@ resource "aws_subnet" "public" {
 
   tags = {
     Name = "${var.environment}-public-subnet-${count.index + 1}"
-    env  = var.environment
-    app  = var.application_name
     type = "public"
   }
 }
@@ -32,8 +28,6 @@ resource "aws_subnet" "private" {
 
   tags = {
     Name = "${var.environment}-private-subnet-${count.index + 1}"
-    env  = var.environment
-    app  = var.application_name
     type = "private"
   }
 }
@@ -43,8 +37,6 @@ resource "aws_internet_gateway" "main" {
 
   tags = {
     Name = "${var.environment}-igw"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -53,8 +45,6 @@ resource "aws_eip" "nat" {
 
   tags = {
     Name = "${var.environment}-nat-eip"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -64,8 +54,6 @@ resource "aws_nat_gateway" "main" {
 
   tags = {
     Name = "${var.environment}-nat"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -79,8 +67,6 @@ resource "aws_route_table" "public" {
 
   tags = {
     Name = "${var.environment}-public-rt"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -94,8 +80,6 @@ resource "aws_route_table" "private" {
 
   tags = {
     Name = "${var.environment}-private-rt"
-    env  = var.environment
-    app  = var.application_name
   }
 }
 
@@ -125,7 +109,5 @@ resource "aws_security_group" "common" {
 
   tags = {
     Name = "${var.environment}-common-sg"
-    env  = var.environment
-    app  = var.application_name
   }
 }
