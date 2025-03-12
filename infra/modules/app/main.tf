@@ -111,6 +111,8 @@ resource "aws_lambda_permission" "api_gateway" {
 resource "aws_apigatewayv2_domain_name" "api" {
   domain_name = "api.${var.environment}.dog-walking.${var.domain_name}"
 
+  depends_on = [aws_acm_certificate_validation.api_cert]
+
   domain_name_configuration {
     certificate_arn = aws_acm_certificate.api_cert.arn
     endpoint_type   = "REGIONAL"
