@@ -3,27 +3,47 @@
 
 A service for helping dog owners find dog walkers
 
+## API
+
+### Build
+
+```sh
+make build
+```
+
+The API is packaged into `api.zip` ready to be uploaded to a lambda function.
+
+### Test
+
+```sh
+make test
+```
+
 ## Infrastructure
 
-Deployed using Terraform in a Docker container.
+Deployed using Terraform.
+
+```sh
+cd infra
+```
 
 ### Plan
 
 `ENV=uat` is the default.
 
-```bash
+```sh
 make plan
 ```
 
 ### Apply
 
-```bash
+```sh
 make apply
 ```
 
 ### Destroy
 
-```bash
+```sh
 make destroy
 ```
 
@@ -32,3 +52,4 @@ make destroy
 Key differences between this project and a real-life deployment:
 
 * UAT and PROD should ideally be in different AWS accounts.
+* Resource IDs (such as ARNs and Hosted Zone IDs) are secrets here due to this being a public repo. These could be environment variables in a private repo.
