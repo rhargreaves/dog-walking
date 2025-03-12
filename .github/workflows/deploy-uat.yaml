@@ -1,4 +1,4 @@
-name: Deploy UAT and Run Tests
+name: Deploy UAT & Test
 
 on:
   push:
