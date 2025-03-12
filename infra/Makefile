@@ -26,6 +26,7 @@ apply:
 .PHONY: apply
 
 destroy:
+	touch api.zip # dummy deploy artifact
 	$(DOCKER_TF) -chdir=environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
 
