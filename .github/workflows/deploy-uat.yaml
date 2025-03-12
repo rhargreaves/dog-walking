@@ -23,7 +23,7 @@ jobs:
         run: make build
 
       - name: Upload API
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api.zip
           path: api.zip
@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download API
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: api.zip
           path: ./infra
