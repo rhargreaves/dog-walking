@@ -61,9 +61,6 @@ jobs:
       - name: Terraform Init
         run: make init
 
-      - name: Terraform Format
-        run: make fmt
-
       - name: Terraform Plan
         run: make plan
 
