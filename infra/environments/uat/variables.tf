@@ -17,3 +17,13 @@ variable "vpc_cidr" {
 variable "availability_zones" {
   type    = list(string)
 }
+
+variable "domain_name" {
+  type        = string
+  description = "The base domain name for the application"
+}
+
+variable "hosted_zone_id" {
+  type        = string
+  description = "The Route53 hosted zone ID for the domain"
+}

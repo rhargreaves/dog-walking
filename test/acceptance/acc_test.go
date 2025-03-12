@@ -11,7 +11,7 @@ import (
 
 func getResponse(t *testing.T) *http.Response {
 	host := os.Getenv("API_HOST")
-	resp, err := http.Get("http://" + host)
+	resp, err := http.Get("https://" + host + "/hello")
 	require.NoError(t, err, "Failed to fetch URL")
 	return resp
 }

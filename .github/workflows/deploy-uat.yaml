@@ -12,18 +12,42 @@ permissions:
   contents: read
 
 jobs:
+  build-api:
+    name: Build API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build API
+        run: make build
+
+      - name: Upload API
+        uses: actions/upload-artifact@v3
+        with:
+          name: api.zip
+          path: api.zip
+
   deploy-uat:
     name: Deploy UAT
     runs-on: ubuntu-latest
+    needs: build-api
     defaults:
       run:
         working-directory: ./infra
     env:
       ENV: uat
+      TF_ENV_hosted_zone_id: ${{ secrets.TF_ENV_hosted_zone_id }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Download API
+        uses: actions/download-artifact@v3
+        with:
+          name: api.zip
+          path: ./infra
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2

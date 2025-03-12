@@ -28,3 +28,6 @@ go.work.sum
 plan.tfplan
 *.tfstate
 .terraform/
+
+bootstrap
+api.zip

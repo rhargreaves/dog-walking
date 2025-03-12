@@ -9,6 +9,9 @@ DOCKER_TF := docker run --rm \
 	$(TF_ENV_VARS) \
 	$(TERRAFORM_IMAGE)
 
+deploy: init plan apply
+.PHONY: deploy
+
 init:
 	$(DOCKER_TF) -chdir=environments/$(ENV) init
 .PHONY: init
@@ -28,6 +31,10 @@ destroy:
 validate:
 	$(DOCKER_TF) -chdir=environments/$(ENV) validate
 .PHONY: validate
+
+unlock:
+	$(DOCKER_TF) -chdir=environments/$(ENV) force-unlock -force $(TF_LOCK_ID)
+.PHONY: unlock
 
 fmt:
 	$(DOCKER_TF) fmt

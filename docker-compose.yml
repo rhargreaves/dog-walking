@@ -1,4 +1,12 @@
 services:
+  bootstrap:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap
+    volumes:
+      - .:/app
+
   acceptance-test:
     build:
       context: .
