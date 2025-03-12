@@ -3,7 +3,7 @@ module github.com/rhargreaves/dog-walking
 go 1.23.1
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
+	github.com/aws/aws-lambda-go v1.47.0
 	github.com/stretchr/testify v1.10.0
 )
 
