@@ -4,7 +4,7 @@ build-images:
 
 build: build-images
 	docker compose run bootstrap
-	mv api.zip infra/api.zip
+	cp api.zip infra/api.zip
 .PHONY: build
 
 test: build-images
