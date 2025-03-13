@@ -25,6 +25,11 @@ jobs:
       - name: Test API
         run: make test-local
 
+      - name: Build API for Lambda
+        run: make build
+        env:
+          GOARCH: arm64
+
       - name: Upload API
         uses: actions/upload-artifact@v4
         with:
