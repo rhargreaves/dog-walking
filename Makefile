@@ -30,9 +30,9 @@ test:
 	docker compose down
 .PHONY: test
 
-sam-local-api: build
+start-local-api: build
 	docker compose run --rm --service-ports sam
-.PHONY: sam-local-api
+.PHONY: start-local-api
 
 clean:
 	-rm -rf out

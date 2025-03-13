@@ -13,7 +13,7 @@ Resources:
         HelloAPI:
           Type: HttpApi
           Properties:
-            Path: /hello
+            Path: /ping
             Method: GET
         DogsAPI:
           Type: HttpApi

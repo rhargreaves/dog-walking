@@ -9,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/hello"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/ping"]
       interval: 5s
       timeout: 2s
       retries: 10

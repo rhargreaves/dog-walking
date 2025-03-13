@@ -23,13 +23,13 @@ func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 	path := req.RequestContext.HTTP.Path
 	method := req.RequestContext.HTTP.Method
 
-	if method == "GET" && path == "/hello" {
+	if method == "GET" && path == "/ping" {
 		return events.APIGatewayV2HTTPResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
-				"Content-Type": "application/json",
+				"Content-Type": "text/plain",
 			},
-			Body: `{"message":"Hello World from the Dog Walking API!"}`,
+			Body: "OK",
 		}, nil
 	}
 
