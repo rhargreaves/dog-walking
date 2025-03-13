@@ -11,7 +11,7 @@ A service for helping dog owners find dog walkers
 make build
 ```
 
-The API is packaged into `api.zip` ready to be uploaded to a lambda function.
+The API is compiled to `out/bootstrap` ready to be deployed as a Lambda function.
 
 ### Test
 
