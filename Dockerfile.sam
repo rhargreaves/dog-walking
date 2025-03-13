@@ -1,16 +1,10 @@
 FROM python:3-slim
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     groff \
     less
-WORKDIR /tmp
-RUN curl -L "https://github.com/aws/aws-sam-cli/releases/download/v1.135.0/aws-sam-cli-linux-arm64.zip" -o "aws-sam-cli.zip" && \
-    unzip aws-sam-cli.zip -d sam-cli && \
-    ./sam-cli/install && \
-    rm -rf aws-sam-cli.zip sam-cli
-
+RUN pip install --no-cache-dir aws-sam-cli
 ENV SAM_CLI_TELEMETRY=0
 WORKDIR /sam
 ENTRYPOINT ["sam"]
