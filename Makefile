@@ -12,7 +12,7 @@ test: build
 .PHONY: test
 
 sam-local-api: build
-	docker compose run sam --rm --service-ports
+	docker compose run --rm --service-ports sam
 .PHONY: sam-local-api
 
 clean:

@@ -15,11 +15,7 @@ services:
       retries: 10
       start_period: 10s
     environment:
-      - AWS_DEFAULT_REGION
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_SESSION_TOKEN
-      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=60
+      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=20
     networks:
       - dog-walking
     command: >
@@ -44,8 +40,8 @@ services:
       context: .
       dockerfile: Dockerfile.acceptance
     container_name: acceptance-test
-    environment:
-      - API_BASE_URL=http://sam:3000
+    env_file:
+      - .env
     networks:
       - dog-walking
 
