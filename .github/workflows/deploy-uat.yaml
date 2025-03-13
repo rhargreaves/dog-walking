@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-api:
-    name: Build API
+    name: Build & Test API
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
       - name: Build API
         run: make build
 
-      - name: Test API locally
+      - name: Test API
         run: make test-local
 
       - name: Upload API
