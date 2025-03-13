@@ -18,6 +18,12 @@ module "base" {
   availability_zones = var.availability_zones
 }
 
+module "data" {
+  source = "../../modules/data"
+
+  environment = var.environment
+}
+
 module "app" {
   source = "../../modules/app"
 
@@ -27,4 +33,6 @@ module "app" {
   private_subnet_ids = module.base.private_subnet_ids
   domain_name        = var.domain_name
   hosted_zone_id     = var.hosted_zone_id
+  dynamodb_access_policy_arn = module.data.dynamodb_access_policy_arn
+  dogs_table_name = module.data.dogs_table_name
 }

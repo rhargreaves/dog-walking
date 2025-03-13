@@ -22,6 +22,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = var.dynamodb_access_policy_arn
+}
+
 data "archive_file" "bootstrap" {
   type        = "zip"
   source_file = "${path.module}/../../../out/bootstrap"
@@ -41,6 +46,7 @@ resource "aws_lambda_function" "api" {
   environment {
     variables = {
       ENVIRONMENT = var.environment
+      DOGS_TABLE  = var.dogs_table_name
     }
   }
 

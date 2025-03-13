@@ -27,3 +27,13 @@ variable "hosted_zone_id" {
   description = "The Route53 hosted zone ID for the domain"
   type        = string
 }
+
+variable "dynamodb_access_policy_arn" {
+  description = "ARN of the policy for DynamoDB access"
+  type        = string
+}
+
+variable "dogs_table_name" {
+  description = "Name of the DynamoDB table for dogs"
+  type        = string
+}
