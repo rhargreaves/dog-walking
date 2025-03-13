@@ -2,7 +2,7 @@ export WORKDIR=$(shell pwd)
 ifeq ($(shell uname -s),Darwin)
     export CONTAINER_HOST=host.docker.internal
 else
-    export CONTAINER_HOST=localhost
+    export CONTAINER_HOST=172.17.0.1
 endif
 
 build:
