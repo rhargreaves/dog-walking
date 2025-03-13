@@ -61,9 +61,6 @@ jobs:
           name: bootstrap
           path: out
 
-      - name: List files in ..
-        run: ls -la -R ..
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
