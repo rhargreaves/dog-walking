@@ -15,7 +15,7 @@ services:
       retries: 10
       start_period: 10s
     environment:
-      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=20
+      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=30
     networks:
       - dog-walking
     command: >
@@ -33,15 +33,23 @@ services:
       - .:/app
 
   acceptance-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.acceptance
+    container_name: acceptance-test
+    environment:
+      - API_BASE_URL
+
+  acceptance-test-local:
     depends_on:
       sam:
         condition: service_healthy
     build:
       context: .
       dockerfile: Dockerfile.acceptance
-    container_name: acceptance-test
-    env_file:
-      - .env
+    container_name: acceptance-test-local
+    environment:
+      - API_BASE_URL=http://sam:3000
     networks:
       - dog-walking
 

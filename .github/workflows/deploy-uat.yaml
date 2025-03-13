@@ -22,6 +22,9 @@ jobs:
       - name: Build API
         run: make build
 
+      - name: Test API locally
+        run: make test-local
+
       - name: Upload API
         uses: actions/upload-artifact@v4
         with:
@@ -88,4 +91,4 @@ jobs:
       - name: Run acceptance tests
         run: make test
         env:
-          API_HOST: api.uat.dog-walking.roberthargreaves.com
+          API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com

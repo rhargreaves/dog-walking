@@ -1,11 +1,15 @@
 export WORKDIR=$(shell pwd)
 
 build:
-	rm bootstrap api.zip
+	-rm bootstrap api.zip
 	docker compose build
 	docker compose run --rm bootstrap
 	cp api.zip infra/api.zip
 .PHONY: build
+
+test-local: build
+	docker compose run --rm acceptance-test-local
+.PHONY: test-local
 
 test: build
 	docker compose run --rm acceptance-test
