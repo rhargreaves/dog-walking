@@ -12,17 +12,19 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Printf("Request: method=%s, path=%s\n", req.HTTPMethod, req.Path)
+func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	fmt.Printf("Request: method=%s, path=%s, rawPath=%s\n",
+		req.RequestContext.HTTP.Method,
+		req.RequestContext.HTTP.Path,
+		req.RawPath)
 	fmt.Printf("Headers: %v\n", req.Headers)
+	fmt.Printf("Route: %s\n", req.RouteKey)
 
-	path := req.Path
-	if path == "" {
-		path = "/"
-	}
+	path := req.RequestContext.HTTP.Path
+	method := req.RequestContext.HTTP.Method
 
-	if req.HTTPMethod == "GET" && path == "/hello" {
-		return events.APIGatewayProxyResponse{
+	if method == "GET" && path == "/hello" {
+		return events.APIGatewayV2HTTPResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
@@ -31,8 +33,8 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		}, nil
 	}
 
-	if req.HTTPMethod == "POST" && path == "/dogs" {
-		return events.APIGatewayProxyResponse{
+	if method == "POST" && path == "/dogs" {
+		return events.APIGatewayV2HTTPResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
@@ -41,12 +43,13 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		}, nil
 	}
 
-	return events.APIGatewayProxyResponse{
+	return events.APIGatewayV2HTTPResponse{
 		StatusCode: 404,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
-		Body: fmt.Sprintf(`{"error":"Route not found","path":"%s","method":"%s"}`, path, req.HTTPMethod),
+		Body: fmt.Sprintf(`{"error":"Route not found","path":"%s","method":"%s","routeKey":"%s"}`,
+			path, method, req.RouteKey),
 	}, nil
 }
 

@@ -94,9 +94,15 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   payload_format_version = "2.0"
 }
 
-resource "aws_apigatewayv2_route" "catch_all_route" {
+resource "aws_apigatewayv2_route" "hello_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "$default"
+  route_key = "GET /hello"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "dogs_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "POST /dogs"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
