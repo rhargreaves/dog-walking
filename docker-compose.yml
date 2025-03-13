@@ -22,7 +22,6 @@ services:
       --container-host-interface 0.0.0.0
       --container-host ${CONTAINER_HOST}
       --docker-volume-basedir ${WORKDIR}
-      --debug
 
   bootstrap:
     build:
