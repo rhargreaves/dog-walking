@@ -8,7 +8,8 @@ build:
 .PHONY: build
 
 test-local: build
-	docker compose run --rm acceptance-test-local
+	docker compose run --rm acceptance-test-local \
+		|| (docker compose logs && exit 1)
 .PHONY: test-local
 
 test: build
