@@ -8,7 +8,7 @@ Resources:
       Handler: bootstrap
       Runtime: provided.al2
       Architectures:
-        - arm64
+        - x86_64
       Events:
         HelloAPI:
           Type: Api
