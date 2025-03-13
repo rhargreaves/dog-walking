@@ -15,3 +15,8 @@ Resources:
           Properties:
             Path: /hello
             Method: GET
+        DogsAPI:
+          Type: Api
+          Properties:
+            Path: /dogs
+            Method: POST

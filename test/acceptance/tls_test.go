@@ -2,13 +2,19 @@ package main
 
 import (
 	"net/http"
-	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestServerIsRunningOverTLS(t *testing.T) {
+func skipIfLocal(t *testing.T) {
+	if strings.HasPrefix(baseUrl(), "http://sam:") {
+		t.Skip("Skipping TLS test on local environment")
+	}
+}
+
+func TestServerIsRunning(t *testing.T) {
 	resp := response(t, "/hello")
 	defer resp.Body.Close()
 
@@ -16,7 +22,10 @@ func TestServerIsRunningOverTLS(t *testing.T) {
 }
 
 func TestServerIsNotAccessibleOnPort80(t *testing.T) {
-	_, err := http.Get("http://" + os.Getenv("API_HOST"))
+	skipIfLocal(t)
+
+	insecureUrl := strings.Replace(baseUrl(), "https://", "http://", 1)
+	_, err := http.Get(insecureUrl)
 
 	require.Error(t, err, "Expected connection to be refused on port 80")
 	require.Contains(t, err.Error(), "connection refused",

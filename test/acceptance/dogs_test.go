@@ -13,11 +13,11 @@ type Dog struct {
 }
 
 func TestDogsReturnsEmptyListOfDogs(t *testing.T) {
-	resp := response(t, "/dogs")
+	resp := postJson(t, "/dogs", Dog{})
 	defer resp.Body.Close()
 	require.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
 
-	var dogs []Dog
+	var dogs Dog
 	err := json.NewDecoder(resp.Body).Decode(&dogs)
 	require.NoError(t, err, "Failed to decode response body")
 

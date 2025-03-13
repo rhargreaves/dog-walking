@@ -2,36 +2,41 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
+	"github.com/gin-gonic/gin"
 )
 
 type Response struct {
 	Message string `json:"message"`
 }
 
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response := Response{
-		Message: "Hello World from the Dog Walking API!",
-	}
+type Dog struct {
+}
 
-	body, err := json.Marshal(response)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Error generating response",
-		}, nil
-	}
+var ginLambda *ginadapter.GinLambda
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-		Body: string(body),
-	}, nil
+func init() {
+	r := gin.Default()
+
+	r.GET("/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, Response{
+			Message: "Hello World from the Dog Walking API!",
+		})
+	})
+
+	r.POST("/dogs", func(c *gin.Context) {
+		c.JSON(http.StatusOK, Dog{})
+	})
+
+	ginLambda = ginadapter.New(r)
+}
+
+func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	return ginLambda.ProxyWithContext(ctx, req)
 }
 
 func main() {
