@@ -27,5 +27,4 @@ module "app" {
   private_subnet_ids = module.base.private_subnet_ids
   domain_name        = var.domain_name
   hosted_zone_id     = var.hosted_zone_id
-  api_zip_path       = "${path.module}/../../api.zip"
 }

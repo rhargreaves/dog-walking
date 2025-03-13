@@ -5,7 +5,7 @@ TERRAFORM_WORKDIR := /workspace
 ENV ?= uat
 
 DOCKER_TF := docker run --rm \
-	-v $(shell pwd):$(TERRAFORM_WORKDIR) \
+	-v $(shell pwd)/..:$(TERRAFORM_WORKDIR) \
 	-w $(TERRAFORM_WORKDIR) \
 	$(TF_ENV_VARS) \
 	$(TERRAFORM_IMAGE)
@@ -14,28 +14,28 @@ deploy: init plan apply
 .PHONY: deploy
 
 init:
-	$(DOCKER_TF) -chdir=environments/$(ENV) init
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) init
 .PHONY: init
 
 plan:
-	$(DOCKER_TF) -chdir=environments/$(ENV) plan -out=plan.tfplan
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) plan -out=plan.tfplan
 .PHONY: plan
 
 apply:
-	$(DOCKER_TF) -chdir=environments/$(ENV) apply plan.tfplan
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) apply plan.tfplan
 .PHONY: apply
 
 destroy:
 	touch api.zip # dummy deploy artifact
-	$(DOCKER_TF) -chdir=environments/$(ENV) destroy -auto-approve
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
 
 validate:
-	$(DOCKER_TF) -chdir=environments/$(ENV) validate
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) validate
 .PHONY: validate
 
 unlock:
-	$(DOCKER_TF) -chdir=environments/$(ENV) force-unlock -force $(TF_LOCK_ID)
+	$(DOCKER_TF) -chdir=infra/environments/$(ENV) force-unlock -force $(TF_LOCK_ID)
 .PHONY: unlock
 
 fmt:

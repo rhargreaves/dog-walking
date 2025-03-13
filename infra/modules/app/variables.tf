@@ -27,8 +27,3 @@ variable "hosted_zone_id" {
   description = "The Route53 hosted zone ID for the domain"
   type        = string
 }
-
-variable "api_zip_path" {
-  description = "The path to the compiled API zip file"
-  type        = string
-}

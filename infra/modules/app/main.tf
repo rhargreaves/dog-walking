@@ -22,6 +22,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+data "archive_file" "bootstrap" {
+  type        = "zip"
+  source_file = "${path.module}/../../../out/bootstrap"
+  output_path = "${path.module}/../../../out/bootstrap.zip"
+}
+
 resource "aws_lambda_function" "api" {
   function_name = "${var.environment}-dog-walking-api"
   role          = aws_iam_role.lambda_role.arn
@@ -29,8 +35,8 @@ resource "aws_lambda_function" "api" {
   runtime       = "provided.al2023"
   architectures = ["arm64"]
 
-  filename         = var.api_zip_path
-  source_code_hash = filebase64sha256(var.api_zip_path)
+  filename         = data.archive_file.bootstrap.output_path
+  source_code_hash = data.archive_file.bootstrap.output_base64sha256
 
   environment {
     variables = {

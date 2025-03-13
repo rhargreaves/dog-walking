@@ -30,5 +30,4 @@ plan.tfplan
 *.tfstate
 .terraform/
 
-bootstrap
-api.zip
+out/

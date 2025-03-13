@@ -5,12 +5,19 @@ else
     export CONTAINER_HOST=172.17.0.1
 endif
 
-build:
-	-rm bootstrap api.zip
-	docker compose build
-	docker compose run --rm bootstrap
-	cp api.zip infra/api.zip
+GO_IMAGE := golang:1.23.4-alpine
+GO_CMD := docker run --rm -v $(shell pwd):/app -w /app $(GO_IMAGE) sh -c
+
+build: lint
+	-rm -rf out
+	mkdir -p out
+	$(GO_CMD) "go mod download && \
+		GOOS=linux GOARCH=arm64 go build -o out/bootstrap main.go"
 .PHONY: build
+
+lint:
+	$(GO_CMD) "go fmt ./... && go mod tidy"
+.PHONY: lint
 
 test-local: build
 	docker compose run --rm acceptance-test-local \
@@ -28,6 +35,7 @@ sam-local-api: build
 .PHONY: sam-local-api
 
 clean:
-	-rm bootstrap api.zip infra/api.zip
+	-rm -rf out
 	docker compose down --rmi all --volumes --remove-orphans
+	docker rm go-cmd
 .PHONY: clean
