@@ -1,4 +1,9 @@
 export WORKDIR=$(shell pwd)
+ifeq ($(shell uname -s),Darwin)
+    export CONTAINER_HOST=host.docker.internal
+else
+    export CONTAINER_HOST=localhost
+endif
 
 build:
 	-rm bootstrap api.zip
@@ -10,10 +15,12 @@ build:
 test-local: build
 	docker compose run --rm acceptance-test-local \
 		|| (docker compose logs && exit 1)
+	docker compose down
 .PHONY: test-local
 
 test: build
 	docker compose run --rm acceptance-test
+	docker compose down
 .PHONY: test
 
 sam-local-api: build

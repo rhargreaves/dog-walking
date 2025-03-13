@@ -15,14 +15,15 @@ services:
       retries: 20
       start_period: 10s
     environment:
-      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=30
-    networks:
-      - dog-walking
+      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=10
     command: >
       local start-api
       --host 0.0.0.0
-      --container-host host.docker.internal
+      --container-host ${CONTAINER_HOST}
+      --docker-network dog-walking
       --docker-volume-basedir ${WORKDIR}
+    networks:
+      - dog-walking
 
   bootstrap:
     build:
