@@ -4,7 +4,7 @@ Resources:
   DogWalkingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: out/
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures:

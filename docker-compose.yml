@@ -25,8 +25,8 @@ services:
 
   acceptance-test:
     build:
-      context: .
-      dockerfile: Dockerfile.acceptance
+      context: test/acceptance
+      dockerfile: Dockerfile
     container_name: acceptance-test
     environment:
       - API_BASE_URL
@@ -36,8 +36,8 @@ services:
       sam:
         condition: service_healthy
     build:
-      context: .
-      dockerfile: Dockerfile.acceptance
+      context: test/acceptance
+      dockerfile: Dockerfile
     container_name: acceptance-test-local
     environment:
       - API_BASE_URL=http://sam:3000
