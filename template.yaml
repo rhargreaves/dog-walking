@@ -10,7 +10,7 @@ Resources:
       Architectures:
         - arm64
       Events:
-        HelloAPI:
+        PingAPI:
           Type: HttpApi
           Properties:
             Path: /ping
