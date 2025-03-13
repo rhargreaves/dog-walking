@@ -15,7 +15,7 @@ func skipIfLocal(t *testing.T) {
 }
 
 func TestServerIsRunning(t *testing.T) {
-	resp := response(t, "/ping")
+	resp := get(t, "/ping")
 	defer resp.Body.Close()
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")

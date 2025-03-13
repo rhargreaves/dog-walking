@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -10,6 +11,10 @@ import (
 
 type Response struct {
 	Message string `json:"message"`
+}
+
+type Dog struct {
+	Name string `json:"name"`
 }
 
 func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
@@ -34,12 +39,30 @@ func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 	}
 
 	if method == "POST" && path == "/dogs" {
+		var dog Dog
+		err := json.Unmarshal([]byte(req.Body), &dog)
+		if err != nil {
+			return events.APIGatewayV2HTTPResponse{
+				StatusCode: 400,
+				Body:       fmt.Sprintf(`{"error":"%s"}`, err.Error()),
+			}, nil
+		}
+
+		returnedDog := Dog{Name: dog.Name}
+		returnedDogJson, err := json.Marshal(returnedDog)
+		if err != nil {
+			return events.APIGatewayV2HTTPResponse{
+				StatusCode: 500,
+				Body:       fmt.Sprintf(`{"error":"%s"}`, err.Error()),
+			}, nil
+		}
+
 		return events.APIGatewayV2HTTPResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
-			Body: `{}`,
+			Body: string(returnedDogJson),
 		}, nil
 	}
 

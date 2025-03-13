@@ -12,8 +12,8 @@ type Dog struct {
 	Name string `json:"name"`
 }
 
-func TestDogsReturnsEmptyListOfDogs(t *testing.T) {
-	resp := postJson(t, "/dogs", Dog{})
+func TestDogsCreateDog(t *testing.T) {
+	resp := postJson(t, "/dogs", Dog{Name: "Rover"})
 	defer resp.Body.Close()
 	require.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
 
@@ -21,5 +21,11 @@ func TestDogsReturnsEmptyListOfDogs(t *testing.T) {
 	err := json.NewDecoder(resp.Body).Decode(&dogs)
 	require.NoError(t, err, "Failed to decode response body")
 
-	require.Empty(t, dogs, "Expected empty list of dogs")
+	require.Equal(t, "Rover", dogs.Name, "Expected dog name to be returned")
+}
+
+func TestDogsRejectsInvalidJson(t *testing.T) {
+	resp := postBytes(t, "/dogs", []byte(`foo`))
+	defer resp.Body.Close()
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, "Expected status code 403")
 }
