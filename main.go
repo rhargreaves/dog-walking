@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -50,6 +51,15 @@ func init() {
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Printf("API Gateway request: method=%s, path=%s, resource=%s\n",
+		req.HTTPMethod, req.Path, req.Resource)
+	fmt.Printf("API Gateway headers: %v\n", req.Headers)
+
+	ctxJSON, _ := json.MarshalIndent(req.RequestContext, "", "  ")
+	fmt.Printf("API Gateway request context: %s\n", string(ctxJSON))
+	reqJSON, _ := json.MarshalIndent(req, "", "  ")
+	fmt.Printf("Full API Gateway request: %s\n", string(reqJSON))
+
 	return ginLambda.ProxyWithContext(ctx, req)
 }
 
