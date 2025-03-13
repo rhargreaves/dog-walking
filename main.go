@@ -38,6 +38,13 @@ func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		}, nil
 	}
 
+	if method == "GET" && path == "/dogs" {
+		return events.APIGatewayV2HTTPResponse{
+			StatusCode: 200,
+			Body:       `[{"name":"Rover"}]`,
+		}, nil
+	}
+
 	if method == "POST" && path == "/dogs" {
 		var dog Dog
 		err := json.Unmarshal([]byte(req.Body), &dog)

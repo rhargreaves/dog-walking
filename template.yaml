@@ -20,3 +20,8 @@ Resources:
           Properties:
             Path: /dogs
             Method: POST
+        DogsListAPI:
+          Type: HttpApi
+          Properties:
+            Path: /dogs
+            Method: GET
