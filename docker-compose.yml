@@ -20,10 +20,7 @@ services:
       local start-api
       --host 0.0.0.0
       --container-host ${CONTAINER_HOST}
-      --docker-network dog-walking
       --docker-volume-basedir ${WORKDIR}
-    networks:
-      - dog-walking
 
   bootstrap:
     build:
@@ -51,9 +48,3 @@ services:
     container_name: acceptance-test-local
     environment:
       - API_BASE_URL=http://sam:3000
-    networks:
-      - dog-walking
-
-networks:
-  dog-walking:
-    name: dog-walking
