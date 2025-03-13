@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  DogWalkingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: bootstrap
+      Runtime: provided.al2
+      Architectures:
+        - arm64
+      Events:
+        HelloAPI:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
+        DogsAPI:
+          Type: Api
+          Properties:
+            Path: /dogs
+            Method: POST

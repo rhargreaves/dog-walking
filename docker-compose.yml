@@ -1,4 +1,29 @@
 services:
+  sam:
+    build:
+      context: .
+      dockerfile: Dockerfile.sam
+    volumes:
+      - .:/sam
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/hello"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+    environment:
+      - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=30
+    networks:
+      - dog-walking
+    command: >
+      local start-api
+      --host 0.0.0.0
+      --container-host host.docker.internal
+      --docker-volume-basedir ${WORKDIR}
+
   bootstrap:
     build:
       context: .
@@ -13,4 +38,21 @@ services:
       dockerfile: Dockerfile.acceptance
     container_name: acceptance-test
     environment:
-      - API_HOST=api.uat.dog-walking.roberthargreaves.com
+      - API_BASE_URL
+
+  acceptance-test-local:
+    depends_on:
+      sam:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile.acceptance
+    container_name: acceptance-test-local
+    environment:
+      - API_BASE_URL=http://sam:3000
+    networks:
+      - dog-walking
+
+networks:
+  dog-walking:
+    name: dog-walking
