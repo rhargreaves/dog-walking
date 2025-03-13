@@ -4,8 +4,6 @@ go 1.23.1
 
 require (
 	github.com/aws/aws-lambda-go v1.47.0
-	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
-	github.com/gin-gonic/gin v1.10.0
 	github.com/stretchr/testify v1.10.0
 )
 
