@@ -3,4 +3,4 @@ WORKDIR /app
 COPY . .
 RUN go mod download && \
 	go install gotest.tools/gotestsum@latest
-CMD ["gotestsum", "--format", "testname", "..."]
+CMD ["gotestsum", "--format", "testname", "./..."]
