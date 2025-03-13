@@ -19,6 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
       - name: Build API
         run: make build
 
@@ -59,7 +62,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Terraform Init
         run: make init
