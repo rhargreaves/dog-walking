@@ -20,6 +20,7 @@ lint:
 .PHONY: lint
 
 test-local: build
+	docker compose build
 	docker compose run --rm acceptance-test-local \
 		|| (docker compose logs && exit 1)
 	docker compose down
@@ -37,5 +38,4 @@ start-local-api: build
 clean:
 	-rm -rf out
 	docker compose down --rmi all --volumes --remove-orphans
-	docker rm go-cmd
 .PHONY: clean
