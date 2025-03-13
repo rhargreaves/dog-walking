@@ -26,7 +26,7 @@ resource "aws_lambda_function" "api" {
   function_name = "${var.environment}-dog-walking-api"
   role          = aws_iam_role.lambda_role.arn
   handler       = "main"
-  runtime       = "provided.al2"
+  runtime       = "provided.al2023"
   architectures = ["arm64"]
 
   filename         = var.api_zip_path
