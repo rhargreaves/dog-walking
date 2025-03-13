@@ -18,8 +18,8 @@ test-local: build
 	docker compose down
 .PHONY: test-local
 
-test: build
-	docker compose run --rm acceptance-test
+test:
+	docker compose run --build --rm acceptance-test
 	docker compose down
 .PHONY: test
 
