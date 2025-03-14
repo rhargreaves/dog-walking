@@ -1,4 +1,4 @@
-export WORKDIR=$(shell pwd)
+export HOST_API_PATH=$(shell pwd)/api
 ifeq ($(shell uname -s),Darwin)
     export CONTAINER_HOST=host.docker.internal
 else

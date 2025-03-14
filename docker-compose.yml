@@ -7,9 +7,9 @@ services:
       context: api
       dockerfile: Dockerfile.sam
     volumes:
-      - ${WORKDIR}/api:${WORKDIR}/api
+      - ${HOST_API_PATH}:${HOST_API_PATH}
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: ${WORKDIR}/api
+    working_dir: ${HOST_API_PATH}
     ports:
       - "3000:3000"
     healthcheck:
