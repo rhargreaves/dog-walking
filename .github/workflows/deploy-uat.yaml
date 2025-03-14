@@ -7,6 +7,10 @@ on:
       - '*.md'
   workflow_dispatch:
 
+concurrency:
+  group: deploy-uat
+  cancel-in-progress: false
+
 permissions:
   id-token: write
   contents: read
