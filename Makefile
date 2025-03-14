@@ -5,10 +5,22 @@ else
     export CONTAINER_HOST=172.17.0.1
 endif
 
+SHOW_LOGS_ON_FAILURE := false
 GO_IMAGE := golang:1.23.4-alpine
-GO_CMD := docker run --rm -v $(shell pwd):/app -w /app $(GO_IMAGE) sh -c
+GO_CMD := docker run --rm \
+	-v $(shell pwd):/app \
+	-v go-mod-cache:/gomodcache \
+	-e GOMODCACHE=/gomodcache \
+	-w /app \
+	$(GO_IMAGE) \
+	sh -c
 
-build: lint
+create-mod-cache:
+	-docker volume create go-mod-cache
+.PHONY: create-mod-cache
+
+build: create-mod-cache lint
+	docker compose down
 	-rm -rf out
 	mkdir -p out
 	$(GO_CMD) "go mod download && \
@@ -22,7 +34,9 @@ lint:
 test-local: build
 	docker compose build
 	docker compose run --rm acceptance-test-local \
-		|| (docker compose logs && exit 1)
+		|| (if [ "$(SHOW_LOGS_ON_FAILURE)" = "true" ]; then \
+			docker compose logs; \
+		fi; \ exit 1)
 	docker compose down
 .PHONY: test-local
 
@@ -35,7 +49,11 @@ start-local-api: build
 	docker compose run --rm --service-ports sam
 .PHONY: start-local-api
 
-clean:
+clean-cache:
+	-docker volume rm go-mod-cache
+.PHONY: clean-cache
+
+clean: clean-cache
 	-rm -rf out
 	docker compose down --rmi all --volumes --remove-orphans
 .PHONY: clean
