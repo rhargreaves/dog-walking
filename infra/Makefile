@@ -26,8 +26,8 @@ apply:
 .PHONY: apply
 
 destroy:
-	mkdir -p api/build
-	touch api/build/bootstrap # dummy lambda artifact
+	mkdir -p ../api/build
+	touch ../api/build/bootstrap # dummy lambda artifact
 	$(DOCKER_TF) -chdir=infra/environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
 
