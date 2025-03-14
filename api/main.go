@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -14,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -22,59 +24,36 @@ type Dog struct {
 	ID   string `json:"id"`
 }
 
-func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	path := req.RequestContext.HTTP.Path
-	method := req.RequestContext.HTTP.Method
-	fmt.Printf("Request: %s %s\n", method, path)
+var ginLambda *ginadapter.GinLambdaV2
 
-	if method == "GET" && path == "/ping" {
-		return healthCheck()
-	}
+func init() {
+	r := gin.Default()
 
-	if method == "GET" && path == "/dogs" {
-		return listDogs()
-	}
+	r.GET("/ping", healthCheck)
+	r.GET("/dogs", listDogs)
+	r.POST("/dogs", postDog)
 
-	if method == "POST" && path == "/dogs" {
-		return postDog(req)
-	}
-
-	return routeNotFound(req, path, method)
+	ginLambda = ginadapter.NewV2(r)
 }
 
-func postDog(req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	return ginLambda.ProxyWithContext(ctx, req)
+}
+
+func postDog(c *gin.Context) {
 	var dog Dog
-	err := json.Unmarshal([]byte(req.Body), &dog)
-	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 400,
-			Body:       fmt.Sprintf(`{"error":"%s"}`, err.Error()),
-		}, nil
+	if err := c.ShouldBindJSON(&dog); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	err = storeDog(&dog)
+	err := storeDog(&dog)
 	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
-			Body:       fmt.Sprintf(`{"error":"%s"}`, err.Error()),
-		}, nil
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	returnedDogJson, err := json.Marshal(dog)
-	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
-			Body:       fmt.Sprintf(`{"error":"%s"}`, err.Error()),
-		}, nil
-	}
-
-	return events.APIGatewayV2HTTPResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-		Body: string(returnedDogJson),
-	}, nil
+	c.JSON(http.StatusOK, dog)
 }
 
 func storeDog(dog *Dog) error {
@@ -105,7 +84,7 @@ func storeDog(dog *Dog) error {
 	return nil
 }
 
-func listDogs() (events.APIGatewayV2HTTPResponse, error) {
+func listDogs(c *gin.Context) {
 	svc := dynamodb.New(session.Must(createSession()))
 
 	input := &dynamodb.ScanInput{
@@ -115,45 +94,23 @@ func listDogs() (events.APIGatewayV2HTTPResponse, error) {
 
 	result, err := svc.Scan(input)
 	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
-			Headers:    map[string]string{"Content-Type": "application/json"},
-			Body:       fmt.Sprintf(`{"error":"Failed to scan dogs table: %s"}`, err.Error()),
-		}, nil
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to scan dogs table: %s", err.Error())})
+		return
 	}
 
 	if len(result.Items) == 0 {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 200,
-			Headers:    map[string]string{"Content-Type": "application/json"},
-			Body:       "[]",
-		}, nil
+		c.JSON(http.StatusOK, []Dog{})
+		return
 	}
 
 	var dogs []Dog
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
 	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
-			Headers:    map[string]string{"Content-Type": "application/json"},
-			Body:       fmt.Sprintf(`{"error":"Failed to unmarshal dogs: %s"}`, err.Error()),
-		}, nil
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to unmarshal dogs: %s", err.Error())})
+		return
 	}
 
-	dogsJSON, err := json.Marshal(dogs)
-	if err != nil {
-		return events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
-			Headers:    map[string]string{"Content-Type": "application/json"},
-			Body:       fmt.Sprintf(`{"error":"Failed to marshal dogs to JSON: %s"}`, err.Error()),
-		}, nil
-	}
-
-	return events.APIGatewayV2HTTPResponse{
-		StatusCode: 200,
-		Headers:    map[string]string{"Content-Type": "application/json"},
-		Body:       string(dogsJSON),
-	}, nil
+	c.JSON(http.StatusOK, dogs)
 }
 
 func createSession() (*session.Session, error) {
@@ -175,25 +132,8 @@ func createSession() (*session.Session, error) {
 	return session.NewSession(config)
 }
 
-func healthCheck() (events.APIGatewayV2HTTPResponse, error) {
-	return events.APIGatewayV2HTTPResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Content-Type": "text/plain",
-		},
-		Body: "OK",
-	}, nil
-}
-
-func routeNotFound(req events.APIGatewayV2HTTPRequest, path string, method string) (events.APIGatewayV2HTTPResponse, error) {
-	return events.APIGatewayV2HTTPResponse{
-		StatusCode: 404,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-		Body: fmt.Sprintf(`{"error":"Route not found","path":"%s","method":"%s","routeKey":"%s"}`,
-			path, method, req.RouteKey),
-	}, nil
+func healthCheck(c *gin.Context) {
+	c.String(http.StatusOK, "OK")
 }
 
 func main() {
