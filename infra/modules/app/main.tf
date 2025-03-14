@@ -46,7 +46,7 @@ resource "aws_lambda_function" "api" {
   environment {
     variables = {
       ENVIRONMENT = var.environment
-      DOGS_TABLE  = var.dogs_table_name
+      DOGS_TABLE_NAME  = var.dogs_table_name
     }
   }
 
