@@ -1,4 +1,4 @@
-module github.com/rhargreaves/dog-walking
+module github.com/rhargreaves/dog-walking/api
 
 go 1.23.1
 

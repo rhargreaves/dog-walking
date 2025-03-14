@@ -4,10 +4,10 @@ services:
       localstack:
         condition: service_healthy
     build:
-      context: .
+      context: api
       dockerfile: Dockerfile.sam
     volumes:
-      - .:/sam
+      - ./api:/sam
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "3000:3000"

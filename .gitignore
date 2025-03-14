@@ -30,4 +30,4 @@ plan.tfplan
 *.tfstate
 .terraform/
 
-out/
+api/build/

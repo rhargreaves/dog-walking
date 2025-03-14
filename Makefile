@@ -21,14 +21,14 @@ create-mod-cache:
 
 build: create-mod-cache lint
 	docker compose down
-	-rm -rf out
-	mkdir -p out
-	$(GO_CMD) "go mod download && \
-		GOOS=linux GOARCH=arm64 go build -o out/bootstrap main.go"
+	-rm -rf api/build
+	mkdir -p api/build
+	$(GO_CMD) "cd api && go mod download && \
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap main.go"
 .PHONY: build
 
 lint:
-	$(GO_CMD) "go fmt ./... && go mod tidy"
+	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"
 .PHONY: lint
 
 test-local: build
@@ -54,6 +54,6 @@ clean-cache:
 .PHONY: clean-cache
 
 clean: clean-cache
-	-rm -rf out
+	-rm -rf api/build
 	docker compose down --rmi all --volumes --remove-orphans
 .PHONY: clean
