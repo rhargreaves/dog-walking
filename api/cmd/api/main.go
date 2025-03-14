@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,11 +19,14 @@ func init() {
 	r := gin.Default()
 	r.Use(common.ErrorMiddleware)
 
+	dogRepository := dogs.NewDogRepository(os.Getenv("DOGS_TABLE_NAME"))
+	dogHandler := dogs.NewDogHandler(dogRepository)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
-	r.GET("/dogs", dogs.ListDogs)
-	r.POST("/dogs", dogs.PostDog)
+	r.GET("/dogs", dogHandler.ListDogs)
+	r.POST("/dogs", dogHandler.PostDog)
 
 	ginLambda = ginadapter.NewV2(r)
 }
