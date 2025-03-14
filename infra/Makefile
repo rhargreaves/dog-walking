@@ -1,42 +1,43 @@
 TERRAFORM_IMAGE := hashicorp/terraform:latest
-TF_ENV_VARS := -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
-	-e TF_VAR_hosted_zone_id
 TERRAFORM_WORKDIR := /workspace
 ENV ?= uat
 
 DOCKER_TF := docker run --rm \
-	-v $(shell pwd)/..:$(TERRAFORM_WORKDIR) \
+	-v $(shell pwd):$(TERRAFORM_WORKDIR) \
+	-v $(shell pwd)/../api/build:/build \
 	-w $(TERRAFORM_WORKDIR) \
-	$(TF_ENV_VARS) \
+	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
+	-e TF_VAR_hosted_zone_id \
+	-e TF_VAR_bootstrap_path=/build/bootstrap \
 	$(TERRAFORM_IMAGE)
 
 deploy: init plan apply
 .PHONY: deploy
 
 init:
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) init
+	$(DOCKER_TF) -chdir=environments/$(ENV) init
 .PHONY: init
 
 plan:
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) plan -out=plan.tfplan
+	$(DOCKER_TF) -chdir=environments/$(ENV) plan -out=plan.tfplan
 .PHONY: plan
 
 apply:
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) apply plan.tfplan
+	$(DOCKER_TF) -chdir=environments/$(ENV) apply plan.tfplan
 .PHONY: apply
 
 destroy:
 	mkdir -p ../api/build
-	touch ../api/build/bootstrap # dummy lambda artifact
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) destroy -auto-approve
+	touch ../api/build/bootstrap # need some artifact even if empty
+	$(DOCKER_TF) -chdir=environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
 
 validate:
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) validate
+	$(DOCKER_TF) -chdir=environments/$(ENV) validate
 .PHONY: validate
 
 unlock:
-	$(DOCKER_TF) -chdir=infra/environments/$(ENV) force-unlock -force $(TF_LOCK_ID)
+	$(DOCKER_TF) -chdir=environments/$(ENV) force-unlock -force $(TF_LOCK_ID)
 .PHONY: unlock
 
 fmt:

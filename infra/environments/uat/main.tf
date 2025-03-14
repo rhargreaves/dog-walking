@@ -34,5 +34,6 @@ module "app" {
   domain_name        = var.domain_name
   hosted_zone_id     = var.hosted_zone_id
   dynamodb_access_policy_arn = module.data.dynamodb_access_policy_arn
-  dogs_table_name = module.data.dogs_table_name
+  dogs_table_name    = module.data.dogs_table_name
+  bootstrap_path     = var.bootstrap_path
 }

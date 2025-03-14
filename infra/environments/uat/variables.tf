@@ -27,3 +27,8 @@ variable "hosted_zone_id" {
   type        = string
   description = "The Route53 hosted zone ID for the domain"
 }
+
+variable "bootstrap_path" {
+  description = "Path to the Lambda bootstrap binary"
+  type        = string
+}

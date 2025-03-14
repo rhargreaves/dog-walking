@@ -29,8 +29,8 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
 
 data "archive_file" "bootstrap" {
   type        = "zip"
-  source_file = "${path.module}/../../../api/build/bootstrap"
-  output_path = "${path.module}/../../../api/build/bootstrap.zip"
+  source_file = var.bootstrap_path
+  output_path = "${var.bootstrap_path}.zip"
 }
 
 resource "aws_lambda_function" "api" {

@@ -37,3 +37,8 @@ variable "dogs_table_name" {
   description = "Name of the DynamoDB table for dogs"
   type        = string
 }
+
+variable "bootstrap_path" {
+  description = "Path to the bootstrap file"
+  type        = string
+}
