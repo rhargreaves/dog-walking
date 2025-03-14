@@ -106,33 +106,21 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   payload_format_version = "2.0"
 }
 
-resource "aws_apigatewayv2_route" "ping_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /ping"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+locals {
+  routes = [
+    "GET /ping",
+    "POST /dogs",
+    "GET /dogs",
+    "GET /dogs/{id}",
+    "PUT /dogs/{id}"
+  ]
 }
 
-resource "aws_apigatewayv2_route" "dogs_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "POST /dogs"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
+resource "aws_apigatewayv2_route" "routes" {
+  for_each = { for route in local.routes : route => route }
 
-resource "aws_apigatewayv2_route" "dogs_list_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /dogs"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "dogs_get_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /dogs/{id}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "dogs_put_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "PUT /dogs/{id}"
+  route_key = each.value
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
