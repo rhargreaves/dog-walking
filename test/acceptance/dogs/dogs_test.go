@@ -22,7 +22,7 @@ func TestCreateDog_RejectsInvalidJson(t *testing.T) {
 	common.RequireStatus(t, resp, http.StatusBadRequest)
 }
 
-func TestGetDog_Exists(t *testing.T) {
+func TestGetDog_ReturnsDogWhenExists(t *testing.T) {
 	const dogName = "Rover"
 	createdDog := createDog(t, dogName)
 
@@ -37,7 +37,7 @@ func TestGetDog_Exists(t *testing.T) {
 	assert.Equal(t, createdDog.ID, fetchedDog.ID, "Expected dog ID to be returned")
 }
 
-func TestGetDog_ReturnsNotFoundForMissingDog(t *testing.T) {
+func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 	resp := common.Get(t, "/dogs/123")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
@@ -48,7 +48,7 @@ func TestGetDog_ReturnsNotFoundForMissingDog(t *testing.T) {
 		"Expected error message to be returned")
 }
 
-func TestUpdateDog_Exists(t *testing.T) {
+func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	dog := createDog(t, "Rover")
 
 	resp := common.PutJson(t, "/dogs/"+dog.ID, Dog{Name: "Rose"})
@@ -64,6 +64,12 @@ func TestUpdateDog_Exists(t *testing.T) {
 
 	assert.Equal(t, "Rose", fetchedDog.Name, "Expected updated dog name to be returned")
 	assert.Equal(t, dog.ID, fetchedDog.ID, "Expected dog ID to be returned")
+}
+
+func TestUpdateDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
+	resp := common.PutJson(t, "/dogs/123", Dog{Name: "Mr. Peanutbutter"})
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusNotFound)
 }
 
 func TestListDogs(t *testing.T) {

@@ -83,7 +83,14 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 
 	err := h.dogRepository.Update(id, &dog)
 	if err != nil {
-		c.Error(err)
+		if errors.Is(err, ErrDogNotFound) {
+			c.Error(common.APIError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			})
+		} else {
+			c.Error(err)
+		}
 		return
 	}
 

@@ -118,12 +118,18 @@ func (r *dogRepository) Update(id string, dog *Dog) error {
 				S: aws.String(dog.Name),
 			},
 		},
+		ReturnValues: aws.String("ALL_OLD"),
 	}
 
-	_, err := r.dynamoDB.UpdateItem(input)
+	result, err := r.dynamoDB.UpdateItem(input)
 	if err != nil {
 		return fmt.Errorf("failed to update dog: %w", err)
 	}
+
+	if len(result.Attributes) == 0 {
+		return ErrDogNotFound
+	}
+
 	return nil
 }
 
