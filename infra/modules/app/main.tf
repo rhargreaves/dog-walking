@@ -124,6 +124,12 @@ resource "aws_apigatewayv2_route" "dogs_list_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+resource "aws_apigatewayv2_route" "dogs_get_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /dogs/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
 resource "aws_lambda_permission" "api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"

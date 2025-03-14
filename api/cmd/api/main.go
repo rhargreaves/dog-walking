@@ -26,7 +26,8 @@ func init() {
 		c.String(http.StatusOK, "OK")
 	})
 	r.GET("/dogs", dogHandler.ListDogs)
-	r.POST("/dogs", dogHandler.PostDog)
+	r.GET("/dogs/:id", dogHandler.GetDog)
+	r.POST("/dogs", dogHandler.CreateDog)
 
 	ginLambda = ginadapter.NewV2(r)
 }

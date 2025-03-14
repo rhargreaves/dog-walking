@@ -8,8 +8,9 @@ import (
 )
 
 type DogHandler interface {
-	PostDog(c *gin.Context)
+	CreateDog(c *gin.Context)
 	ListDogs(c *gin.Context)
+	GetDog(c *gin.Context)
 }
 
 type dogHandler struct {
@@ -20,7 +21,7 @@ func NewDogHandler(dogRepository DogRepository) DogHandler {
 	return &dogHandler{dogRepository: dogRepository}
 }
 
-func (h *dogHandler) PostDog(c *gin.Context) {
+func (h *dogHandler) CreateDog(c *gin.Context) {
 	var dog Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
 		c.Error(common.APIError{
@@ -47,4 +48,15 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dogs)
+}
+
+func (h *dogHandler) GetDog(c *gin.Context) {
+	id := c.Param("id")
+	dog, err := h.dogRepository.Get(id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dog)
 }

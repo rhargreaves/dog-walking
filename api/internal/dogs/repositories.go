@@ -15,6 +15,7 @@ import (
 type DogRepository interface {
 	Create(dog *Dog) error
 	List() ([]Dog, error)
+	Get(id string) (*Dog, error)
 }
 
 type dogRepository struct {
@@ -66,6 +67,34 @@ func (r *dogRepository) List() ([]Dog, error) {
 	}
 
 	return dogs, nil
+}
+
+func (r *dogRepository) Get(id string) (*Dog, error) {
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String(r.tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+	}
+
+	result, err := r.dynamoDB.GetItem(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get dog: %w", err)
+	}
+
+	if result.Item == nil {
+		return nil, fmt.Errorf("dog not found")
+	}
+
+	var dog Dog
+	err = dynamodbattribute.UnmarshalMap(result.Item, &dog)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal dog: %w", err)
+	}
+
+	return &dog, nil
 }
 
 func createSession() (*session.Session, error) {

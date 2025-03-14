@@ -40,6 +40,39 @@ func TestDogsCreateDog(t *testing.T) {
 	assert.NotEmpty(t, dogs.ID, "Expected dog ID to be returned")
 }
 
+func TestDogsGetDog(t *testing.T) {
+	const dogName = "Rover"
+
+	resp := postJson(t, "/dogs", Dog{Name: dogName})
+	defer resp.Body.Close()
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
+
+	if resp.StatusCode >= http.StatusInternalServerError {
+		logResponseBody(t, resp)
+	}
+
+	var dog Dog
+	err := json.NewDecoder(resp.Body).Decode(&dog)
+	require.NoError(t, err, "Failed to decode response body")
+
+	assert.Equal(t, dogName, dog.Name, "Expected dog name to be returned")
+
+	id := dog.ID
+	resp = get(t, "/dogs/"+id)
+	defer resp.Body.Close()
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
+
+	if resp.StatusCode >= http.StatusInternalServerError {
+		logResponseBody(t, resp)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&dog)
+	require.NoError(t, err, "Failed to decode response body")
+
+	assert.Equal(t, dogName, dog.Name, "Expected dog name to be returned")
+	assert.Equal(t, id, dog.ID, "Expected dog ID to be returned")
+}
+
 func TestDogsListDogs(t *testing.T) {
 	resp := get(t, "/dogs")
 	defer resp.Body.Close()
