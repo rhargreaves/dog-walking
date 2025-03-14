@@ -7,8 +7,9 @@ services:
       context: api
       dockerfile: Dockerfile.sam
     volumes:
-      - ./api:/sam
+      - ${WORKDIR}/api:${WORKDIR}/api
       - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: ${WORKDIR}/api
     ports:
       - "3000:3000"
     healthcheck:
@@ -27,8 +28,9 @@ services:
       --host 0.0.0.0
       --container-host-interface 0.0.0.0
       --container-host ${CONTAINER_HOST}
-      --docker-volume-basedir ${WORKDIR}
       --docker-network dog-walking_default
+      --skip-pull-image
+      --warm-containers EAGER
 
   localstack:
     image: localstack/localstack:latest
