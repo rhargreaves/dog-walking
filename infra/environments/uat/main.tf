@@ -24,8 +24,8 @@ module "data" {
   environment = var.environment
 }
 
-module "app" {
-  source = "../../modules/app"
+module "api" {
+  source = "../../modules/api"
 
   environment        = var.environment
   application_name   = var.application_name
