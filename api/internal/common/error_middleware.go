@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ func (e APIError) Error() string {
 	return e.Message
 }
 
-func errorMiddleware(c *gin.Context) {
+func ErrorMiddleware(c *gin.Context) {
 	c.Next()
 
 	if len(c.Errors) > 0 {

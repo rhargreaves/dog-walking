@@ -8,19 +8,21 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
+	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs"
 )
 
 var ginLambda *ginadapter.GinLambdaV2
 
 func init() {
 	r := gin.Default()
-	r.Use(errorMiddleware)
+	r.Use(common.ErrorMiddleware)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
-	r.GET("/dogs", listDogs)
-	r.POST("/dogs", postDog)
+	r.GET("/dogs", dogs.ListDogs)
+	r.POST("/dogs", dogs.PostDog)
 
 	ginLambda = ginadapter.NewV2(r)
 }

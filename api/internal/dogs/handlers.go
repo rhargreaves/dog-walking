@@ -1,8 +1,7 @@
-package main
+package dogs
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -13,13 +12,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/rhargreaves/dog-walking/api/models"
+	"github.com/rhargreaves/dog-walking/api/internal/common"
 )
 
-func postDog(c *gin.Context) {
-	var dog models.Dog
+func PostDog(c *gin.Context) {
+	var dog Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
-		c.Error(APIError{
+		c.Error(common.APIError{
 			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		})
@@ -35,12 +34,11 @@ func postDog(c *gin.Context) {
 	c.JSON(http.StatusOK, dog)
 }
 
-func storeDog(dog *models.Dog) error {
+func storeDog(dog *Dog) error {
 	svc := dynamodb.New(session.Must(createSession()))
 	dog.ID = uuid.New().String()
 
 	tableName := os.Getenv("DOGS_TABLE_NAME")
-	fmt.Printf("Storing dog in table %s\n", tableName)
 
 	input := &dynamodb.PutItemInput{
 		TableName: aws.String(tableName),
@@ -56,14 +54,12 @@ func storeDog(dog *models.Dog) error {
 
 	_, err := svc.PutItem(input)
 	if err != nil {
-		log.Printf("Error persisting dog to DynamoDB: %s", err)
 		return err
 	}
-
 	return nil
 }
 
-func listDogs(c *gin.Context) {
+func ListDogs(c *gin.Context) {
 	svc := dynamodb.New(session.Must(createSession()))
 
 	input := &dynamodb.ScanInput{
@@ -72,14 +68,14 @@ func listDogs(c *gin.Context) {
 
 	result, err := svc.Scan(input)
 	if err != nil {
-		c.Error(fmt.Errorf("Failed to scan dogs table: %s", err.Error()))
+		c.Error(fmt.Errorf("failed to scan dogs table: %s", err.Error()))
 		return
 	}
 
-	var dogs []models.Dog
+	var dogs []Dog
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
 	if err != nil {
-		c.Error(fmt.Errorf("Failed to unmarshal dogs: %s", err.Error()))
+		c.Error(fmt.Errorf("failed to unmarshal dogs: %s", err.Error()))
 		return
 	}
 

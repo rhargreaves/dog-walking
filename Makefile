@@ -24,7 +24,7 @@ build: create-mod-cache lint
 	-rm -rf api/build
 	mkdir -p api/build
 	$(GO_CMD) "cd api && go mod download && \
-		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
 .PHONY: build
 
 lint:
