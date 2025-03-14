@@ -12,6 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func BaseUrl() string {
 	return os.Getenv("API_BASE_URL")
 }

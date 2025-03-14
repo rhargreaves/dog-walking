@@ -37,6 +37,17 @@ func TestGetDog_Exists(t *testing.T) {
 	assert.Equal(t, createdDog.ID, fetchedDog.ID, "Expected dog ID to be returned")
 }
 
+func TestGetDog_ReturnsNotFoundForMissingDog(t *testing.T) {
+	resp := common.Get(t, "/dogs/123")
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusNotFound)
+
+	var errorResponse common.ErrorResponse
+	common.DecodeJSON(t, resp, &errorResponse)
+	assert.Equal(t, "dog not found", errorResponse.Error,
+		"Expected error message to be returned")
+}
+
 func TestUpdateDog_Exists(t *testing.T) {
 	dog := createDog(t, "Rover")
 

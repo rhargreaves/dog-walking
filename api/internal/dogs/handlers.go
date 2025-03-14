@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -55,7 +56,14 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 	id := c.Param("id")
 	dog, err := h.dogRepository.Get(id)
 	if err != nil {
-		c.Error(err)
+		if errors.Is(err, ErrDogNotFound) {
+			c.Error(common.APIError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			})
+		} else {
+			c.Error(err)
+		}
 		return
 	}
 

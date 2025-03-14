@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -11,6 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
 )
+
+var ErrDogNotFound = errors.New("dog not found")
 
 type DogRepository interface {
 	Create(dog *Dog) error
@@ -86,7 +89,7 @@ func (r *dogRepository) Get(id string) (*Dog, error) {
 	}
 
 	if result.Item == nil {
-		return nil, fmt.Errorf("dog not found")
+		return nil, ErrDogNotFound
 	}
 
 	var dog Dog
