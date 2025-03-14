@@ -53,7 +53,7 @@ func TestDogsListDogs(t *testing.T) {
 	err := json.NewDecoder(resp.Body).Decode(&dogs)
 	require.NoError(t, err, "Failed to decode response body")
 
-	require.GreaterOrEqual(t, 1, len(dogs), "Expected at least 1 dog to be returned")
+	require.GreaterOrEqual(t, len(dogs), 1, "Expected at least 1 dog to be returned")
 	require.NotEmpty(t, dogs[0].ID, "Expected dog ID to be returned")
 }
 
