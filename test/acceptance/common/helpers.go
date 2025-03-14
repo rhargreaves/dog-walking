@@ -34,6 +34,23 @@ func PostJson(t *testing.T, endpoint string, body interface{}) *http.Response {
 	return PostBytes(t, endpoint, jsonBody)
 }
 
+func PutBytes(t *testing.T, endpoint string, body []byte) *http.Response {
+	req, err := http.NewRequest(http.MethodPut, BaseUrl()+endpoint, bytes.NewBuffer(body))
+	require.NoError(t, err, "Failed to create PUT request")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.NoError(t, err, "Failed to PUT to URL")
+	return resp
+}
+
+func PutJson(t *testing.T, endpoint string, body interface{}) *http.Response {
+	jsonBody, err := json.Marshal(body)
+	require.NoError(t, err, "Failed to marshal body")
+	return PutBytes(t, endpoint, jsonBody)
+}
+
 func RequireStatus(t *testing.T, resp *http.Response, expectedStatus int) {
 	assert.Equal(t, expectedStatus, resp.StatusCode,
 		"Expected status code %d", expectedStatus)

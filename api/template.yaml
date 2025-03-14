@@ -37,3 +37,8 @@ Resources:
           Properties:
             Path: /dogs
             Method: GET
+        DogsPutAPI:
+          Type: HttpApi
+          Properties:
+            Path: /dogs/{id}
+            Method: PUT

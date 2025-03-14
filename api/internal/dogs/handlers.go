@@ -11,6 +11,7 @@ type DogHandler interface {
 	CreateDog(c *gin.Context)
 	ListDogs(c *gin.Context)
 	GetDog(c *gin.Context)
+	UpdateDog(c *gin.Context)
 }
 
 type dogHandler struct {
@@ -53,6 +54,26 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 func (h *dogHandler) GetDog(c *gin.Context) {
 	id := c.Param("id")
 	dog, err := h.dogRepository.Get(id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dog)
+}
+
+func (h *dogHandler) UpdateDog(c *gin.Context) {
+	id := c.Param("id")
+	var dog Dog
+	if err := c.ShouldBindJSON(&dog); err != nil {
+		c.Error(common.APIError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err := h.dogRepository.Update(id, &dog)
 	if err != nil {
 		c.Error(err)
 		return

@@ -37,6 +37,24 @@ func TestGetDog_Exists(t *testing.T) {
 	assert.Equal(t, createdDog.ID, fetchedDog.ID, "Expected dog ID to be returned")
 }
 
+func TestUpdateDog_Exists(t *testing.T) {
+	dog := createDog(t, "Rover")
+
+	resp := common.PutJson(t, "/dogs/"+dog.ID, Dog{Name: "Rose"})
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	resp = common.Get(t, "/dogs/"+dog.ID)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	var fetchedDog Dog
+	common.DecodeJSON(t, resp, &fetchedDog)
+
+	assert.Equal(t, "Rose", fetchedDog.Name, "Expected updated dog name to be returned")
+	assert.Equal(t, dog.ID, fetchedDog.ID, "Expected dog ID to be returned")
+}
+
 func TestListDogs(t *testing.T) {
 	createDog(t, "ListTest")
 

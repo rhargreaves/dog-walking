@@ -16,6 +16,7 @@ type DogRepository interface {
 	Create(dog *Dog) error
 	List() ([]Dog, error)
 	Get(id string) (*Dog, error)
+	Update(id string, dog *Dog) error
 }
 
 type dogRepository struct {
@@ -95,6 +96,32 @@ func (r *dogRepository) Get(id string) (*Dog, error) {
 	}
 
 	return &dog, nil
+}
+
+func (r *dogRepository) Update(id string, dog *Dog) error {
+	input := &dynamodb.UpdateItemInput{
+		TableName: aws.String(r.tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+		ExpressionAttributeNames: map[string]*string{
+			"#n": aws.String("name"),
+		},
+		UpdateExpression: aws.String("set #n = :name"),
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":name": {
+				S: aws.String(dog.Name),
+			},
+		},
+	}
+
+	_, err := r.dynamoDB.UpdateItem(input)
+	if err != nil {
+		return fmt.Errorf("failed to update dog: %w", err)
+	}
+	return nil
 }
 
 func createSession() (*session.Session, error) {
