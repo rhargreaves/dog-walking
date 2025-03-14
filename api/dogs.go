@@ -19,13 +19,16 @@ import (
 func postDog(c *gin.Context) {
 	var dog models.Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(APIError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
 		return
 	}
 
 	err := storeDog(&dog)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Error(err)
 		return
 	}
 
@@ -65,24 +68,18 @@ func listDogs(c *gin.Context) {
 
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(os.Getenv("DOGS_TABLE_NAME")),
-		Limit:     aws.Int64(5),
 	}
 
 	result, err := svc.Scan(input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to scan dogs table: %s", err.Error())})
-		return
-	}
-
-	if len(result.Items) == 0 {
-		c.JSON(http.StatusOK, []models.Dog{})
+		c.Error(fmt.Errorf("Failed to scan dogs table: %s", err.Error()))
 		return
 	}
 
 	var dogs []models.Dog
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to unmarshal dogs: %s", err.Error())})
+		c.Error(fmt.Errorf("Failed to unmarshal dogs: %s", err.Error()))
 		return
 	}
 
@@ -99,10 +96,10 @@ func createSession() (*session.Session, error) {
 	fmt.Printf("Creating config for region %s\n", *config.Region)
 
 	if useLocalStack {
-		fmt.Printf("Setting endpoint to %s\n", os.Getenv("AWS_ENDPOINT_URL"))
 		config.Endpoint = aws.String(os.Getenv("AWS_ENDPOINT_URL"))
 		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
 		config.DisableSSL = aws.Bool(true)
+		fmt.Printf("Setting endpoint to %s\n", *config.Endpoint)
 	}
 
 	return session.NewSession(config)

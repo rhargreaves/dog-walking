@@ -14,11 +14,11 @@ var ginLambda *ginadapter.GinLambdaV2
 
 func init() {
 	r := gin.Default()
+	r.Use(errorMiddleware)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
-
 	r.GET("/dogs", listDogs)
 	r.POST("/dogs", postDog)
 
