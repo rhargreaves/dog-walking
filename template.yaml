@@ -7,8 +7,15 @@ Resources:
       CodeUri: out/
       Handler: bootstrap
       Runtime: provided.al2023
+      Environment:
+        Variables:
+          USE_LOCALSTACK: true
+          AWS_REGION: us-east-1
+          AWS_ENDPOINT_URL: http://localstack:4566
+          DOGS_TABLE_NAME: local-dogs
       Architectures:
         - arm64
+      Timeout: 30
       Events:
         PingAPI:
           Type: HttpApi

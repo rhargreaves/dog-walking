@@ -1,5 +1,8 @@
 services:
   sam:
+    depends_on:
+      localstack:
+        condition: service_healthy
     build:
       context: .
       dockerfile: Dockerfile.sam
@@ -13,15 +16,36 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
-      start_period: 10s
     environment:
       - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=10
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
     command: >
       local start-api
       --host 0.0.0.0
       --container-host-interface 0.0.0.0
       --container-host ${CONTAINER_HOST}
       --docker-volume-basedir ${WORKDIR}
+      --docker-network dog-walking_default
+
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb
+      - DEBUG=1
+      - LS_LOG=trace
+      - GATEWAY_LISTEN=0.0.0.0:4566
+    volumes:
+      - ./infra/localstack:/etc/localstack/init/ready.d
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 3
 
   acceptance-test:
     build:
