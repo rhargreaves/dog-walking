@@ -19,10 +19,53 @@ type DogRepository interface {
 
 type dogRepository struct {
 	tableName string
+	dynamoDB  *dynamodb.DynamoDB
 }
 
 func NewDogRepository(tableName string) DogRepository {
-	return &dogRepository{tableName: tableName}
+	dynamoDB := dynamodb.New(session.Must(createSession()))
+	return &dogRepository{tableName: tableName, dynamoDB: dynamoDB}
+}
+
+func (r *dogRepository) Create(dog *Dog) error {
+	dog.ID = uuid.New().String()
+
+	input := &dynamodb.PutItemInput{
+		TableName: aws.String(r.tableName),
+		Item: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(dog.ID),
+			},
+			"name": {
+				S: aws.String(dog.Name),
+			},
+		},
+	}
+
+	_, err := r.dynamoDB.PutItem(input)
+	if err != nil {
+		return fmt.Errorf("failed to put dog: %w", err)
+	}
+	return nil
+}
+
+func (r *dogRepository) List() ([]Dog, error) {
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(r.tableName),
+	}
+
+	result, err := r.dynamoDB.Scan(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan dogs table: %w", err)
+	}
+
+	var dogs []Dog
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
+	}
+
+	return dogs, nil
 }
 
 func createSession() (*session.Session, error) {
@@ -42,47 +85,4 @@ func createSession() (*session.Session, error) {
 	}
 
 	return session.NewSession(config)
-}
-
-func (r *dogRepository) Create(dog *Dog) error {
-	svc := dynamodb.New(session.Must(createSession()))
-	dog.ID = uuid.New().String()
-
-	input := &dynamodb.PutItemInput{
-		TableName: aws.String(r.tableName),
-		Item: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(dog.ID),
-			},
-			"name": {
-				S: aws.String(dog.Name),
-			},
-		},
-	}
-
-	_, err := svc.PutItem(input)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *dogRepository) List() ([]Dog, error) {
-	svc := dynamodb.New(session.Must(createSession()))
-
-	input := &dynamodb.ScanInput{
-		TableName: aws.String(r.tableName),
-	}
-
-	result, err := svc.Scan(input)
-	if err != nil {
-		return nil, err
-	}
-
-	var dogs []Dog
-	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
-	if err != nil {
-		return nil, err
-	}
-	return dogs, nil
 }
