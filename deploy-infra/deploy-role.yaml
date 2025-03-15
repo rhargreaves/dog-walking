@@ -59,9 +59,7 @@ Resources:
               - iam:DeletePolicy
               - iam:TagRole
             Resource:
-              - !Sub arn:aws:iam::${AWS::AccountId}:role/${RoleName}
               - !Sub arn:aws:iam::${AWS::AccountId}:role/*-dog-walking-*
-              - !Sub arn:aws:iam::${AWS::AccountId}:policy/DogWalkingDeploymentPolicy
               - !Sub arn:aws:iam::${AWS::AccountId}:policy/*-dog-walking-*
 
           - Effect: Allow
