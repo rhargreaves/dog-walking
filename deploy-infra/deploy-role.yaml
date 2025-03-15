@@ -33,6 +33,7 @@ Resources:
               - dynamodb:UpdateTable
               - dynamodb:TagResource
               - dynamodb:UpdateContinuousBackups
+              - dynamodb:DescribeContinuousBackups
             Resource: !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*-dogs
 
           - Effect: Allow
@@ -71,6 +72,7 @@ Resources:
             Action:
               - ec2:ModifyVpcAttribute
               - ec2:DescribeAddressesAttribute
+              - ec2:DescribeVpcAttribute
               - ec2:CreateVpc
               - ec2:DeleteVpc
               - ec2:CreateSubnet
@@ -117,6 +119,7 @@ Resources:
               - logs:PutRetentionPolicy
               - logs:DescribeLogGroups
               - logs:TagLogGroup
+              - logs:ListTagsForResource
             Resource: "*"
 
           - Effect: Allow
