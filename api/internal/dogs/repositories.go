@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -106,16 +107,17 @@ func (r *dogRepository) Update(id string, dog *Dog) error {
 				S: aws.String(dog.Name),
 			},
 		},
-		ReturnValues: aws.String("ALL_OLD"),
+		ConditionExpression: aws.String("attribute_exists(id)"),
 	}
 
-	result, err := r.dynamoDB.UpdateItem(input)
+	_, err := r.dynamoDB.UpdateItem(input)
 	if err != nil {
+		var awsErr awserr.Error
+		if errors.As(err, &awsErr) && awsErr.Code() ==
+			dynamodb.ErrCodeConditionalCheckFailedException {
+			return ErrDogNotFound
+		}
 		return fmt.Errorf("failed to update dog: %w", err)
-	}
-
-	if len(result.Attributes) == 0 {
-		return ErrDogNotFound
 	}
 
 	return nil

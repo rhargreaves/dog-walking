@@ -70,6 +70,10 @@ func TestUpdateDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 	resp := common.PutJson(t, "/dogs/123", Dog{Name: "Mr. Peanutbutter"})
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
+
+	resp = common.Get(t, "/dogs/123")
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusNotFound)
 }
 
 func TestListDogs(t *testing.T) {
