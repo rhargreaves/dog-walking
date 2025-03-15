@@ -47,6 +47,10 @@ make apply
 make destroy
 ```
 
+## CI/CD
+
+Deployed using GitHub Actions. There's a CloudFormation template in [deploy-infra](deploy-infra) for setting up a IAM role to deploy this service.
+
 ## Proof-of-concept tradeoffs
 
 Key differences between this project and a real-life deployment:
