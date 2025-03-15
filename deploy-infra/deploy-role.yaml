@@ -27,14 +27,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - dynamodb:CreateTable
-              - dynamodb:DeleteTable
-              - dynamodb:DescribeTable
-              - dynamodb:UpdateTable
-              - dynamodb:TagResource
-              - dynamodb:UpdateContinuousBackups
-              - dynamodb:DescribeContinuousBackups
-              - dynamodb:DescribeTimeToLive
+              - dynamodb:*
             Resource: !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*-dogs
 
           - Effect: Allow
