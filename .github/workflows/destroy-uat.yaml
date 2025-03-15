@@ -29,9 +29,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Terraform Init
-        run: |
-          mkdir -p ../api/build
-          make init
+        run: make init
 
       - name: Terraform Destroy
         run: make destroy
