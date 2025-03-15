@@ -32,13 +32,7 @@ Resources:
 
           - Effect: Allow
             Action:
-              - lambda:CreateFunction
-              - lambda:DeleteFunction
-              - lambda:GetFunction
-              - lambda:UpdateFunctionCode
-              - lambda:UpdateFunctionConfiguration
-              - lambda:AddPermission
-              - lambda:RemovePermission
+              - lambda:*
             Resource: !Sub arn:aws:lambda:*:${AWS::AccountId}:function:*-dog-walking-api
 
           - Effect: Allow
@@ -55,9 +49,17 @@ Resources:
               - iam:DeleteRolePolicy
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
+              - iam:TagPolicy
+              - iam:GetPolicy
               - iam:CreatePolicy
               - iam:DeletePolicy
               - iam:TagRole
+              - iam:ListRolePolicies
+              - iam:ListAttachedRolePolicies
+              - iam:GetPolicyVersion
+              - iam:ListInstanceProfilesForRole
+              - iam:ListPolicyVersions
+              - iam:PassRole
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/*-dog-walking-*
               - !Sub arn:aws:iam::${AWS::AccountId}:policy/*-dog-walking-*
@@ -97,6 +99,10 @@ Resources:
               - ec2:DescribeSecurityGroups
               - ec2:DescribeAddresses
               - ec2:RevokeSecurityGroupEgress
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeNetworkAcls
+              - ec2:DisassociateAddress
+              - ec2:AuthorizeSecurityGroupEgress
             Resource: "*"
 
           - Effect: Allow
@@ -118,6 +124,11 @@ Resources:
               - logs:TagLogGroup
               - logs:ListTagsForResource
               - logs:CreateLogDelivery
+              - logs:DescribeLogDeliveries
+              - logs:DeleteLogDelivery
+              - logs:PutLogDelivery
+              - logs:GetLogDelivery
+              - logs:ListLogDeliveries
             Resource: "*"
 
           - Effect: Allow
@@ -126,6 +137,8 @@ Resources:
               - s3:GetObject
               - s3:PutObject
               - s3:DeleteObject
+              - s3:GetBucketOwnershipControls
+              - s3:GetBucketVersioning
             Resource:
               - !Sub arn:aws:s3:::${TerraformStateBucket}
               - !Sub arn:aws:s3:::${TerraformStateBucket}/*
@@ -138,6 +151,11 @@ Resources:
               - acm:ListTagsForCertificate
               - acm:AddTagsToCertificate
             Resource: !Sub arn:aws:acm:*:${AWS::AccountId}:certificate/*
+
+          - Effect: Allow
+            Action:
+              - sts:GetCallerIdentity
+            Resource: "*"
 
   GitHubActionsRole:
     Type: AWS::IAM::Role
