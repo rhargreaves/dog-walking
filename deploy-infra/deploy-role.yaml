@@ -60,7 +60,9 @@ Resources:
               - iam:TagRole
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/${RoleName}
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/*-dog-walking-*
               - !Sub arn:aws:iam::${AWS::AccountId}:policy/DogWalkingDeploymentPolicy
+              - !Sub arn:aws:iam::${AWS::AccountId}:policy/*-dog-walking-*
 
           - Effect: Allow
             Action:
@@ -96,6 +98,7 @@ Resources:
               - ec2:DescribeNatGateways
               - ec2:DescribeSecurityGroups
               - ec2:DescribeAddresses
+              - ec2:RevokeSecurityGroupEgress
             Resource: "*"
 
           - Effect: Allow
@@ -104,7 +107,9 @@ Resources:
               - route53:GetChange
               - route53:ListResourceRecordSets
               - route53:GetHostedZone
-            Resource: arn:aws:route53:::hostedzone/*
+            Resource:
+              - arn:aws:route53:::hostedzone/*
+              - arn:aws:route53:::change/*
 
           - Effect: Allow
             Action:
@@ -114,6 +119,7 @@ Resources:
               - logs:DescribeLogGroups
               - logs:TagLogGroup
               - logs:ListTagsForResource
+              - logs:CreateLogDelivery
             Resource: "*"
 
           - Effect: Allow
