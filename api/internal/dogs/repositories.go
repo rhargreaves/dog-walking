@@ -38,12 +38,8 @@ func (r *dogRepository) Create(dog *Dog) error {
 	input := &dynamodb.PutItemInput{
 		TableName: aws.String(r.tableName),
 		Item: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(dog.ID),
-			},
-			"name": {
-				S: aws.String(dog.Name),
-			},
+			"id":   {S: aws.String(dog.ID)},
+			"name": {S: aws.String(dog.Name)},
 		},
 	}
 
@@ -76,11 +72,7 @@ func (r *dogRepository) List() ([]Dog, error) {
 func (r *dogRepository) Get(id string) (*Dog, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(r.tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(id),
-			},
-		},
+		Key:       createKey(id),
 	}
 
 	result, err := r.dynamoDB.GetItem(input)
@@ -104,11 +96,7 @@ func (r *dogRepository) Get(id string) (*Dog, error) {
 func (r *dogRepository) Update(id string, dog *Dog) error {
 	input := &dynamodb.UpdateItemInput{
 		TableName: aws.String(r.tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(id),
-			},
-		},
+		Key:       createKey(id),
 		ExpressionAttributeNames: map[string]*string{
 			"#n": aws.String("name"),
 		},
@@ -150,4 +138,12 @@ func createSession() (*session.Session, error) {
 	}
 
 	return session.NewSession(config)
+}
+
+func createKey(id string) map[string]*dynamodb.AttributeValue {
+	return map[string]*dynamodb.AttributeValue{
+		"id": {
+			S: aws.String(id),
+		},
+	}
 }
