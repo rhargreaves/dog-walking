@@ -34,6 +34,7 @@ Resources:
               - dynamodb:TagResource
               - dynamodb:UpdateContinuousBackups
               - dynamodb:DescribeContinuousBackups
+              - dynamodb:DescribeTimeToLive
             Resource: !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*-dogs
 
           - Effect: Allow
