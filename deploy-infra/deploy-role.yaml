@@ -32,6 +32,7 @@ Resources:
               - dynamodb:DescribeTable
               - dynamodb:UpdateTable
               - dynamodb:TagResource
+              - dynamodb:UpdateContinuousBackups
             Resource: !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*-dogs
 
           - Effect: Allow
@@ -61,12 +62,15 @@ Resources:
               - iam:DetachRolePolicy
               - iam:CreatePolicy
               - iam:DeletePolicy
+              - iam:TagRole
             Resource:
-              - !Sub arn:aws:iam::${AWS::AccountId}:role/*-dog-walking-*
-              - !Sub arn:aws:iam::${AWS::AccountId}:policy/*-dog-walking-*
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/${RoleName}
+              - !Sub arn:aws:iam::${AWS::AccountId}:policy/DogWalkingDeploymentPolicy
 
           - Effect: Allow
             Action:
+              - ec2:ModifyVpcAttribute
+              - ec2:DescribeAddressesAttribute
               - ec2:CreateVpc
               - ec2:DeleteVpc
               - ec2:CreateSubnet
@@ -100,18 +104,10 @@ Resources:
 
           - Effect: Allow
             Action:
-              - acm:RequestCertificate
-              - acm:DeleteCertificate
-              - acm:DescribeCertificate
-              - acm:ListTagsForCertificate
-              - acm:AddTagsToCertificate
-            Resource: !Sub arn:aws:acm:*:${AWS::AccountId}:certificate/*
-
-          - Effect: Allow
-            Action:
               - route53:ChangeResourceRecordSets
               - route53:GetChange
               - route53:ListResourceRecordSets
+              - route53:GetHostedZone
             Resource: arn:aws:route53:::hostedzone/*
 
           - Effect: Allow
@@ -121,7 +117,7 @@ Resources:
               - logs:PutRetentionPolicy
               - logs:DescribeLogGroups
               - logs:TagLogGroup
-            Resource: !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/apigateway/*
+            Resource: "*"
 
           - Effect: Allow
             Action:
@@ -132,6 +128,15 @@ Resources:
             Resource:
               - !Sub arn:aws:s3:::${TerraformStateBucket}
               - !Sub arn:aws:s3:::${TerraformStateBucket}/*
+
+          - Effect: Allow
+            Action:
+              - acm:RequestCertificate
+              - acm:DeleteCertificate
+              - acm:DescribeCertificate
+              - acm:ListTagsForCertificate
+              - acm:AddTagsToCertificate
+            Resource: !Sub arn:aws:acm:*:${AWS::AccountId}:certificate/*
 
   GitHubActionsRole:
     Type: AWS::IAM::Role
