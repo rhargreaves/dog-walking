@@ -17,7 +17,7 @@ type Dog struct {
 func createDog(t *testing.T, name string) Dog {
 	resp := common.PostJson(t, "/dogs", Dog{Name: name})
 	defer resp.Body.Close()
-	common.RequireStatus(t, resp, http.StatusOK)
+	common.RequireStatus(t, resp, http.StatusCreated)
 
 	var dog Dog
 	common.DecodeJSON(t, resp, &dog)

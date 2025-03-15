@@ -35,7 +35,7 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dog)
+	c.JSON(http.StatusCreated, dog)
 }
 
 func (h *dogHandler) ListDogs(c *gin.Context) {
