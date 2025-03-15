@@ -27,7 +27,6 @@ apply:
 .PHONY: apply
 
 destroy:
-	mkdir -p ../api/build
 	touch ../api/build/bootstrap # need some artifact even if empty
 	$(DOCKER_TF) -chdir=environments/$(ENV) destroy -auto-approve
 .PHONY: destroy
