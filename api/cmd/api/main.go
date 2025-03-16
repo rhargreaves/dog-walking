@@ -22,6 +22,9 @@ func init() {
 	dogRepository := dogs.NewDogRepository(os.Getenv("DOGS_TABLE_NAME"))
 	dogHandler := dogs.NewDogHandler(dogRepository)
 
+	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"))
+	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
@@ -30,7 +33,7 @@ func init() {
 	r.POST("/dogs", dogHandler.CreateDog)
 	r.PUT("/dogs/:id", dogHandler.UpdateDog)
 	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
-	r.PUT("/dogs/:id/photo", dogHandler.UploadDogPhoto)
+	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
 
 	ginLambda = ginadapter.NewV2(r)
 }
