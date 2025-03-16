@@ -74,3 +74,7 @@ services:
     container_name: acceptance-test-local
     environment:
       - API_BASE_URL=http://sam:3000
+      - AWS_REGION
+      - USE_LOCALSTACK=true
+      - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566
+      - DOG_IMAGES_BUCKET=local-dog-images

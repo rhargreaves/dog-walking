@@ -1,7 +1,7 @@
 package dogs
 
 import (
-	"fmt"
+	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -36,8 +36,8 @@ func createDog(t *testing.T, name string) Dog {
 	return dog
 }
 
-func uploadFile(t *testing.T, url string, file *os.File, contentType string) {
-	req, err := http.NewRequest("PUT", url, file)
+func putBytes(t *testing.T, url string, body []byte, contentType string) *http.Response {
+	req, err := http.NewRequest("PUT", url, bytes.NewReader(body))
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", contentType)
 
@@ -45,8 +45,7 @@ func uploadFile(t *testing.T, url string, file *os.File, contentType string) {
 	resp, err := client.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	return resp
 }
 
 func createS3Session() (*session.Session, error) {
@@ -62,19 +61,6 @@ func createS3Session() (*session.Session, error) {
 	return session.NewSession(&aws.Config{
 		Region: &region,
 	})
-}
-
-func requireS3ObjectExists(t *testing.T, bucket string, key string) {
-	sess, err := createS3Session()
-	require.NoError(t, err)
-
-	s3Client := s3.New(sess)
-	_, err = s3Client.HeadObject(&s3.HeadObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-	require.NoError(t, err,
-		fmt.Sprintf("Object should exist in S3 bucket: %s key: %s", bucket, key))
 }
 
 func getS3Object(t *testing.T, bucket string, key string) []byte {
