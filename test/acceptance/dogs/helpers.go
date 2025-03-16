@@ -2,6 +2,7 @@ package dogs
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -35,6 +36,19 @@ func createDog(t *testing.T, name string) Dog {
 	return dog
 }
 
+func uploadFile(t *testing.T, url string, file *os.File, contentType string) {
+	req, err := http.NewRequest("PUT", url, file)
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
 func createS3Session() (*session.Session, error) {
 	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
 	region := os.Getenv("AWS_REGION")
@@ -61,4 +75,22 @@ func requireS3ObjectExists(t *testing.T, bucket string, key string) {
 	})
 	require.NoError(t, err,
 		fmt.Sprintf("Object should exist in S3 bucket: %s key: %s", bucket, key))
+}
+
+func getS3Object(t *testing.T, bucket string, key string) []byte {
+	sess, err := createS3Session()
+	require.NoError(t, err)
+
+	s3Client := s3.New(sess)
+	result, err := s3Client.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	require.NoError(t, err)
+	defer result.Body.Close()
+
+	body, err := io.ReadAll(result.Body)
+	require.NoError(t, err)
+
+	return body
 }

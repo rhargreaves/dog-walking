@@ -2,7 +2,6 @@ package dogs
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"testing"
 
@@ -10,25 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestUploadImage(t *testing.T) {
+const testImagePath = "../resources/dog.jpg"
+
+func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	file, err := os.Open("../resources/dog.jpg")
+	image, err := os.Open(testImagePath)
 	require.NoError(t, err)
-	defer file.Close()
-
-	url := fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID)
-	req, err := http.NewRequest("PUT", url, file)
-	require.NoError(t, err)
-	req.Header.Set("Content-Type", "image/jpeg")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	defer image.Close()
+	uploadFile(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID),
+		image, "image/jpeg")
 	t.Log("Image uploaded successfully")
 
-	requireS3ObjectExists(t, os.Getenv("DOG_IMAGES_BUCKET"), dog.ID)
+	uploadedImage := getS3Object(t, os.Getenv("DOG_IMAGES_BUCKET"), dog.ID)
+	originalImage, err := os.ReadFile(testImagePath)
+	require.NoError(t, err)
+
+	require.Equal(t, originalImage, uploadedImage)
 }
