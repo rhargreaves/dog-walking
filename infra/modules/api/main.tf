@@ -27,6 +27,11 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
   policy_arn = var.dynamodb_access_policy_arn
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_s3" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = var.s3_access_policy_arn
+}
+
 data "archive_file" "bootstrap" {
   type        = "zip"
   source_file = var.bootstrap_path
@@ -46,7 +51,8 @@ resource "aws_lambda_function" "api" {
   environment {
     variables = {
       ENVIRONMENT = var.environment
-      DOGS_TABLE_NAME  = var.dogs_table_name
+      DOGS_TABLE_NAME = var.dogs_table_name
+      DOG_IMAGES_BUCKET = var.dog_images_bucket
     }
   }
 
@@ -113,7 +119,8 @@ locals {
     "GET /dogs",
     "GET /dogs/{id}",
     "PUT /dogs/{id}",
-    "DELETE /dogs/{id}"
+    "DELETE /dogs/{id}",
+    "PUT /dogs/{id}/photo"
   ]
 }
 

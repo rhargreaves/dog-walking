@@ -37,7 +37,7 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=dynamodb
+      - SERVICES=s3,dynamodb
       - GATEWAY_LISTEN=0.0.0.0:4566
     volumes:
       - ./infra/localstack:/etc/localstack/init/ready.d
@@ -46,6 +46,10 @@ services:
       interval: 10s
       timeout: 2s
       retries: 3
+    networks:
+      default:
+        aliases:
+          - local-dog-images.s3.localhost.localstack.cloud
 
   acceptance-test:
     build:

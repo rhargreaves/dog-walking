@@ -33,8 +33,18 @@ variable "dynamodb_access_policy_arn" {
   type        = string
 }
 
+variable "s3_access_policy_arn" {
+  description = "ARN of the policy for S3 dog images access"
+  type        = string
+}
+
 variable "dogs_table_name" {
   description = "Name of the DynamoDB table for dogs"
+  type        = string
+}
+
+variable "dog_images_bucket" {
+  description = "Name of the S3 bucket for dog images"
   type        = string
 }
 

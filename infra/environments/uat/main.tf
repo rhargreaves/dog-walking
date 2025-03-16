@@ -24,6 +24,12 @@ module "data" {
   environment = var.environment
 }
 
+module "images" {
+  source = "../../modules/images"
+
+  environment = var.environment
+}
+
 module "api" {
   source = "../../modules/api"
 
@@ -34,6 +40,8 @@ module "api" {
   domain_name        = var.domain_name
   hosted_zone_id     = var.hosted_zone_id
   dynamodb_access_policy_arn = module.data.dynamodb_access_policy_arn
+  s3_access_policy_arn = module.images.s3_access_policy_arn
   dogs_table_name    = module.data.dogs_table_name
+  dog_images_bucket  = module.images.bucket_name
   bootstrap_path     = var.bootstrap_path
 }
