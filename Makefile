@@ -15,6 +15,13 @@ GO_CMD := docker run --rm \
 	$(GO_IMAGE) \
 	sh -ec
 
+export AWS_REGION=eu-west-1
+ifeq ($(ENV),uat)
+	export DOG_IMAGES_BUCKET=uat-dog-images
+	export API_BASE_URL=https://api.uat.dog-walking.roberthargreaves.com
+	export DOGS_TABLE_NAME=uat-dogs
+endif
+
 create-mod-cache:
 	-docker volume create go-mod-cache
 .PHONY: create-mod-cache

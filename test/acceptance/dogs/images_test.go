@@ -15,6 +15,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func createS3Session() (*session.Session, error) {
+	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
+	region := os.Getenv("AWS_REGION")
+	if useLocalStack {
+		return session.NewSession(&aws.Config{
+			Region:      &region,
+			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),
+			Credentials: credentials.NewStaticCredentials("test", "test", ""),
+		})
+	}
+	return session.NewSession(&aws.Config{
+		Region: &region,
+	})
+}
+
 func TestUploadImage(t *testing.T) {
 	dog := createDog(t, "Rover")
 
@@ -35,18 +50,15 @@ func TestUploadImage(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	t.Log("Image uploaded successfully")
 
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String("eu-west-1"),
-		Endpoint:    aws.String("http://s3.localhost.localstack.cloud:4566"),
-		Credentials: credentials.NewStaticCredentials("test", "test", ""),
-	})
+	sess, err := createS3Session()
 	require.NoError(t, err)
 
 	s3Client := s3.New(sess)
-	key := fmt.Sprintf("%s", dog.ID)
+	key := dog.ID
+	bucket := os.Getenv("DOG_IMAGES_BUCKET")
 	_, err = s3Client.HeadObject(&s3.HeadObjectInput{
-		Bucket: aws.String("local-dog-images"),
+		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
-	assert.NoError(t, err, "Image should exist in S3 bucket at key: "+key)
+	assert.NoError(t, err, "Image should exist in S3 bucket: "+bucket+" at key: "+key)
 }

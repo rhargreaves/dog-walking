@@ -100,5 +100,3 @@ jobs:
 
       - name: Run acceptance tests
         run: make test
-        env:
-          API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com

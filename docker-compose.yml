@@ -57,7 +57,12 @@ services:
       dockerfile: Dockerfile
     container_name: acceptance-test
     environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
       - API_BASE_URL
+      - AWS_REGION
+      - DOG_IMAGES_BUCKET
 
   acceptance-test-local:
     depends_on:
