@@ -13,7 +13,7 @@ GO_CMD := docker run --rm \
 	-e GOMODCACHE=/gomodcache \
 	-w /app \
 	$(GO_IMAGE) \
-	sh -c
+	sh -ec
 
 create-mod-cache:
 	-docker volume create go-mod-cache
@@ -21,9 +21,10 @@ create-mod-cache:
 
 build: create-mod-cache lint
 	docker compose down
-	-rm -rf api/build
-	mkdir -p api/build
-	$(GO_CMD) "cd api && go mod download && \
+	$(GO_CMD) "cd api; \
+		rm -rf build; \
+		mkdir build; \
+		go mod download; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
 .PHONY: build
 
