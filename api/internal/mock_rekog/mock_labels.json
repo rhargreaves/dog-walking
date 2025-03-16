@@ -1,0 +1,89 @@
+{
+    "Labels": [
+        {
+            "Name": "Airedale",
+            "Confidence": 55.59829330444336,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Animal"
+                },
+                {
+                    "Name": "Canine"
+                },
+                {
+                    "Name": "Dog"
+                },
+                {
+                    "Name": "Mammal"
+                },
+                {
+                    "Name": "Pet"
+                },
+                {
+                    "Name": "Terrier"
+                }
+            ],
+            "Aliases": [],
+            "Categories": [
+                {
+                    "Name": "Animals and Pets"
+                }
+            ]
+        },
+        {
+            "Name": "Dog",
+            "Confidence": 55.59829330444336,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Animal"
+                },
+                {
+                    "Name": "Canine"
+                },
+                {
+                    "Name": "Mammal"
+                },
+                {
+                    "Name": "Pet"
+                }
+            ],
+            "Aliases": [],
+            "Categories": [
+                {
+                    "Name": "Animals and Pets"
+                }
+            ]
+        },
+        {
+            "Name": "Terrier",
+            "Confidence": 55.59829330444336,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Animal"
+                },
+                {
+                    "Name": "Canine"
+                },
+                {
+                    "Name": "Dog"
+                },
+                {
+                    "Name": "Mammal"
+                },
+                {
+                    "Name": "Pet"
+                }
+            ],
+            "Aliases": [],
+            "Categories": [
+                {
+                    "Name": "Animals and Pets"
+                }
+            ]
+        }
+    ],
+    "LabelModelVersion": "3.0"
+}

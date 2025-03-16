@@ -1,6 +1,7 @@
 package dogs
 
 type Dog struct {
-	Name string `json:"name"`
-	ID   string `json:"id"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Breed string `json:"breed,omitempty"`
 }

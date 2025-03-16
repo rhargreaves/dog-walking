@@ -60,3 +60,8 @@ Resources:
           Properties:
             Path: /dogs/{id}/photo
             Method: PUT
+        DogsDetectBreedAPI:
+          Type: HttpApi
+          Properties:
+            Path: /dogs/{id}/detect-breed
+            Method: POST
