@@ -1,6 +1,8 @@
 resource "aws_s3_bucket" "dog_images" {
   bucket = "${var.environment}-dog-images"
 
+  force_destroy = true
+
   tags = {
     Name = "${var.environment}-dog-images"
   }
