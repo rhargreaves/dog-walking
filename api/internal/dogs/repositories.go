@@ -21,6 +21,7 @@ type DogRepository interface {
 	List() ([]Dog, error)
 	Get(id string) (*Dog, error)
 	Update(id string, dog *Dog) error
+	Delete(id string) error
 }
 
 type dogRepository struct {
@@ -118,6 +119,20 @@ func (r *dogRepository) Update(id string, dog *Dog) error {
 			return ErrDogNotFound
 		}
 		return fmt.Errorf("failed to update dog: %w", err)
+	}
+
+	return nil
+}
+
+func (r *dogRepository) Delete(id string) error {
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(r.tableName),
+		Key:       createKey(id),
+	}
+
+	_, err := r.dynamoDB.DeleteItem(input)
+	if err != nil {
+		return fmt.Errorf("failed to delete dog: %w", err)
 	}
 
 	return nil

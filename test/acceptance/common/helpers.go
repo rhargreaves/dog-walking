@@ -55,6 +55,16 @@ func PutJson(t *testing.T, endpoint string, body interface{}) *http.Response {
 	return PutBytes(t, endpoint, jsonBody)
 }
 
+func Delete(t *testing.T, endpoint string) *http.Response {
+	req, err := http.NewRequest(http.MethodDelete, BaseUrl()+endpoint, nil)
+	require.NoError(t, err, "Failed to create DELETE request")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.NoError(t, err, "Failed to DELETE to URL")
+	return resp
+}
+
 func RequireStatus(t *testing.T, resp *http.Response, expectedStatus int) {
 	assert.Equal(t, expectedStatus, resp.StatusCode,
 		"Expected status code %d", expectedStatus)

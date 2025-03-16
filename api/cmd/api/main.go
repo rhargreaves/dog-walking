@@ -29,6 +29,7 @@ func init() {
 	r.GET("/dogs/:id", dogHandler.GetDog)
 	r.POST("/dogs", dogHandler.CreateDog)
 	r.PUT("/dogs/:id", dogHandler.UpdateDog)
+	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
 
 	ginLambda = ginadapter.NewV2(r)
 }

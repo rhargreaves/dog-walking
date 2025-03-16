@@ -42,3 +42,8 @@ Resources:
           Properties:
             Path: /dogs/{id}
             Method: PUT
+        DogsDeleteAPI:
+          Type: HttpApi
+          Properties:
+            Path: /dogs/{id}
+            Method: DELETE

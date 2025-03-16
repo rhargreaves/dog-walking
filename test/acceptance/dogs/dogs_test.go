@@ -89,3 +89,11 @@ func TestListDogs(t *testing.T) {
 	require.GreaterOrEqual(t, len(dogs), 1, "Expected at least 1 dog to be returned")
 	require.NotEmpty(t, dogs[0].ID, "Expected dog ID to be returned")
 }
+
+func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {
+	dog := createDog(t, "Rover")
+
+	resp := common.Delete(t, "/dogs/"+dog.ID)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+}

@@ -13,6 +13,7 @@ type DogHandler interface {
 	ListDogs(c *gin.Context)
 	GetDog(c *gin.Context)
 	UpdateDog(c *gin.Context)
+	DeleteDog(c *gin.Context)
 }
 
 type dogHandler struct {
@@ -73,6 +74,14 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dog)
+}
+
+func (h *dogHandler) DeleteDog(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.dogRepository.Delete(id); err != nil {
+		handleError(c, err)
+		return
+	}
 }
 
 func handleError(c *gin.Context, err error) {

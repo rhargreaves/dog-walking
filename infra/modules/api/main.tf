@@ -112,7 +112,8 @@ locals {
     "POST /dogs",
     "GET /dogs",
     "GET /dogs/{id}",
-    "PUT /dogs/{id}"
+    "PUT /dogs/{id}",
+    "DELETE /dogs/{id}"
   ]
 }
 
