@@ -1,10 +1,17 @@
 package dogs
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/rhargreaves/dog-walking/test/acceptance/common"
 )
@@ -26,4 +33,32 @@ func createDog(t *testing.T, name string) Dog {
 	assert.NotEmpty(t, dog.ID, "Expected dog ID to be returned")
 
 	return dog
+}
+
+func createS3Session() (*session.Session, error) {
+	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
+	region := os.Getenv("AWS_REGION")
+	if useLocalStack {
+		return session.NewSession(&aws.Config{
+			Region:      &region,
+			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),
+			Credentials: credentials.NewStaticCredentials("test", "test", ""),
+		})
+	}
+	return session.NewSession(&aws.Config{
+		Region: &region,
+	})
+}
+
+func requireS3ObjectExists(t *testing.T, bucket string, key string) {
+	sess, err := createS3Session()
+	require.NoError(t, err)
+
+	s3Client := s3.New(sess)
+	_, err = s3Client.HeadObject(&s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	require.NoError(t, err,
+		fmt.Sprintf("Object should exist in S3 bucket: %s key: %s", bucket, key))
 }
