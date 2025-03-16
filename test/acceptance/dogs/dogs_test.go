@@ -97,3 +97,9 @@ func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 }
+
+func TestDeleteDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
+	resp := common.Delete(t, "/dogs/123")
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusNotFound)
+}

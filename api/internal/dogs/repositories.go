@@ -126,13 +126,18 @@ func (r *dogRepository) Update(id string, dog *Dog) error {
 
 func (r *dogRepository) Delete(id string) error {
 	input := &dynamodb.DeleteItemInput{
-		TableName: aws.String(r.tableName),
-		Key:       createKey(id),
+		TableName:    aws.String(r.tableName),
+		Key:          createKey(id),
+		ReturnValues: aws.String("ALL_OLD"),
 	}
 
-	_, err := r.dynamoDB.DeleteItem(input)
+	result, err := r.dynamoDB.DeleteItem(input)
 	if err != nil {
 		return fmt.Errorf("failed to delete dog: %w", err)
+	}
+
+	if result.Attributes == nil {
+		return ErrDogNotFound
 	}
 
 	return nil
