@@ -17,6 +17,29 @@ resource "aws_iam_role" "lambda_role" {
   }
 }
 
+resource "aws_iam_policy" "rekognition_access" {
+  name        = "${var.environment}-dog-walking-rekognition-access"
+  description = "Policy for accessing AWS Rekognition services"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "rekognition:DetectLabels"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_rekognition" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.rekognition_access.arn
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
