@@ -18,19 +18,10 @@ import (
 
 type stubRekognitionClient struct {
 	rekognitioniface.RekognitionAPI
-	labelsToOutput *[]*rekognition.Label
 }
 
 func NewStubRekognitionClient() rekognitioniface.RekognitionAPI {
-	return &stubRekognitionClient{
-		labelsToOutput: &MrPeanutbutterLabels,
-	}
-}
-
-func NewStubRekognitionClientWithLabels(labels *[]*rekognition.Label) rekognitioniface.RekognitionAPI {
-	return &stubRekognitionClient{
-		labelsToOutput: labels,
-	}
+	return &stubRekognitionClient{}
 }
 
 func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
@@ -56,7 +47,7 @@ func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInpu
 	hashString := hex.EncodeToString(hash[:])
 	labels, ok := ImageHashes[hashString]
 	if !ok {
-		return nil, errors.New("image hash (" + hashString + ") not found")
+		return nil, errors.New("Stub Rekognition client: image hash (" + hashString + ") not found")
 	}
 
 	return &rekognition.DetectLabelsOutput{
