@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/rhargreaves/dog-walking/test/acceptance/common"
+	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
 type Dog struct {

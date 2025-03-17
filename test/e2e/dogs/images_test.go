@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rhargreaves/dog-walking/test/acceptance/common"
+	"github.com/rhargreaves/dog-walking/test/e2e/common"
 	"github.com/stretchr/testify/require"
 )
 

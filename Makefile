@@ -51,7 +51,7 @@ test-unit: create-mod-cache
 
 test-local: build
 	docker compose build
-	docker compose run --rm acceptance-test-local \
+	docker compose run --rm e2e-test-local \
 		|| (if [ "$(SHOW_LOGS_ON_FAILURE)" = "true" ]; then \
 			docker compose logs; \
 		fi; \ exit 1)
@@ -59,7 +59,7 @@ test-local: build
 .PHONY: test-local
 
 test:
-	docker compose run --build --rm acceptance-test
+	docker compose run --build --rm e2e-test
 	docker compose down
 .PHONY: test
 

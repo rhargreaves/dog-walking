@@ -80,8 +80,8 @@ jobs:
       - name: Terraform Apply
         run: make apply
 
-  acceptance-test-uat:
-    name: Acceptance Test UAT
+  e2e-test-uat:
+    name: E2E Test UAT
     needs: deploy-uat
     runs-on: ubuntu-latest
     env:
@@ -100,5 +100,5 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
-      - name: Run acceptance tests
+      - name: Run e2e tests
         run: make test

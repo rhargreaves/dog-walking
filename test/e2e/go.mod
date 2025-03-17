@@ -1,4 +1,4 @@
-module github.com/rhargreaves/dog-walking/test/acceptance
+module github.com/rhargreaves/dog-walking/test/e2e
 
 go 1.23.1
 
