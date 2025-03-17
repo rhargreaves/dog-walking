@@ -37,7 +37,7 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 	if contentType != "image/jpeg" {
 		c.Error(common.APIError{
 			Code:    http.StatusBadRequest,
-			Message: "Invalid image content type",
+			Message: "invalid image content type",
 		})
 		return
 	}
@@ -63,6 +63,13 @@ func (h *dogPhotoHandler) DetectBreed(c *gin.Context) {
 
 	breed, confidence, err := h.breedDetector.DetectBreed(id)
 	if err != nil {
+		if err == ErrNoDogDetected || err == ErrNoSpecificBreedDetected {
+			c.Error(common.APIError{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			})
+			return
+		}
 		handleError(c, err)
 		return
 	}
