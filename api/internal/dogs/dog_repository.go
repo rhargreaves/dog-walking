@@ -3,15 +3,14 @@ package dogs
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
+	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
 )
 
@@ -32,7 +31,7 @@ type dogRepository struct {
 }
 
 func NewDogRepository(tableName string) DogRepository {
-	dynamoDB := dynamodb.New(session.Must(createSession()))
+	dynamoDB := dynamodb.New(session.Must(common.CreateSession()))
 	return &dogRepository{tableName: tableName, dynamoDB: dynamoDB}
 }
 
@@ -143,25 +142,6 @@ func (r *dogRepository) Delete(id string) error {
 	}
 
 	return nil
-}
-
-func createSession() (*session.Session, error) {
-	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
-	fmt.Printf("Using localstack: %t\n", useLocalStack)
-
-	config := &aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	}
-	fmt.Printf("Creating config for region %s\n", *config.Region)
-
-	if useLocalStack {
-		config.Endpoint = aws.String(os.Getenv("AWS_ENDPOINT_URL"))
-		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
-		config.DisableSSL = aws.Bool(true)
-		fmt.Printf("Setting endpoint to %s\n", *config.Endpoint)
-	}
-
-	return session.NewSession(config)
 }
 
 func createKey(id string) map[string]*dynamodb.AttributeValue {

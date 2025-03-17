@@ -20,7 +20,7 @@ import (
 
 var ginLambda *ginadapter.GinLambdaV2
 
-func makeRekClient() rekognitioniface.RekognitionAPI {
+func newRekognitionClient() rekognitioniface.RekognitionAPI {
 	if os.Getenv("USE_LOCALSTACK") == "true" {
 		return rekognition_stub.NewStubRekognitionClient()
 	} else {
@@ -39,7 +39,7 @@ func init() {
 	dogHandler := dogs.NewDogHandler(dogRepository)
 
 	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"))
-	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), makeRekClient())
+	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
 
 	r.GET("/ping", func(c *gin.Context) {

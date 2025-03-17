@@ -4,12 +4,9 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -48,23 +45,8 @@ func putBytes(t *testing.T, url string, body []byte, contentType string) *http.R
 	return resp
 }
 
-func createS3Session() (*session.Session, error) {
-	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
-	region := os.Getenv("AWS_REGION")
-	if useLocalStack {
-		return session.NewSession(&aws.Config{
-			Region:      &region,
-			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),
-			Credentials: credentials.NewStaticCredentials("test", "test", ""),
-		})
-	}
-	return session.NewSession(&aws.Config{
-		Region: &region,
-	})
-}
-
 func getS3Object(t *testing.T, bucket string, key string) []byte {
-	sess, err := createS3Session()
+	sess, err := common.CreateS3Session()
 	require.NoError(t, err)
 
 	s3Client := s3.New(sess)
