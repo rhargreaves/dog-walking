@@ -55,13 +55,11 @@ func TestDetectBreed_PopulatesBreedAttribute(t *testing.T) {
 		image, "image/jpeg")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
-	t.Log("Image uploaded successfully")
 
 	resp = common.PostJson(t, fmt.Sprintf("/dogs/%s/photo/detect-breed", dog.ID),
 		DetectBreedRequest{})
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
-	t.Log("Breed detected successfully")
 
 	var response DetectBreedResponse
 	common.DecodeJSON(t, resp, &response)
@@ -82,16 +80,14 @@ func TestDetectBreed_ReturnsNotADog(t *testing.T) {
 		image, "image/jpeg")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
-	t.Log("Image uploaded successfully")
 
 	resp = common.PostJson(t, fmt.Sprintf("/dogs/%s/photo/detect-breed", dog.ID),
 		DetectBreedRequest{})
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusBadRequest)
-	t.Log("Breed not detected successfully")
 
 	var response common.ErrorResponse
 	common.DecodeJSON(t, resp, &response)
 
-	require.Equal(t, "Not a dog", response.Error)
+	require.Equal(t, "no dog detected", response.Error)
 }
