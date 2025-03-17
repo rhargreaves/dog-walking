@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rhargreaves/dog-walking/api/internal/common"
 )
 
 type DogPhotoHandler interface {
@@ -32,8 +33,16 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 		handleError(c, err)
 		return
 	}
+	contentType := c.GetHeader("Content-Type")
+	if contentType != "image/jpeg" {
+		c.Error(common.APIError{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid image content type",
+		})
+		return
+	}
 
-	err = h.dogPhotoRepository.Upload(id, c.Request.Body, c.GetHeader("Content-Type"))
+	err = h.dogPhotoRepository.Upload(id, c.Request.Body, contentType)
 	if err != nil {
 		handleError(c, err)
 		return

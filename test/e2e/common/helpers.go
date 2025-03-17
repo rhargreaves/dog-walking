@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -85,4 +86,10 @@ func logBody(t *testing.T, resp *http.Response) {
 		t.Fatalf("Failed to read response body: %v", err)
 	}
 	t.Errorf("Body: %s", string(bodyBytes))
+}
+
+func SkipIfLocal(t *testing.T) {
+	if strings.HasPrefix(BaseUrl(), "http://sam:") {
+		t.Skip("Skipping test on local environment")
+	}
 }

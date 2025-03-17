@@ -10,7 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testImagePath = "../resources/dog.jpg"
+const testDogImagePath = "../resources/dog.jpg"
+const testToyImagePath = "../resources/toy.jpg"
 
 type DetectBreedRequest struct {
 }
@@ -23,7 +24,7 @@ type DetectBreedResponse struct {
 func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	image, err := os.ReadFile(testImagePath)
+	image, err := os.ReadFile(testDogImagePath)
 	require.NoError(t, err)
 
 	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID),
@@ -47,7 +48,7 @@ func TestUploadImage_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 func TestDetectBreed_PopulatesBreedAttribute(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	image, err := os.ReadFile(testImagePath)
+	image, err := os.ReadFile(testDogImagePath)
 	require.NoError(t, err)
 
 	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID),
@@ -67,4 +68,30 @@ func TestDetectBreed_PopulatesBreedAttribute(t *testing.T) {
 
 	require.Equal(t, "Airedale", response.Breed)
 	require.Greater(t, response.Confidence, 55.0)
+}
+
+func TestDetectBreed_ReturnsNotADog(t *testing.T) {
+	common.SkipIfLocal(t)
+
+	dog := createDog(t, "Sweep")
+
+	image, err := os.ReadFile(testToyImagePath)
+	require.NoError(t, err)
+
+	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID),
+		image, "image/jpeg")
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+	t.Log("Image uploaded successfully")
+
+	resp = common.PostJson(t, fmt.Sprintf("/dogs/%s/photo/detect-breed", dog.ID),
+		DetectBreedRequest{})
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusBadRequest)
+	t.Log("Breed not detected successfully")
+
+	var response common.ErrorResponse
+	common.DecodeJSON(t, resp, &response)
+
+	require.Equal(t, "Not a dog", response.Error)
 }
