@@ -63,5 +63,5 @@ Resources:
         DogsDetectBreedAPI:
           Type: HttpApi
           Properties:
-            Path: /dogs/{id}/detect-breed
+            Path: /dogs/{id}/photo/detect-breed
             Method: POST

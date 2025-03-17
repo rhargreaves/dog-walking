@@ -56,7 +56,7 @@ func TestDetectBreed_PopulatesBreedAttribute(t *testing.T) {
 	common.RequireStatus(t, resp, http.StatusOK)
 	t.Log("Image uploaded successfully")
 
-	resp = common.PostJson(t, fmt.Sprintf("/dogs/%s/detect-breed", dog.ID),
+	resp = common.PostJson(t, fmt.Sprintf("/dogs/%s/photo/detect-breed", dog.ID),
 		DetectBreedRequest{})
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)

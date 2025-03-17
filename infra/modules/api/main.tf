@@ -144,7 +144,7 @@ locals {
     "PUT /dogs/{id}",
     "DELETE /dogs/{id}",
     "PUT /dogs/{id}/photo",
-    "POST /dogs/{id}/detect-breed"
+    "POST /dogs/{id}/photo/detect-breed"
   ]
 }
 

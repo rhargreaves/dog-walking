@@ -35,7 +35,7 @@ func init() {
 	r.PUT("/dogs/:id", dogHandler.UpdateDog)
 	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
 	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
-	r.POST("/dogs/:id/detect-breed", dogPhotoHandler.DetectBreed)
+	r.POST("/dogs/:id/photo/detect-breed", dogPhotoHandler.DetectBreed)
 
 	ginLambda = ginadapter.NewV2(r)
 }
