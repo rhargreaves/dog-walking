@@ -1,33 +1,9 @@
-package testdata
+package rekognition_stub
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 )
-
-var GermanShepherdLabels = []*rekognition.Label{
-	{
-		Name:       aws.String("Dog"),
-		Confidence: aws.Float64(97.3577651977539),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-		},
-	},
-	{
-		Name:       aws.String("German Shepherd"),
-		Confidence: aws.Float64(80.85753631591797),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Dog")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-		},
-	},
-}
 
 var HuskyLabels = []*rekognition.Label{
 	{
@@ -49,42 +25,6 @@ var HuskyLabels = []*rekognition.Label{
 			{Name: aws.String("Dog")},
 			{Name: aws.String("Mammal")},
 			{Name: aws.String("Pet")},
-		},
-	},
-}
-
-var TerrierLabels = []*rekognition.Label{
-	{
-		Name:       aws.String("Dog"),
-		Confidence: aws.Float64(98.3401870727539),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-		},
-	},
-	{
-		Name:       aws.String("Terrier"),
-		Confidence: aws.Float64(86.38780212402344),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Dog")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-		},
-	},
-	{
-		Name:       aws.String("Airedale"),
-		Confidence: aws.Float64(57.59425354003906),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Dog")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-			{Name: aws.String("Terrier")},
 		},
 	},
 }
@@ -114,4 +54,40 @@ var NoSpecificDogBreedLabels = []*rekognition.Label{
 	},
 }
 
-var NotAnAnimal = []*rekognition.Label{}
+var MrPeanutbutterLabels = []*rekognition.Label{
+	{
+		Name:       aws.String("Airedale"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Dog")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+			{Name: aws.String("Terrier")},
+		},
+	},
+	{
+		Name:       aws.String("Dog"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+		},
+	},
+	{
+		Name:       aws.String("Terrier"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Dog")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+		},
+	},
+}
+
+var NotAnAnimalLabels = []*rekognition.Label{}

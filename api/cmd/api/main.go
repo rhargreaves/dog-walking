@@ -15,14 +15,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs"
-	"github.com/rhargreaves/dog-walking/api/internal/mock_rekog"
+	"github.com/rhargreaves/dog-walking/api/internal/rekognition_stub"
 )
 
 var ginLambda *ginadapter.GinLambdaV2
 
 func makeRekClient() rekognitioniface.RekognitionAPI {
 	if os.Getenv("USE_LOCALSTACK") == "true" {
-		return mock_rekog.NewMockRekognitionClient()
+		return rekognition_stub.NewStubRekognitionClient()
 	} else {
 		sess := session.Must(session.NewSession(&aws.Config{
 			Region: aws.String(os.Getenv("AWS_REGION")),
