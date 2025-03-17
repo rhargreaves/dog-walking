@@ -103,10 +103,13 @@ func (r *dogRepository) Update(id string, dog *models.Dog) error {
 		ExpressionAttributeNames: map[string]*string{
 			"#n": aws.String("name"),
 		},
-		UpdateExpression: aws.String("set #n = :name"),
+		UpdateExpression: aws.String("set #n = :name, breed = :breed"),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":name": {
 				S: aws.String(dog.Name),
+			},
+			":breed": {
+				S: aws.String(dog.Breed),
 			},
 		},
 		ConditionExpression: aws.String("attribute_exists(id)"),
