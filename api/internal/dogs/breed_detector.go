@@ -1,16 +1,17 @@
 package dogs
 
 import (
+	"errors"
 	"fmt"
-	"os"
 	"sort"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
-	"github.com/rhargreaves/dog-walking/api/internal/mock_rekog"
 )
+
+var ErrNoDogDetected = errors.New("no dog detected")
+var ErrNoSpecificBreedDetected = errors.New("no specific breed detected")
 
 type BreedDetector interface {
 	DetectBreed(id string) (string, float64, error)
@@ -21,16 +22,7 @@ type breedDetector struct {
 	rekClient  rekognitioniface.RekognitionAPI
 }
 
-func NewBreedDetector(bucketName string) BreedDetector {
-	var rekClient rekognitioniface.RekognitionAPI
-	if os.Getenv("USE_LOCALSTACK") == "true" {
-		rekClient = mock_rekog.NewMockRekognitionClient()
-	} else {
-		sess := session.Must(session.NewSession(&aws.Config{
-			Region: aws.String(os.Getenv("AWS_REGION")),
-		}))
-		rekClient = rekognition.New(sess)
-	}
+func NewBreedDetector(bucketName string, rekClient rekognitioniface.RekognitionAPI) BreedDetector {
 	return &breedDetector{
 		bucketName: bucketName,
 		rekClient:  rekClient,
@@ -76,7 +68,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 		}
 	}
 	if !isDog {
-		return "", 0, fmt.Errorf("no dog detected in the image")
+		return "", 0, ErrNoDogDetected
 	}
 
 	// Look for breed-specific labels
@@ -92,7 +84,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 	}
 
 	if len(breedLabels) == 0 {
-		return "", 0, fmt.Errorf("could not identify specific dog breed")
+		return "", 0, ErrNoSpecificBreedDetected
 	}
 
 	// Sort by confidence (highest first)

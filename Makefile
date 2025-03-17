@@ -7,7 +7,8 @@ endif
 
 SHOW_LOGS_ON_FAILURE := false
 GO_IMAGE := golang:1.23.4-alpine
-GO_CMD := docker run --rm \
+TTY_ARG := $(shell if [ -t 0 ]; then echo "-t"; else echo ""; fi)
+GO_CMD := docker run -i $(TTY_ARG) --rm \
 	-v $(shell pwd):/app \
 	-v go-mod-cache:/gomodcache \
 	-e GOMODCACHE=/gomodcache \
@@ -26,18 +27,27 @@ create-mod-cache:
 	-docker volume create go-mod-cache
 .PHONY: create-mod-cache
 
-build: create-mod-cache lint
+build: create-mod-cache lint test-unit compile
+.PHONY: build
+
+compile: create-mod-cache lint test-unit
 	docker compose down
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
 		mkdir build; \
-		go mod download; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
-.PHONY: build
+.PHONY: compile
 
 lint:
 	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"
 .PHONY: lint
+
+test-unit: create-mod-cache
+	$(GO_CMD) "cd api; \
+		go mod download; \
+		go install gotest.tools/gotestsum@latest; \
+		gotestsum --format testname ./..."
+.PHONY: test-unit
 
 test-local: build
 	docker compose build

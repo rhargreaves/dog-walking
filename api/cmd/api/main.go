@@ -7,13 +7,29 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/rekognition"
+	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs"
+	"github.com/rhargreaves/dog-walking/api/internal/mock_rekog"
 )
 
 var ginLambda *ginadapter.GinLambdaV2
+
+func makeRekClient() rekognitioniface.RekognitionAPI {
+	if os.Getenv("USE_LOCALSTACK") == "true" {
+		return mock_rekog.NewMockRekognitionClient()
+	} else {
+		sess := session.Must(session.NewSession(&aws.Config{
+			Region: aws.String(os.Getenv("AWS_REGION")),
+		}))
+		return rekognition.New(sess)
+	}
+}
 
 func init() {
 	r := gin.Default()
@@ -23,7 +39,7 @@ func init() {
 	dogHandler := dogs.NewDogHandler(dogRepository)
 
 	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"))
-	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"))
+	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), makeRekClient())
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
 
 	r.GET("/ping", func(c *gin.Context) {

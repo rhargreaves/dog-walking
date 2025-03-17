@@ -1,41 +1,69 @@
 package mock_rekog
 
 import (
-	_ "embed"
-	"encoding/json"
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 )
 
-//go:embed mock_labels.json
-var mockLabelsJSON []byte
-
-type RekognitionLabelsResponse struct {
-	Labels            []*rekognition.Label `json:"Labels"`
-	LabelModelVersion string               `json:"LabelModelVersion"`
+var mrPeanutbutterLabels = []*rekognition.Label{
+	{
+		Name:       aws.String("Airedale"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Dog")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+			{Name: aws.String("Terrier")},
+		},
+	},
+	{
+		Name:       aws.String("Dog"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+		},
+	},
+	{
+		Name:       aws.String("Terrier"),
+		Confidence: aws.Float64(55.59829330444336),
+		Parents: []*rekognition.Parent{
+			{Name: aws.String("Animal")},
+			{Name: aws.String("Canine")},
+			{Name: aws.String("Dog")},
+			{Name: aws.String("Mammal")},
+			{Name: aws.String("Pet")},
+		},
+	},
 }
 
 type mockRekognitionClient struct {
 	rekognitioniface.RekognitionAPI
+	labelsToOutput *[]*rekognition.Label
 }
 
 func NewMockRekognitionClient() rekognitioniface.RekognitionAPI {
-	return &mockRekognitionClient{}
+	return &mockRekognitionClient{
+		labelsToOutput: &mrPeanutbutterLabels,
+	}
+}
+
+func NewMockRekognitionClientWithLabels(labels *[]*rekognition.Label) rekognitioniface.RekognitionAPI {
+	return &mockRekognitionClient{
+		labelsToOutput: labels,
+	}
 }
 
 func (m *mockRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
-	var response RekognitionLabelsResponse
-	if err := json.Unmarshal(mockLabelsJSON, &response); err != nil {
-		return nil, fmt.Errorf("failed to parse mock labels JSON: %w", err)
-	}
-
 	return &rekognition.DetectLabelsOutput{
-		Labels:            response.Labels,
-		LabelModelVersion: &response.LabelModelVersion,
+		Labels:            *m.labelsToOutput,
+		LabelModelVersion: aws.String("3.0"),
 	}, nil
 }
 
