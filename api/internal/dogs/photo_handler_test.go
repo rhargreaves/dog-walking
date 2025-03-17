@@ -9,48 +9,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
+	"github.com/rhargreaves/dog-walking/api/internal/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-type MockDogRepository struct {
-	mock.Mock
-}
-
-func (m *MockDogRepository) Get(id string) (*Dog, error) {
-	args := m.Called(id)
-	return args.Get(0).(*Dog), args.Error(1)
-}
-
-func (m *MockDogRepository) Create(dog *Dog) error {
-	args := m.Called(dog)
-	return args.Error(0)
-}
-
-func (m *MockDogRepository) Delete(id string) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
-
-func (m *MockDogRepository) List() ([]Dog, error) {
-	args := m.Called()
-	return args.Get(0).([]Dog), args.Error(1)
-}
-
-func (m *MockDogRepository) Update(id string, dog *Dog) error {
-	args := m.Called(id, dog)
-	return args.Error(0)
-}
-
-type MockBreedDetector struct {
-	mock.Mock
-}
-
-func (m *MockBreedDetector) DetectBreed(id string) (string, float64, error) {
-	args := m.Called(id)
-	return args.String(0), args.Get(1).(float64), args.Error(2)
-}
 
 func requireAPIError(t *testing.T, c *gin.Context, expectedCode int, expectedMessage string) {
 	require.Len(t, c.Errors, 1)
@@ -65,8 +28,8 @@ func requireAPIError(t *testing.T, c *gin.Context, expectedCode int, expectedMes
 func TestUploadPhoto_ReturnsBadRequest_WhenFileIsNotAnImage(t *testing.T) {
 	const dogId = "123"
 
-	dogRepository := new(MockDogRepository)
-	dogRepository.On("Get", dogId).Return(&Dog{ID: dogId}, nil)
+	dogRepository := new(mocks.DogRepository)
+	dogRepository.On("Get", dogId).Return(&models.Dog{ID: dogId}, nil)
 	handler := NewDogPhotoHandler(dogRepository, nil, nil)
 
 	w := httptest.NewRecorder()
@@ -85,9 +48,9 @@ func TestUploadPhoto_ReturnsBadRequest_WhenFileIsNotAnImage(t *testing.T) {
 func TestUploadPhoto_ReturnsBadRequest_WhenImageIsNotADog(t *testing.T) {
 	const dogId = "123"
 
-	dogRepository := new(MockDogRepository)
-	dogRepository.On("Get", dogId).Return(&Dog{ID: dogId}, nil)
-	breedDetector := new(MockBreedDetector)
+	dogRepository := new(mocks.DogRepository)
+	dogRepository.On("Get", dogId).Return(&models.Dog{ID: dogId}, nil)
+	breedDetector := new(mocks.BreedDetector)
 	breedDetector.On("DetectBreed", dogId).Return("", 0.0, ErrNoDogDetected)
 	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
 
@@ -107,9 +70,9 @@ func TestUploadPhoto_ReturnsBadRequest_WhenImageIsNotADog(t *testing.T) {
 func TestUploadPhoto_ReturnsBadRequest_WhenNoSpecificBreedOfDogIsDetected(t *testing.T) {
 	const dogId = "123"
 
-	dogRepository := new(MockDogRepository)
-	dogRepository.On("Get", dogId).Return(&Dog{ID: dogId}, nil)
-	breedDetector := new(MockBreedDetector)
+	dogRepository := new(mocks.DogRepository)
+	dogRepository.On("Get", dogId).Return(&models.Dog{ID: dogId}, nil)
+	breedDetector := new(mocks.BreedDetector)
 	breedDetector.On("DetectBreed", dogId).Return("", 0.0, ErrNoSpecificBreedDetected)
 	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
 

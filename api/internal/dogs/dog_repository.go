@@ -12,15 +12,17 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
 )
 
 var ErrDogNotFound = errors.New("dog not found")
 
+//go:generate mockery --name DogRepository --output ../mocks --outpkg mocks --case underscore
 type DogRepository interface {
-	Create(dog *Dog) error
-	List() ([]Dog, error)
-	Get(id string) (*Dog, error)
-	Update(id string, dog *Dog) error
+	Create(dog *models.Dog) error
+	List() ([]models.Dog, error)
+	Get(id string) (*models.Dog, error)
+	Update(id string, dog *models.Dog) error
 	Delete(id string) error
 }
 
@@ -34,7 +36,7 @@ func NewDogRepository(tableName string) DogRepository {
 	return &dogRepository{tableName: tableName, dynamoDB: dynamoDB}
 }
 
-func (r *dogRepository) Create(dog *Dog) error {
+func (r *dogRepository) Create(dog *models.Dog) error {
 	dog.ID = uuid.New().String()
 
 	input := &dynamodb.PutItemInput{
@@ -52,7 +54,7 @@ func (r *dogRepository) Create(dog *Dog) error {
 	return nil
 }
 
-func (r *dogRepository) List() ([]Dog, error) {
+func (r *dogRepository) List() ([]models.Dog, error) {
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(r.tableName),
 	}
@@ -62,7 +64,7 @@ func (r *dogRepository) List() ([]Dog, error) {
 		return nil, fmt.Errorf("failed to scan dogs table: %w", err)
 	}
 
-	var dogs []Dog
+	var dogs []models.Dog
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
@@ -71,7 +73,7 @@ func (r *dogRepository) List() ([]Dog, error) {
 	return dogs, nil
 }
 
-func (r *dogRepository) Get(id string) (*Dog, error) {
+func (r *dogRepository) Get(id string) (*models.Dog, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(r.tableName),
 		Key:       createKey(id),
@@ -86,7 +88,7 @@ func (r *dogRepository) Get(id string) (*Dog, error) {
 		return nil, ErrDogNotFound
 	}
 
-	var dog Dog
+	var dog models.Dog
 	err = dynamodbattribute.UnmarshalMap(result.Item, &dog)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal dog: %w", err)
@@ -95,7 +97,7 @@ func (r *dogRepository) Get(id string) (*Dog, error) {
 	return &dog, nil
 }
 
-func (r *dogRepository) Update(id string, dog *Dog) error {
+func (r *dogRepository) Update(id string, dog *models.Dog) error {
 	input := &dynamodb.UpdateItemInput{
 		TableName: aws.String(r.tableName),
 		Key:       createKey(id),

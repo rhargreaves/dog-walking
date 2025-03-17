@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
 )
 
 type DogHandler interface {
@@ -25,7 +26,7 @@ func NewDogHandler(dogRepository DogRepository) DogHandler {
 }
 
 func (h *dogHandler) CreateDog(c *gin.Context) {
-	var dog Dog
+	var dog models.Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
 		handleBindError(c, err)
 		return
@@ -62,7 +63,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 
 func (h *dogHandler) UpdateDog(c *gin.Context) {
 	id := c.Param("id")
-	var dog Dog
+	var dog models.Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
 		handleBindError(c, err)
 		return

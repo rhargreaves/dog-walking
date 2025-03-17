@@ -1,4 +1,4 @@
-package dogs
+package models
 
 type Dog struct {
 	ID    string `json:"id"`
