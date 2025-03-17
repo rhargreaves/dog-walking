@@ -41,19 +41,6 @@ var CatLabels = []*rekognition.Label{
 	},
 }
 
-var NoSpecificDogBreedLabels = []*rekognition.Label{
-	{
-		Name:       aws.String("Dog"),
-		Confidence: aws.Float64(90.0),
-		Parents: []*rekognition.Parent{
-			{Name: aws.String("Animal")},
-			{Name: aws.String("Canine")},
-			{Name: aws.String("Mammal")},
-			{Name: aws.String("Pet")},
-		},
-	},
-}
-
 var MrPeanutbutterLabels = []*rekognition.Label{
 	{
 		Name:       aws.String("Airedale"),
