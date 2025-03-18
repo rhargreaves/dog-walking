@@ -43,7 +43,7 @@ func authorise(authorisationToken string, jwtSecret string) (AuthorisedClaims, e
 		return AuthorisedClaims{}, errors.New("no AuthorizationToken provided")
 	}
 	tokenString := strings.TrimPrefix(authorisationToken, "Bearer ")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return []byte(jwtSecret), nil
 	})
 	if err != nil {
@@ -67,7 +67,7 @@ func authorise(authorisationToken string, jwtSecret string) (AuthorisedClaims, e
 		return AuthorisedClaims{}, errors.New("token has no email claim")
 	}
 
-	groups, ok := claims["cognito:groups"].([]interface{})
+	groups, ok := claims["cognito:groups"].([]any)
 	if !ok {
 		return AuthorisedClaims{}, errors.New("token has no cognito:groups claim")
 	}
@@ -80,7 +80,7 @@ func authorise(authorisationToken string, jwtSecret string) (AuthorisedClaims, e
 
 }
 
-func convertToStringSlice(slice []interface{}) []string {
+func convertToStringSlice(slice []any) []string {
 	result := make([]string, len(slice))
 	for i, v := range slice {
 		result[i] = v.(string)

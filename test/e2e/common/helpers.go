@@ -66,7 +66,7 @@ func PostBytes(t *testing.T, endpoint string, body []byte) *http.Response {
 	return resp
 }
 
-func PostJson(t *testing.T, endpoint string, body interface{}) *http.Response {
+func PostJson(t *testing.T, endpoint string, body any) *http.Response {
 	jsonBody, err := json.Marshal(body)
 	require.NoError(t, err, "failed to marshal body")
 	return PostBytes(t, endpoint, jsonBody)
@@ -82,7 +82,7 @@ func PutBytes(t *testing.T, endpoint string, body []byte) *http.Response {
 	return resp
 }
 
-func PutJson(t *testing.T, endpoint string, body interface{}) *http.Response {
+func PutJson(t *testing.T, endpoint string, body any) *http.Response {
 	jsonBody, err := json.Marshal(body)
 	require.NoError(t, err, "failed to marshal body")
 	return PutBytes(t, endpoint, jsonBody)
@@ -106,7 +106,7 @@ func RequireStatus(t *testing.T, resp *http.Response, expectedStatus int) {
 	}
 }
 
-func DecodeJSON(t *testing.T, resp *http.Response, target interface{}) {
+func DecodeJSON(t *testing.T, resp *http.Response, target any) {
 	err := json.NewDecoder(resp.Body).Decode(target)
 	require.NoError(t, err, "failed to decode response body")
 }
