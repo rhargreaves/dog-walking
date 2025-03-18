@@ -13,7 +13,6 @@ import (
 var ErrNoDogDetected = errors.New("no dog detected")
 var ErrNoSpecificBreedDetected = errors.New("no specific breed detected")
 
-//go:generate mockery --name BreedDetector --output ../mocks --outpkg mocks --case underscore
 type BreedDetector interface {
 	DetectBreed(id string) (string, float64, error)
 }

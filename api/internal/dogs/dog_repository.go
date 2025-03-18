@@ -16,7 +16,6 @@ import (
 
 var ErrDogNotFound = errors.New("dog not found")
 
-//go:generate mockery --name DogRepository --output ../mocks --outpkg mocks --case underscore
 type DogRepository interface {
 	Create(dog *models.Dog) error
 	List() ([]models.Dog, error)

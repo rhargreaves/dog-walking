@@ -58,7 +58,7 @@ test-unit: create-mod-cache
 	$(GO_CMD) "cd api; \
 		go mod download; \
 		go install github.com/vektra/mockery/v2@latest; \
-		go generate ./...; \
+		mockery; \
 		go install gotest.tools/gotestsum@latest; \
 		gotestsum --format testname ./..."
 .PHONY: test-unit

@@ -9,6 +9,14 @@ type BreedDetector struct {
 	mock.Mock
 }
 
+type BreedDetector_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *BreedDetector) EXPECT() *BreedDetector_Expecter {
+	return &BreedDetector_Expecter{mock: &_m.Mock}
+}
+
 // DetectBreed provides a mock function with given fields: id
 func (_m *BreedDetector) DetectBreed(id string) (string, float64, error) {
 	ret := _m.Called(id)
@@ -42,6 +50,34 @@ func (_m *BreedDetector) DetectBreed(id string) (string, float64, error) {
 	}
 
 	return r0, r1, r2
+}
+
+// BreedDetector_DetectBreed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DetectBreed'
+type BreedDetector_DetectBreed_Call struct {
+	*mock.Call
+}
+
+// DetectBreed is a helper method to define mock.On call
+//   - id string
+func (_e *BreedDetector_Expecter) DetectBreed(id interface{}) *BreedDetector_DetectBreed_Call {
+	return &BreedDetector_DetectBreed_Call{Call: _e.mock.On("DetectBreed", id)}
+}
+
+func (_c *BreedDetector_DetectBreed_Call) Run(run func(id string)) *BreedDetector_DetectBreed_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *BreedDetector_DetectBreed_Call) Return(_a0 string, _a1 float64, _a2 error) *BreedDetector_DetectBreed_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *BreedDetector_DetectBreed_Call) RunAndReturn(run func(string) (string, float64, error)) *BreedDetector_DetectBreed_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewBreedDetector creates a new instance of BreedDetector. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

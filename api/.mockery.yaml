@@ -1,0 +1,15 @@
+with-expecter: true
+log-level: warn
+disable-deprecation-warnings: true
+packages:
+  github.com/rhargreaves/dog-walking/api/internal/dogs:
+    config:
+      filename: "mock_{{.InterfaceName | snakecase}}.go"
+      dir: "internal/mocks"
+      mockname: "{{.InterfaceName }}"
+      outpkg: "mocks"
+    interfaces:
+      BreedDetector:
+        config:
+      DogRepository:
+        config:
