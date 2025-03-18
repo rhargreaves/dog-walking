@@ -23,7 +23,7 @@ Dependencies are swapped out as follows:
 
 | Production/UAT | Local |
 |----------------|-------|
-| AWS Lambda/API Gatway | AWS SAM |
+| AWS Lambda/API Gatway | AWS SAM Local |
 | AWS DynamoDB   | Localstack DynamoDB |
 | AWS S3   | Localstack S3 |
 | AWS Rekognition   | Lookup based on [image MD5](api/internal/rekognition_stub/hashes.go) |
