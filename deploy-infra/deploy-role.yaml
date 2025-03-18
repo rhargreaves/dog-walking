@@ -167,7 +167,7 @@ Resources:
           - Effect: Allow
             Action:
               - cognito-idp:*
-            Resource: !Sub arn:aws:cognito-idp:*:${AWS::AccountId}:userpool/*
+            Resource: "*"
 
   GitHubActionsRole:
     Type: AWS::IAM::Role
