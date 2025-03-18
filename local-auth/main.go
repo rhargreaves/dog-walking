@@ -53,16 +53,16 @@ func errorResponse(errorMessage string, methodArn string) events.APIGatewayV2Cus
 
 func handleRequest(ctx context.Context,
 	event events.APIGatewayV2CustomAuthorizerV1Request) (events.APIGatewayV2CustomAuthorizerIAMPolicyResponse, error) {
-	fmt.Println("event:", event)
-	methodArn := event.MethodArn
-	fmt.Println("methodArn:", methodArn)
+	if event.MethodArn == "" {
+		return errorResponse("No MethodArn provided", ""), nil
+	}
 
 	jwtSecret := os.Getenv("LOCAL_JWT_SECRET")
 	fmt.Println("local_jwt_secret: ", jwtSecret)
 
 	tokenString := event.AuthorizationToken
 	if tokenString == "" {
-		return errorResponse("No AuthorizationToken provided", methodArn), nil
+		return errorResponse("No AuthorizationToken provided", event.MethodArn), nil
 	}
 
 	fmt.Println("raw tokenString:", tokenString)
@@ -74,7 +74,7 @@ func handleRequest(ctx context.Context,
 	})
 	if err != nil {
 		fmt.Println("error:", err)
-		return errorResponse(err.Error(), methodArn), nil
+		return errorResponse(err.Error(), event.MethodArn), nil
 	}
 
 	fmt.Println("token:", token)
@@ -82,14 +82,14 @@ func handleRequest(ctx context.Context,
 		fmt.Println("token OK: claims:", claims)
 		return authorisedResponse(
 			claims["sub"].(string),
-			methodArn,
+			event.MethodArn,
 			claims["email"].(string),
 			convertToStringSlice(claims["cognito:groups"].([]interface{})),
 		), nil
 	}
 
 	fmt.Println("token is invalid")
-	return errorResponse("invalid token", methodArn), nil
+	return errorResponse("invalid token", event.MethodArn), nil
 }
 
 func convertToStringSlice(slice []interface{}) []string {

@@ -56,3 +56,13 @@ func TestHandleRequest_MissingToken(t *testing.T) {
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
 	assert.Equal(t, "No AuthorizationToken provided", response.Context["error"])
 }
+func TestHandleRequest_MissingMethodArn(t *testing.T) {
+	event := events.APIGatewayV2CustomAuthorizerV1Request{}
+
+	response, err := handleRequest(context.Background(), event)
+	require.NoError(t, err)
+
+	assert.Equal(t, "", response.PrincipalID)
+	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
+	assert.Equal(t, "No MethodArn provided", response.Context["error"])
+}
