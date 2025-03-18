@@ -54,7 +54,7 @@ func TestHandleRequest_MissingToken(t *testing.T) {
 
 	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
-	assert.Equal(t, "No AuthorizationToken provided", response.Context["error"])
+	assert.Equal(t, "no AuthorizationToken provided", response.Context["error"])
 }
 func TestHandleRequest_MissingMethodArn(t *testing.T) {
 	event := events.APIGatewayV2CustomAuthorizerV1Request{}
@@ -64,5 +64,19 @@ func TestHandleRequest_MissingMethodArn(t *testing.T) {
 
 	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
-	assert.Equal(t, "No MethodArn provided", response.Context["error"])
+	assert.Equal(t, "no MethodArn provided", response.Context["error"])
+}
+
+func TestHandleRequest_InvalidJWT(t *testing.T) {
+	event := events.APIGatewayV2CustomAuthorizerV1Request{
+		MethodArn:          methodArn,
+		AuthorizationToken: "Bearer foo",
+	}
+
+	response, err := handleRequest(context.Background(), event)
+	require.NoError(t, err)
+
+	assert.Equal(t, "", response.PrincipalID)
+	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
+	assert.Equal(t, "token is malformed: token contains an invalid number of segments", response.Context["error"])
 }

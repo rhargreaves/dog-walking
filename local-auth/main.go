@@ -54,30 +54,26 @@ func errorResponse(errorMessage string, methodArn string) events.APIGatewayV2Cus
 func handleRequest(ctx context.Context,
 	event events.APIGatewayV2CustomAuthorizerV1Request) (events.APIGatewayV2CustomAuthorizerIAMPolicyResponse, error) {
 	if event.MethodArn == "" {
-		return errorResponse("No MethodArn provided", ""), nil
+		return errorResponse("no MethodArn provided", ""), nil
 	}
 
 	jwtSecret := os.Getenv("LOCAL_JWT_SECRET")
-	fmt.Println("local_jwt_secret: ", jwtSecret)
+	if jwtSecret == "" {
+		return errorResponse("environment variable LOCAL_JWT_SECRET missing", event.MethodArn), nil
+	}
 
 	tokenString := event.AuthorizationToken
 	if tokenString == "" {
-		return errorResponse("No AuthorizationToken provided", event.MethodArn), nil
+		return errorResponse("no AuthorizationToken provided", event.MethodArn), nil
 	}
-
-	fmt.Println("raw tokenString:", tokenString)
 	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-	fmt.Println("trimmed tokenString:", tokenString)
-
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtSecret), nil
 	})
 	if err != nil {
-		fmt.Println("error:", err)
 		return errorResponse(err.Error(), event.MethodArn), nil
 	}
 
-	fmt.Println("token:", token)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		fmt.Println("token OK: claims:", claims)
 		return authorisedResponse(
