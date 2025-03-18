@@ -14,19 +14,6 @@ import (
 
 const methodArn = "arn:aws:execute-api:us-east-1:123456789012:api-id/stage/method/resourcepath"
 
-func createTestJWT(t *testing.T) string {
-	claims := jwt.MapClaims{
-		"sub":            "test-user-id",
-		"email":          "test@example.com",
-		"cognito:groups": []string{"Users"},
-		"exp":            time.Now().Add(time.Hour * 24).Unix(),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
-	require.NoError(t, err)
-	return tokenString
-}
-
 func TestHandleRequest(t *testing.T) {
 	event := events.APIGatewayV2CustomAuthorizerV1Request{
 		MethodArn:          methodArn,
@@ -99,4 +86,17 @@ func TestHandleRequest_TokenHasExpired(t *testing.T) {
 	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
 	assert.Equal(t, "token has invalid claims: token is expired", response.Context["error"])
+}
+
+func createTestJWT(t *testing.T) string {
+	claims := jwt.MapClaims{
+		"sub":            "test-user-id",
+		"email":          "test@example.com",
+		"cognito:groups": []string{"Users"},
+		"exp":            time.Now().Add(time.Hour * 24).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
+	require.NoError(t, err)
+	return tokenString
 }
