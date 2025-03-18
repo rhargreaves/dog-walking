@@ -22,6 +22,25 @@ func handleRequest(ctx context.Context,
 	fmt.Println("local_jwt_secret: ", jwtSecret)
 
 	tokenString := event.AuthorizationToken
+	if tokenString == "" {
+		return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
+			PrincipalID: "user",
+			PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
+				Version: "2012-10-17",
+				Statement: []events.IAMPolicyStatement{
+					{
+						Action:   []string{"execute-api:Invoke"},
+						Effect:   "Deny",
+						Resource: []string{methodArn},
+					},
+				},
+			},
+			Context: map[string]interface{}{
+				"error": "No token provided",
+			},
+		}, nil
+	}
+
 	fmt.Println("raw tokenString:", tokenString)
 	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 	fmt.Println("trimmed tokenString:", tokenString)

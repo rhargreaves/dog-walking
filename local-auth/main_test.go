@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const methodArn = "arn:aws:execute-api:us-east-1:123456789012:api-id/stage/method/resourcepath"
+
 func createTestJWT(t *testing.T) string {
 	claims := jwt.MapClaims{
 		"sub":            "test-user-id",
@@ -27,7 +29,7 @@ func createTestJWT(t *testing.T) string {
 
 func TestHandleRequest(t *testing.T) {
 	event := events.APIGatewayV2CustomAuthorizerV1Request{
-		MethodArn:          "arn:aws:execute-api:us-east-1:123456789012:api-id/stage/method/resourcepath",
+		MethodArn:          methodArn,
 		AuthorizationToken: createTestJWT(t),
 	}
 
@@ -40,4 +42,17 @@ func TestHandleRequest(t *testing.T) {
 	assert.Equal(t, "test-user-id", response.Context["userId"])
 	assert.Equal(t, "test@example.com", response.Context["email"])
 	assert.Equal(t, []interface{}([]interface{}{"Users"}), response.Context["groups"])
+}
+
+func TestHandleRequest_MissingToken(t *testing.T) {
+	event := events.APIGatewayV2CustomAuthorizerV1Request{
+		MethodArn: methodArn,
+	}
+
+	response, err := handleRequest(context.Background(), event)
+	require.NoError(t, err)
+
+	assert.Equal(t, "user", response.PrincipalID)
+	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
+	assert.Equal(t, "No token provided", response.Context["error"])
 }
