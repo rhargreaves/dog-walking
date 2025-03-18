@@ -21,7 +21,7 @@ import (
 var ginLambda *ginadapter.GinLambdaV2
 
 func newRekognitionClient() rekognitioniface.RekognitionAPI {
-	if os.Getenv("USE_LOCALSTACK") == "true" {
+	if common.IsLocal() {
 		return rekognition_stub.NewStubRekognitionClient()
 	} else {
 		sess := session.Must(session.NewSession(&aws.Config{

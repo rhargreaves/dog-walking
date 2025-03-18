@@ -9,16 +9,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
+func IsLocal() bool {
+	return os.Getenv("USE_LOCALSTACK") == "true"
+}
+
 func CreateSession() (*session.Session, error) {
-	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
-	fmt.Printf("Using localstack: %t\n", useLocalStack)
+	fmt.Printf("Using localstack: %t\n", IsLocal())
 
 	config := &aws.Config{
 		Region: aws.String(os.Getenv("AWS_REGION")),
 	}
 	fmt.Printf("Creating config for region %s\n", *config.Region)
 
-	if useLocalStack {
+	if IsLocal() {
 		config.Endpoint = aws.String(os.Getenv("AWS_ENDPOINT_URL"))
 		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
 		config.DisableSSL = aws.Bool(true)
@@ -29,9 +32,8 @@ func CreateSession() (*session.Session, error) {
 }
 
 func CreateS3Session() (*session.Session, error) {
-	useLocalStack := os.Getenv("USE_LOCALSTACK") == "true"
 	region := os.Getenv("AWS_REGION")
-	if useLocalStack {
+	if IsLocal() {
 		return session.NewSession(&aws.Config{
 			Region:      &region,
 			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),
