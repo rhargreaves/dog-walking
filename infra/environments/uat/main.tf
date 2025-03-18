@@ -44,4 +44,13 @@ module "api" {
   dogs_table_name    = module.data.dogs_table_name
   dog_images_bucket  = module.images.bucket_name
   bootstrap_path     = var.bootstrap_path
+  cognito_client_id  = module.auth.cognito_client_id
+  cognito_user_pool_id = module.auth.cognito_user_pool_id
+}
+
+module "auth" {
+  source = "../../modules/auth"
+
+  environment = var.environment
+  sysadmin_password = var.sysadmin_password
 }

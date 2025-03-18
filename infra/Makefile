@@ -8,6 +8,7 @@ DOCKER_TF := docker run --rm \
 	-w $(TERRAFORM_WORKDIR) \
 	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
 	-e TF_VAR_hosted_zone_id \
+	-e TF_VAR_sysadmin_password \
 	-e TF_VAR_bootstrap_path=/api/build/bootstrap \
 	$(TERRAFORM_IMAGE)
 

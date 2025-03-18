@@ -135,9 +135,28 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   payload_format_version = "2.0"
 }
 
+data "aws_region" "current" {}
+
+resource "aws_apigatewayv2_authorizer" "cognito" {
+  api_id           = aws_apigatewayv2_api.api.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "cognito"
+
+  jwt_configuration {
+    audience = [var.cognito_client_id]
+    issuer   = "https://cognito-idp.${data.aws_region.current.name}.amazonaws.com/${var.cognito_user_pool_id}"
+  }
+}
+
+resource "aws_apigatewayv2_route" "ping_route" {
+  api_id           = aws_apigatewayv2_api.api.id
+  route_key        = "GET /ping"
+  target           = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
 locals {
-  routes = [
-    "GET /ping",
+  authed_routes = [
     "POST /dogs",
     "GET /dogs",
     "GET /dogs/{id}",
@@ -148,12 +167,14 @@ locals {
   ]
 }
 
-resource "aws_apigatewayv2_route" "routes" {
-  for_each = { for route in local.routes : route => route }
+resource "aws_apigatewayv2_route" "authed_routes" {
+  for_each = { for route in local.authed_routes : route => route }
 
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = each.value
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  api_id           = aws_apigatewayv2_api.api.id
+  route_key        = each.value
+  target           = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  authorizer_id    = aws_apigatewayv2_authorizer.cognito.id
+  authorization_type = "JWT"
 }
 
 resource "aws_lambda_permission" "api_gateway" {

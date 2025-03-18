@@ -32,3 +32,9 @@ variable "bootstrap_path" {
   description = "Path to the Lambda bootstrap binary"
   type        = string
 }
+
+variable "sysadmin_password" {
+  description = "Password for the sysadmin user"
+  type        = string
+  sensitive   = true
+}

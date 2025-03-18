@@ -164,6 +164,11 @@ Resources:
               - sts:GetCallerIdentity
             Resource: "*"
 
+          - Effect: Allow
+            Action:
+              - cognito-idp:*
+            Resource: !Sub arn:aws:cognito-idp:*:${AWS::AccountId}:userpool/*
+
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
