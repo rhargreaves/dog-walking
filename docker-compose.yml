@@ -63,6 +63,11 @@ services:
       - API_BASE_URL
       - AWS_REGION
       - DOG_IMAGES_BUCKET
+      - COGNITO_USER_POOL_NAME
+      - COGNITO_CLIENT_NAME
+      - COGNITO_USERNAME
+      - COGNITO_PASSWORD
+      - USE_REAL_COGNITO
 
   e2e-test-local:
     depends_on:
@@ -79,3 +84,4 @@ services:
       - USE_LOCALSTACK=true
       - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566
       - DOG_IMAGES_BUCKET=local-dog-images
+      - USE_REAL_COGNITO=false
