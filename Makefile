@@ -21,7 +21,6 @@ ifeq ($(ENV),uat)
 	export DOG_IMAGES_BUCKET=uat-dog-images
 	export API_BASE_URL=https://api.uat.dog-walking.roberthargreaves.com
 	export DOGS_TABLE_NAME=uat-dogs
-	export USE_REAL_COGNITO=true
 	export COGNITO_USER_POOL_NAME=uat-dog-walking
 	export COGNITO_CLIENT_NAME=uat-dog-walking-client
 endif
