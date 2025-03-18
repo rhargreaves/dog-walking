@@ -9,15 +9,25 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/rhargreaves/dog-walking/test/e2e/common/auth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var (
+	jwtToken string
+)
+
+func Authenticate(t *testing.T) {
+	if os.Getenv("USE_REAL_COGNITO") == "true" {
+		fmt.Println("🔑 Authenticating with AWS Cognito")
+		jwtToken = auth.GetCognitoJWT(t)
+	} else {
+		fmt.Println("🔑 Authenticating with local credentials")
+		jwtToken = auth.CreateLocalJWT(t)
+	}
+}
 
 type ErrorResponse struct {
 	Error string `json:"error"`
@@ -30,7 +40,7 @@ func BaseUrl() string {
 func NewAuthedRequest(t *testing.T, method, endpoint string, body io.Reader) *http.Request {
 	req, err := http.NewRequest(method, BaseUrl()+endpoint, body)
 	require.NoError(t, err, "Failed to create "+method+" request")
-	req.Header.Set("Authorization", "Bearer "+createTestJWT(t))
+	req.Header.Set("Authorization", "Bearer "+jwtToken)
 	return req
 }
 
@@ -110,96 +120,4 @@ func SkipIfLocal(t *testing.T) {
 	if strings.HasPrefix(BaseUrl(), "http://sam:") {
 		t.Skip("Skipping test on local environment")
 	}
-}
-
-func findUserPoolByName(t *testing.T, cognito *cognitoidentityprovider.CognitoIdentityProvider, poolName string) string {
-	listPoolsInput := &cognitoidentityprovider.ListUserPoolsInput{
-		MaxResults: aws.Int64(1),
-	}
-	listPoolsOutput, err := cognito.ListUserPools(listPoolsInput)
-	require.NoError(t, err, "Failed to list user pools")
-
-	var userPoolId string
-	for _, pool := range listPoolsOutput.UserPools {
-		if *pool.Name == poolName {
-			userPoolId = *pool.Id
-			break
-		}
-	}
-	require.NotEmpty(t, userPoolId,
-		fmt.Sprintf("Could not find user pool with name '%s'", poolName))
-	return userPoolId
-}
-
-func findClientByName(t *testing.T, cognito *cognitoidentityprovider.CognitoIdentityProvider, poolId string, clientName string) string {
-	listClientsInput := &cognitoidentityprovider.ListUserPoolClientsInput{
-		UserPoolId: aws.String(poolId),
-	}
-	listClientsOutput, err := cognito.ListUserPoolClients(listClientsInput)
-	require.NoError(t, err, "Failed to list user pool clients")
-
-	var clientId string
-	for _, client := range listClientsOutput.UserPoolClients {
-		if *client.ClientName == clientName {
-			clientId = *client.ClientId
-			break
-		}
-	}
-	require.NotEmpty(t, clientId,
-		fmt.Sprintf("Could not find client with name '%s'", clientName))
-	return clientId
-}
-
-func getCognitoToken(t *testing.T) string {
-	poolName := os.Getenv("COGNITO_USER_POOL_NAME")
-	require.NotEmpty(t, poolName, "COGNITO_USER_POOL_NAME environment variable is required")
-
-	clientName := os.Getenv("COGNITO_CLIENT_NAME")
-	require.NotEmpty(t, clientName, "COGNITO_CLIENT_NAME environment variable is required")
-
-	sess := session.Must(session.NewSession())
-	cognito := cognitoidentityprovider.New(sess)
-	userPoolId := findUserPoolByName(t, cognito, poolName)
-	clientId := findClientByName(t, cognito, userPoolId, clientName)
-
-	// Get credentials from environment
-	username := os.Getenv("COGNITO_USERNAME")
-	password := os.Getenv("COGNITO_PASSWORD")
-	require.NotEmpty(t, username, "COGNITO_USERNAME environment variable is required")
-	require.NotEmpty(t, password, "COGNITO_PASSWORD environment variable is required")
-
-	// Initiate auth
-	authInput := &cognitoidentityprovider.InitiateAuthInput{
-		AuthFlow: aws.String("USER_PASSWORD_AUTH"),
-		ClientId: aws.String(clientId),
-		AuthParameters: map[string]*string{
-			"USERNAME": aws.String(username),
-			"PASSWORD": aws.String(password),
-		},
-	}
-
-	authOutput, err := cognito.InitiateAuth(authInput)
-	require.NoError(t, err, "Failed to authenticate with Cognito")
-	require.NotNil(t, authOutput.AuthenticationResult, "No authentication result received")
-
-	return *authOutput.AuthenticationResult.IdToken
-}
-
-func createTestJWT(t *testing.T) string {
-	if os.Getenv("USE_REAL_COGNITO") == "true" {
-		return getCognitoToken(t)
-	}
-
-	// Fallback to local test JWT
-	claims := jwt.MapClaims{
-		"sub":            "test-user-id",
-		"email":          "test@example.com",
-		"cognito:groups": []string{"Users"},
-		"exp":            time.Now().Add(time.Hour).Unix(),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
-	require.NoError(t, err, "Failed to create JWT")
-	fmt.Println("tokenString:", tokenString)
-	return tokenString
 }
