@@ -10,11 +10,12 @@ GO_IMAGE := golang:1.23.4-alpine
 TTY_ARG := $(shell if [ -t 0 ]; then echo "-t"; else echo ""; fi)
 GO_CMD := docker run -i $(TTY_ARG) --rm \
 	-v $(shell pwd):/app \
-	-v go-mod-cache:/gomodcache \
-	-e GOMODCACHE=/gomodcache \
+	-v go-cache:/go \
+	-e GOPATH=/go \
+	-e GOCACHE=/go/cache \
 	-w /app \
 	$(GO_IMAGE) \
-	sh -exc
+	sh -ec
 
 export AWS_REGION=eu-west-1
 ifeq ($(ENV),uat)
@@ -25,14 +26,14 @@ ifeq ($(ENV),uat)
 	export COGNITO_CLIENT_NAME=uat-dog-walking-client
 endif
 
-create-mod-cache:
-	-docker volume create go-mod-cache
-.PHONY: create-mod-cache
+create-go-cache:
+	-docker volume create go-cache
+.PHONY: create-go-cache
 
-build: create-mod-cache lint test-unit compile
+build: create-go-cache lint test-unit compile
 .PHONY: build
 
-compile: create-mod-cache lint test-unit
+compile: create-go-cache lint test-unit
 	docker compose down
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
@@ -54,7 +55,7 @@ lint:
 	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"
 .PHONY: lint
 
-test-unit: create-mod-cache
+test-unit: create-go-cache
 	$(GO_CMD) "cd api; \
 		go mod download; \
 		go install github.com/vektra/mockery/v2@latest; \
