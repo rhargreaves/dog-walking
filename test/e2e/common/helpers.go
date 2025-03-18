@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/rhargreaves/dog-walking/test/e2e/common/auth"
@@ -19,8 +18,12 @@ var (
 	jwtToken string
 )
 
+func isLocal() bool {
+	return os.Getenv("USE_LOCALSTACK") == "true"
+}
+
 func Authenticate() {
-	if os.Getenv("USE_LOCALSTACK") == "true" {
+	if isLocal() {
 		fmt.Println("🔑 Authenticating with local credentials")
 		jwtToken = auth.CreateLocalJWT()
 	} else {
@@ -117,7 +120,7 @@ func logBody(t *testing.T, resp *http.Response) {
 }
 
 func SkipIfLocal(t *testing.T) {
-	if strings.HasPrefix(BaseUrl(), "http://sam:") {
+	if isLocal() {
 		t.Skip("Skipping test on local environment")
 	}
 }
