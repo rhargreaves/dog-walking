@@ -8,7 +8,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	common.Authenticate(&testing.T{})
+	common.Authenticate()
 	code := m.Run()
 	os.Exit(code)
 }

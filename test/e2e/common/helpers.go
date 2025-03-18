@@ -19,13 +19,13 @@ var (
 	jwtToken string
 )
 
-func Authenticate(t *testing.T) {
+func Authenticate() {
 	if os.Getenv("USE_REAL_COGNITO") == "true" {
 		fmt.Println("🔑 Authenticating with AWS Cognito")
-		jwtToken = auth.GetCognitoJWT(t)
+		jwtToken = auth.GetCognitoJWT()
 	} else {
 		fmt.Println("🔑 Authenticating with local credentials")
-		jwtToken = auth.CreateLocalJWT(t)
+		jwtToken = auth.CreateLocalJWT()
 	}
 }
 

@@ -1,15 +1,14 @@
 package auth
 
 import (
+	"log"
 	"os"
-	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/stretchr/testify/require"
 )
 
-func CreateLocalJWT(t *testing.T) string {
+func CreateLocalJWT() string {
 	claims := jwt.MapClaims{
 		"sub":            "test-user-id",
 		"email":          "test@example.com",
@@ -18,6 +17,8 @@ func CreateLocalJWT(t *testing.T) string {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
-	require.NoError(t, err, "failed to create JWT")
+	if err != nil {
+		log.Fatal("failed to create JWT:", err)
+	}
 	return tokenString
 }
