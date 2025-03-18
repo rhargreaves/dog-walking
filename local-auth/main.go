@@ -11,6 +11,27 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+func authorisedResponse(principalID string, methodArn string, email string, groups []string) events.APIGatewayV2CustomAuthorizerIAMPolicyResponse {
+	return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
+		PrincipalID: principalID,
+		PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
+			Version: "2012-10-17",
+			Statement: []events.IAMPolicyStatement{
+				{
+					Action:   []string{"execute-api:Invoke"},
+					Effect:   "Allow",
+					Resource: []string{methodArn},
+				},
+			},
+		},
+		Context: map[string]interface{}{
+			"userId": principalID,
+			"email":  email,
+			"groups": groups,
+		},
+	}
+}
+
 func errorResponse(errorMessage string, methodArn string) events.APIGatewayV2CustomAuthorizerIAMPolicyResponse {
 	return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
 		PrincipalID: "",
@@ -32,7 +53,6 @@ func errorResponse(errorMessage string, methodArn string) events.APIGatewayV2Cus
 
 func handleRequest(ctx context.Context,
 	event events.APIGatewayV2CustomAuthorizerV1Request) (events.APIGatewayV2CustomAuthorizerIAMPolicyResponse, error) {
-	fmt.Println("ctx:", ctx)
 	fmt.Println("event:", event)
 	methodArn := event.MethodArn
 	fmt.Println("methodArn:", methodArn)
@@ -60,28 +80,24 @@ func handleRequest(ctx context.Context,
 	fmt.Println("token:", token)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		fmt.Println("token OK: claims:", claims)
-		return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
-			PrincipalID: claims["sub"].(string),
-			PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
-				Version: "2012-10-17",
-				Statement: []events.IAMPolicyStatement{
-					{
-						Action:   []string{"execute-api:Invoke"},
-						Effect:   "Allow",
-						Resource: []string{methodArn},
-					},
-				},
-			},
-			Context: map[string]interface{}{
-				"userId": claims["sub"],
-				"email":  claims["email"],
-				"groups": claims["cognito:groups"],
-			},
-		}, nil
+		return authorisedResponse(
+			claims["sub"].(string),
+			methodArn,
+			claims["email"].(string),
+			convertToStringSlice(claims["cognito:groups"].([]interface{})),
+		), nil
 	}
 
 	fmt.Println("token is invalid")
 	return errorResponse("invalid token", methodArn), nil
+}
+
+func convertToStringSlice(slice []interface{}) []string {
+	result := make([]string, len(slice))
+	for i, v := range slice {
+		result[i] = v.(string)
+	}
+	return result
 }
 
 func main() {

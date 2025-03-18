@@ -41,7 +41,7 @@ func TestHandleRequest(t *testing.T) {
 	assert.Equal(t, []string{"execute-api:Invoke"}, response.PolicyDocument.Statement[0].Action)
 	assert.Equal(t, "test-user-id", response.Context["userId"])
 	assert.Equal(t, "test@example.com", response.Context["email"])
-	assert.Equal(t, []interface{}([]interface{}{"Users"}), response.Context["groups"])
+	assert.Equal(t, []string{"Users"}, response.Context["groups"])
 }
 
 func TestHandleRequest_MissingToken(t *testing.T) {
