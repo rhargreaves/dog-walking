@@ -11,6 +11,25 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+func errorResponse(errorMessage string, methodArn string) events.APIGatewayV2CustomAuthorizerIAMPolicyResponse {
+	return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
+		PrincipalID: "",
+		PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
+			Version: "2012-10-17",
+			Statement: []events.IAMPolicyStatement{
+				{
+					Action:   []string{"execute-api:Invoke"},
+					Effect:   "Deny",
+					Resource: []string{methodArn},
+				},
+			},
+		},
+		Context: map[string]interface{}{
+			"error": errorMessage,
+		},
+	}
+}
+
 func handleRequest(ctx context.Context,
 	event events.APIGatewayV2CustomAuthorizerV1Request) (events.APIGatewayV2CustomAuthorizerIAMPolicyResponse, error) {
 	fmt.Println("ctx:", ctx)
@@ -23,22 +42,7 @@ func handleRequest(ctx context.Context,
 
 	tokenString := event.AuthorizationToken
 	if tokenString == "" {
-		return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
-			PrincipalID: "user",
-			PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
-				Version: "2012-10-17",
-				Statement: []events.IAMPolicyStatement{
-					{
-						Action:   []string{"execute-api:Invoke"},
-						Effect:   "Deny",
-						Resource: []string{methodArn},
-					},
-				},
-			},
-			Context: map[string]interface{}{
-				"error": "No token provided",
-			},
-		}, nil
+		return errorResponse("No AuthorizationToken provided", methodArn), nil
 	}
 
 	fmt.Println("raw tokenString:", tokenString)
@@ -50,22 +54,7 @@ func handleRequest(ctx context.Context,
 	})
 	if err != nil {
 		fmt.Println("error:", err)
-		return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
-			PrincipalID: "user",
-			PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
-				Version: "2012-10-17",
-				Statement: []events.IAMPolicyStatement{
-					{
-						Action:   []string{"execute-api:Invoke"},
-						Effect:   "Deny",
-						Resource: []string{methodArn},
-					},
-				},
-			},
-			Context: map[string]interface{}{
-				"error": err.Error(),
-			},
-		}, nil
+		return errorResponse(err.Error(), methodArn), nil
 	}
 
 	fmt.Println("token:", token)
@@ -92,22 +81,7 @@ func handleRequest(ctx context.Context,
 	}
 
 	fmt.Println("token is invalid")
-	return events.APIGatewayV2CustomAuthorizerIAMPolicyResponse{
-		PrincipalID: "user",
-		PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
-			Version: "2012-10-17",
-			Statement: []events.IAMPolicyStatement{
-				{
-					Action:   []string{"execute-api:Invoke"},
-					Effect:   "Deny",
-					Resource: []string{methodArn},
-				},
-			},
-		},
-		Context: map[string]interface{}{
-			"error": "invalid token",
-		},
-	}, nil
+	return errorResponse("invalid token", methodArn), nil
 }
 
 func main() {

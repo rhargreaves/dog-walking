@@ -52,7 +52,7 @@ func TestHandleRequest_MissingToken(t *testing.T) {
 	response, err := handleRequest(context.Background(), event)
 	require.NoError(t, err)
 
-	assert.Equal(t, "user", response.PrincipalID)
+	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
-	assert.Equal(t, "No token provided", response.Context["error"])
+	assert.Equal(t, "No AuthorizationToken provided", response.Context["error"])
 }
