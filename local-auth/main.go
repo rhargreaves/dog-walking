@@ -74,18 +74,34 @@ func handleRequest(ctx context.Context,
 		return errorResponse(err.Error(), event.MethodArn), nil
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println("token OK: claims:", claims)
-		return authorisedResponse(
-			claims["sub"].(string),
-			event.MethodArn,
-			claims["email"].(string),
-			convertToStringSlice(claims["cognito:groups"].([]interface{})),
-		), nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return errorResponse("token is invalid", event.MethodArn), nil
 	}
 
-	fmt.Println("token is invalid")
-	return errorResponse("invalid token", event.MethodArn), nil
+	fmt.Println("token OK: claims:", claims)
+
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return errorResponse("token has no sub claim", event.MethodArn), nil
+	}
+
+	email, ok := claims["email"].(string)
+	if !ok {
+		return errorResponse("token has no email claim", event.MethodArn), nil
+	}
+
+	groups, ok := claims["cognito:groups"].([]interface{})
+	if !ok {
+		return errorResponse("token has no cognito:groups claim", event.MethodArn), nil
+	}
+
+	return authorisedResponse(
+		sub,
+		event.MethodArn,
+		email,
+		convertToStringSlice(groups),
+	), nil
 }
 
 func convertToStringSlice(slice []interface{}) []string {

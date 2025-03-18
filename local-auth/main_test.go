@@ -80,3 +80,23 @@ func TestHandleRequest_InvalidJWT(t *testing.T) {
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
 	assert.Equal(t, "token is malformed: token contains an invalid number of segments", response.Context["error"])
 }
+
+func TestHandleRequest_TokenHasExpired(t *testing.T) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"exp": time.Now().Add(time.Hour * -24).Unix(),
+	})
+	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
+	require.NoError(t, err)
+
+	event := events.APIGatewayV2CustomAuthorizerV1Request{
+		MethodArn:          methodArn,
+		AuthorizationToken: tokenString,
+	}
+
+	response, err := handleRequest(context.Background(), event)
+	require.NoError(t, err)
+
+	assert.Equal(t, "", response.PrincipalID)
+	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
+	assert.Equal(t, "token has invalid claims: token is expired", response.Context["error"])
+}
