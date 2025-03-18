@@ -20,12 +20,12 @@ var (
 )
 
 func Authenticate() {
-	if os.Getenv("USE_REAL_COGNITO") == "true" {
-		fmt.Println("🔑 Authenticating with AWS Cognito")
-		jwtToken = auth.GetCognitoJWT()
-	} else {
+	if os.Getenv("USE_LOCALSTACK") == "true" {
 		fmt.Println("🔑 Authenticating with local credentials")
 		jwtToken = auth.CreateLocalJWT()
+	} else {
+		fmt.Println("🔑 Authenticating with AWS Cognito")
+		jwtToken = auth.GetCognitoJWT()
 	}
 }
 
