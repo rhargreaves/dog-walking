@@ -36,8 +36,8 @@ func GetCognitoJWT(t *testing.T) string {
 	}
 
 	authOutput, err := cognito.InitiateAuth(authInput)
-	require.NoError(t, err, "Failed to authenticate with Cognito")
-	require.NotNil(t, authOutput.AuthenticationResult, "No authentication result received")
+	require.NoError(t, err, "failed to authenticate with Cognito")
+	require.NotNil(t, authOutput.AuthenticationResult, "no authentication result received")
 	return *authOutput.AuthenticationResult.IdToken
 }
 
@@ -47,7 +47,7 @@ func findUserPoolByName(t *testing.T, cognito *cognitoidentityprovider.CognitoId
 		MaxResults: aws.Int64(1),
 	}
 	listPoolsOutput, err := cognito.ListUserPools(listPoolsInput)
-	require.NoError(t, err, "Failed to list user pools")
+	require.NoError(t, err, "failed to list user pools")
 
 	var userPoolId string
 	for _, pool := range listPoolsOutput.UserPools {
@@ -57,7 +57,7 @@ func findUserPoolByName(t *testing.T, cognito *cognitoidentityprovider.CognitoId
 		}
 	}
 	require.NotEmpty(t, userPoolId,
-		fmt.Sprintf("Could not find user pool with name '%s'", poolName))
+		fmt.Sprintf("could not find user pool with name '%s'", poolName))
 	return userPoolId
 }
 
@@ -67,7 +67,7 @@ func findClientByName(t *testing.T, cognito *cognitoidentityprovider.CognitoIden
 		UserPoolId: aws.String(poolId),
 	}
 	listClientsOutput, err := cognito.ListUserPoolClients(listClientsInput)
-	require.NoError(t, err, "Failed to list user pool clients")
+	require.NoError(t, err, "failed to list user pool clients")
 
 	var clientId string
 	for _, client := range listClientsOutput.UserPoolClients {
@@ -77,6 +77,6 @@ func findClientByName(t *testing.T, cognito *cognitoidentityprovider.CognitoIden
 		}
 	}
 	require.NotEmpty(t, clientId,
-		fmt.Sprintf("Could not find client with name '%s'", clientName))
+		fmt.Sprintf("could not find client with name '%s'", clientName))
 	return clientId
 }

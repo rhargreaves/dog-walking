@@ -18,6 +18,6 @@ func CreateLocalJWT(t *testing.T) string {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
-	require.NoError(t, err, "Failed to create JWT")
+	require.NoError(t, err, "failed to create JWT")
 	return tokenString
 }
