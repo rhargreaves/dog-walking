@@ -13,15 +13,25 @@ make build
 
 The API is compiled to `out/bootstrap` ready to be deployed as a Lambda function.
 
-### Test
+### Local Testing
 
 ```sh
-make test
+make test-local
 ```
+
+Dependencies are swapped out as follows:
+
+| Production/UAT | Local |
+|----------------|-------|
+| AWS Lambda/API Gatway | AWS SAM |
+| AWS DynamoDB   | Localstack DynamoDB |
+| AWS S3   | Localstack S3 |
+| AWS Rekognition   | Lookup based on [image MD5](api/internal/rekognition_stub/hashes.go) |
 
 ## Infrastructure
 
 Deployed using Terraform.
+
 
 ```sh
 cd infra
