@@ -14,7 +14,7 @@ GO_CMD := docker run -i $(TTY_ARG) --rm \
 	-e GOMODCACHE=/gomodcache \
 	-w /app \
 	$(GO_IMAGE) \
-	sh -ec
+	sh -exc
 
 export AWS_REGION=eu-west-1
 ifeq ($(ENV),uat)
