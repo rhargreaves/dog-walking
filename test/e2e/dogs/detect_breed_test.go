@@ -38,12 +38,13 @@ func uploadImageAndDetectBreed(t *testing.T, dogID string, imagePath string) *ht
 	image, err := os.ReadFile(imagePath)
 	require.NoError(t, err)
 
-	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dogID),
+	resp := putBytes(t, fmt.Sprintf("/dogs/%s/photo", dogID),
 		image, "image/jpeg")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	return common.PostJson(t, fmt.Sprintf("/dogs/%s/photo/detect-breed", dogID),
+	return common.PostJson(t,
+		fmt.Sprintf("/dogs/%s/photo/detect-breed", dogID),
 		DetectBreedRequest{})
 }
 

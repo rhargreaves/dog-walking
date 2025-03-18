@@ -35,8 +35,7 @@ func createDog(t *testing.T, name string) Dog {
 }
 
 func putBytes(t *testing.T, url string, body []byte, contentType string) *http.Response {
-	req, err := http.NewRequest("PUT", url, bytes.NewReader(body))
-	require.NoError(t, err)
+	req := common.NewAuthedRequest(t, http.MethodPut, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", contentType)
 
 	client := &http.Client{}

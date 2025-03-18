@@ -1,16 +1,39 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  DummyApi:   # Here to fix the issue with binary media types
+  MyApi:
     Type: AWS::Serverless::Api
     Properties:
       BinaryMediaTypes:
         - image/jpeg
       StageName: dev
+      Auth:
+        DefaultAuthorizer: LocalAuth
+        Authorizers:
+          LocalAuth:
+            FunctionPayloadType: TOKEN
+            FunctionArn: !GetAtt LocalAuthFunction.Arn
+            Identity:
+              Headers:
+                - Authorization
+
+
+  LocalAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: local-auth/build/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Environment:
+        Variables:
+          LOCAL_JWT_SECRET: "1234567890"
+      Architectures:
+        - arm64
+
   DogWalkingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/
+      CodeUri: api/build/
       Handler: bootstrap
       Runtime: provided.al2023
       Environment:
@@ -33,35 +56,42 @@ Resources:
         DogsAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs
             Method: POST
         DogsGetAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs/{id}
             Method: GET
         DogsListAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs
             Method: GET
         DogsPutAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs/{id}
             Method: PUT
         DogsDeleteAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs/{id}
             Method: DELETE
         DogsPutPhotoAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs/{id}/photo
             Method: PUT
         DogsDetectBreedAPI:
           Type: HttpApi
           Properties:
+            ApiId: !Ref MyApi
             Path: /dogs/{id}/photo/detect-breed
             Method: POST

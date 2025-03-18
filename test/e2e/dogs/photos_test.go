@@ -16,7 +16,7 @@ func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 	image, err := os.ReadFile(testCartoonDogImagePath)
 	require.NoError(t, err)
 
-	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), dog.ID),
+	resp := putBytes(t, fmt.Sprintf("/dogs/%s/photo", dog.ID),
 		image, "image/jpeg")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
@@ -28,8 +28,7 @@ func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 }
 
 func TestUploadImage_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := putBytes(t, fmt.Sprintf("%s/dogs/%s/photo", common.BaseUrl(), "123"),
-		[]byte{}, "text/plain")
+	resp := putBytes(t, "/dogs/123/photo", []byte{}, "text/plain")
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 }

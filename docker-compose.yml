@@ -7,9 +7,9 @@ services:
       context: api
       dockerfile: Dockerfile.sam
     volumes:
-      - ${HOST_API_PATH}:${HOST_API_PATH}
+      - ${PROJECT_ROOT}:${PROJECT_ROOT}
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: ${HOST_API_PATH}
+    working_dir: ${PROJECT_ROOT}
     ports:
       - "3000:3000"
     healthcheck:
@@ -74,6 +74,7 @@ services:
     container_name: e2e-test-local
     environment:
       - API_BASE_URL=http://sam:3000
+      - LOCAL_JWT_SECRET=1234567890
       - AWS_REGION
       - USE_LOCALSTACK=true
       - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566

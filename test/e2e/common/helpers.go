@@ -3,12 +3,15 @@ package common
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,14 +24,28 @@ func BaseUrl() string {
 	return os.Getenv("API_BASE_URL")
 }
 
+func NewAuthedRequest(t *testing.T, method, endpoint string, body io.Reader) *http.Request {
+	req, err := http.NewRequest(method, BaseUrl()+endpoint, body)
+	require.NoError(t, err, "Failed to create "+method+" request")
+	req.Header.Set("Authorization", "Bearer "+createTestJWT(t))
+	return req
+}
+
 func Get(t *testing.T, endpoint string) *http.Response {
-	resp, err := http.Get(BaseUrl() + endpoint)
+	req := NewAuthedRequest(t, http.MethodGet, endpoint, nil)
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	require.NoError(t, err, "Failed to fetch URL")
 	return resp
 }
 
 func PostBytes(t *testing.T, endpoint string, body []byte) *http.Response {
-	resp, err := http.Post(BaseUrl()+endpoint, "application/json", bytes.NewBuffer(body))
+	req := NewAuthedRequest(t, http.MethodPost, endpoint, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
 	require.NoError(t, err, "Failed to POST to URL")
 	return resp
 }
@@ -40,8 +57,7 @@ func PostJson(t *testing.T, endpoint string, body interface{}) *http.Response {
 }
 
 func PutBytes(t *testing.T, endpoint string, body []byte) *http.Response {
-	req, err := http.NewRequest(http.MethodPut, BaseUrl()+endpoint, bytes.NewBuffer(body))
-	require.NoError(t, err, "Failed to create PUT request")
+	req := NewAuthedRequest(t, http.MethodPut, endpoint, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -57,8 +73,7 @@ func PutJson(t *testing.T, endpoint string, body interface{}) *http.Response {
 }
 
 func Delete(t *testing.T, endpoint string) *http.Response {
-	req, err := http.NewRequest(http.MethodDelete, BaseUrl()+endpoint, nil)
-	require.NoError(t, err, "Failed to create DELETE request")
+	req := NewAuthedRequest(t, http.MethodDelete, endpoint, nil)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -92,4 +107,18 @@ func SkipIfLocal(t *testing.T) {
 	if strings.HasPrefix(BaseUrl(), "http://sam:") {
 		t.Skip("Skipping test on local environment")
 	}
+}
+
+func createTestJWT(t *testing.T) string {
+	claims := jwt.MapClaims{
+		"sub":            "test-user-id",
+		"email":          "test@example.com",
+		"cognito:groups": []string{"Users"},
+		"exp":            time.Now().Add(time.Hour).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(os.Getenv("LOCAL_JWT_SECRET")))
+	require.NoError(t, err, "Failed to create JWT")
+	fmt.Println("tokenString:", tokenString)
+	return tokenString
 }

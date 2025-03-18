@@ -1,4 +1,4 @@
-export HOST_API_PATH=$(shell pwd)/api
+export PROJECT_ROOT=$(shell pwd)
 ifeq ($(shell uname -s),Darwin)
     export CONTAINER_HOST=host.docker.internal
 else
@@ -38,6 +38,16 @@ compile: create-mod-cache lint test-unit
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
 .PHONY: compile
 
+compile-local-auth:
+	$(GO_CMD) "cd local-auth; \
+		rm -rf build; \
+		mkdir build; \
+		go mod download; \
+		go install gotest.tools/gotestsum@latest; \
+		LOCAL_JWT_SECRET=1234567890 gotestsum --format testname ./...; \
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
+.PHONY: compile-local-auth
+
 lint:
 	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"
 .PHONY: lint
@@ -51,7 +61,7 @@ test-unit: create-mod-cache
 		gotestsum --format testname ./..."
 .PHONY: test-unit
 
-test-local: build
+test-local: build compile-local-auth
 	docker compose build
 	docker compose run --rm e2e-test-local \
 		|| (if [ "$(SHOW_LOGS_ON_FAILURE)" = "true" ]; then \
@@ -65,9 +75,17 @@ test:
 	docker compose down
 .PHONY: test
 
-start-local-api: build
-	docker compose run --rm --service-ports sam
+start-local-api:
+	docker compose up -d sam
 .PHONY: start-local-api
+
+stop-local-api:
+	docker compose down
+.PHONY: stop-local-api
+
+test-e2e-local:
+	docker compose run --rm e2e-test-local
+.PHONY: test-e2e-local
 
 clean-cache:
 	-docker volume rm go-mod-cache

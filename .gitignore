@@ -31,3 +31,4 @@ plan.tfplan
 .terraform/
 
 api/build/
+local-auth/build/
