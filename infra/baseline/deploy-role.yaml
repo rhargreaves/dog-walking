@@ -205,7 +205,9 @@ Resources:
             Action: sts:AssumeRoleWithWebIdentity
             Condition:
               StringEquals:
-                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:environment:uat
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${GitHubRepository}:environment:uat
+                  - !Sub repo:${GitHubRepository}:environment:prod
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
       ManagedPolicyArns:
         - !Ref DeploymentPolicy
