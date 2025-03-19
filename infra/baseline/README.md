@@ -1,4 +1,4 @@
-# CI/CD Infrastructure
+# Baseline Infrastructure
 
 Scripts to setup the AWS account to support the deployment of this service.
 

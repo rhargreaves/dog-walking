@@ -59,7 +59,7 @@ make destroy
 
 ## CI/CD
 
-Deployed using GitHub Actions. There's a CloudFormation template in [deploy-infra](deploy-infra) for setting up a IAM role to deploy this service.
+Deployed using GitHub Actions. There's a CloudFormation template in [infra/baseline](infra/baseline) for setting up a IAM role to deploy this service.
 
 ## Proof-of-concept tradeoffs
 
