@@ -3,9 +3,7 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
-    build:
-      context: api
-      dockerfile: Dockerfile.sam
+    image: ghcr.io/rhargreaves/aws-sam-cli:1.135.0
     volumes:
       - .:/sam
       - /var/run/docker.sock:/var/run/docker.sock
