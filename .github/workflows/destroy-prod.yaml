@@ -1,0 +1,39 @@
+name: Destroy PROD
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy-prod:
+    name: Destroy PROD
+    runs-on: ubuntu-24.04-arm
+    environment: prod
+    defaults:
+      run:
+        working-directory: ./infra
+    env:
+      ENV: prod
+      TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_hosted_zone_id }}
+      TF_VAR_sysadmin_password: ${{ secrets.TF_VAR_sysadmin_password }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Terraform Init
+        run: make init
+
+      - name: Terraform Destroy
+        run: make destroy

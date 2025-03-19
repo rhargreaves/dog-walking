@@ -26,6 +26,14 @@ ifeq ($(ENV),uat)
 	export COGNITO_USER_POOL_NAME=uat-dog-walking
 	export COGNITO_CLIENT_NAME=uat-dog-walking-client
 endif
+ifeq ($(ENV),prod)
+	export DOG_IMAGES_BUCKET=prod-dog-images
+	export API_BASE_URL=https://api.dog-walking.roberthargreaves.com
+	export DOGS_TABLE_NAME=prod-dogs
+	export COGNITO_USER_POOL_NAME=prod-dog-walking
+	export COGNITO_CLIENT_NAME=prod-dog-walking-client
+endif
+
 
 create-go-cache:
 	-docker volume create go-cache

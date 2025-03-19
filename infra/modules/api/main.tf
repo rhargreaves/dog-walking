@@ -217,7 +217,7 @@ resource "aws_lambda_permission" "api_gateway" {
 }
 
 resource "aws_apigatewayv2_domain_name" "api" {
-  domain_name = "api.${var.environment}.dog-walking.${var.domain_name}"
+  domain_name = var.domain_name
 
   depends_on = [aws_acm_certificate_validation.api_cert]
 
@@ -239,7 +239,7 @@ resource "aws_apigatewayv2_api_mapping" "api" {
 }
 
 resource "aws_acm_certificate" "api_cert" {
-  domain_name       = "api.${var.environment}.dog-walking.${var.domain_name}"
+  domain_name       = var.domain_name
   validation_method = "DNS"
 
   lifecycle {
@@ -253,7 +253,7 @@ resource "aws_acm_certificate" "api_cert" {
 
 resource "aws_route53_record" "api" {
   zone_id = var.hosted_zone_id
-  name    = "api.${var.environment}.dog-walking.${var.domain_name}"
+  name    = var.domain_name
   type    = "A"
 
   alias {
