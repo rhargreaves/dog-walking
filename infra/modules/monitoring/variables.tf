@@ -1,6 +1,6 @@
-variable "service_name" {
+variable "application_name" {
   type        = string
-  description = "Name of the service"
+  description = "Name of the application"
 }
 
 variable "api_id" {

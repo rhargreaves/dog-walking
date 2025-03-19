@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "api_dashboard" {
-  dashboard_name = "${var.service_name}-${var.environment}-dashboard"
+  dashboard_name = "${var.environment}-${var.application_name}-dashboard"
 
   dashboard_body = jsonencode({
     widgets = [
@@ -64,7 +64,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_errors" {
-  alarm_name          = "${var.service_name}-${var.environment}-api-errors"
+  alarm_name          = "${var.environment}-${var.application_name}-api-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "5XXError"
@@ -82,7 +82,7 @@ resource "aws_cloudwatch_metric_alarm" "api_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  alarm_name          = "${var.service_name}-${var.environment}-lambda-errors"
+  alarm_name          = "${var.environment}-${var.application_name}-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "Errors"
@@ -99,5 +99,5 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 }
 
 resource "aws_sns_topic" "alerts" {
-  name = "${var.service_name}-${var.environment}-alerts"
+  name = "${var.environment}-${var.application_name}-alerts"
 }
