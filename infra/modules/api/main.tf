@@ -1,3 +1,15 @@
+locals {
+  authed_routes = toset([
+    "POST /dogs",
+    "GET /dogs",
+    "GET /dogs/{id}",
+    "PUT /dogs/{id}",
+    "DELETE /dogs/{id}",
+    "PUT /dogs/{id}/photo",
+    "POST /dogs/{id}/photo/detect-breed"
+  ])
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "${var.environment}-dog-walking-lambda-role"
 
@@ -112,6 +124,15 @@ resource "aws_apigatewayv2_stage" "api" {
   name        = "$default"
   auto_deploy = true
 
+  dynamic "route_settings" {
+    for_each = local.authed_routes
+
+    content {
+      route_key = route_settings.value
+      detailed_metrics_enabled = true
+    }
+  }
+
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
     format = jsonencode({
@@ -169,20 +190,8 @@ resource "aws_apigatewayv2_route" "ping_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
-locals {
-  authed_routes = [
-    "POST /dogs",
-    "GET /dogs",
-    "GET /dogs/{id}",
-    "PUT /dogs/{id}",
-    "DELETE /dogs/{id}",
-    "PUT /dogs/{id}/photo",
-    "POST /dogs/{id}/photo/detect-breed"
-  ]
-}
-
 resource "aws_apigatewayv2_route" "authed_routes" {
-  for_each = { for route in local.authed_routes : route => route }
+  for_each = local.authed_routes
 
   api_id             = aws_apigatewayv2_api.api.id
   route_key          = each.value
