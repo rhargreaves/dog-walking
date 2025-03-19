@@ -27,6 +27,14 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Build & cache AWS SAM image
+        uses: docker/build-push-action@v6
+        with:
+          context: api
+          file: Dockerfile.sam
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build API
         run: make build
 
