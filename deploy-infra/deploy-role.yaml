@@ -186,10 +186,8 @@ Resources:
               - sns:ListSubscriptions
               - sns:ListSubscriptionsByTopic
               - sns:ListTagsForResource
-              - sns:AddTagsToResource
-              - sns:RemoveTagsFromResource
               - sns:SetTopicAttributes
-              - sns:GetTopicAttributes
+              - sns:TagResource
               - sns:Publish
             Resource: !Sub arn:aws:sns:*:${AWS::AccountId}:*-dog-walking-*
 
