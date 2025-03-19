@@ -53,7 +53,7 @@ func GetCognitoJWT() string {
 
 func findUserPoolByName(cognito *cognitoidentityprovider.CognitoIdentityProvider, poolName string) string {
 	listPoolsInput := &cognitoidentityprovider.ListUserPoolsInput{
-		MaxResults: aws.Int64(1),
+		MaxResults: aws.Int64(25),
 	}
 	listPoolsOutput, err := cognito.ListUserPools(listPoolsInput)
 	if err != nil {
