@@ -13,6 +13,7 @@ jobs:
   destroy-uat:
     name: Destroy UAT
     runs-on: ubuntu-24.04-arm
+    environment: uat
     defaults:
       run:
         working-directory: ./infra
