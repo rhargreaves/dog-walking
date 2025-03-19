@@ -8,12 +8,12 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         width  = 12
         height = 6
         properties = {
-          metrics = [
-            ["AWS/ApiGateway", "Count", "ApiId", var.api_id]
-          ]
+          metrics = [ {
+            "expression": "SELECT SUM(\"Count\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource", "id": "q1" } ]
           period = 300
           stat   = "Sum"
           region = var.aws_region
+          view   = "timeSeries"
           title  = "Requests"
         }
       },
@@ -22,12 +22,12 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         width  = 12
         height = 6
         properties = {
-          metrics = [
-            ["AWS/ApiGateway", "4XXError", "ApiId", var.api_id]
-          ]
+          metrics = [ {
+            "expression": "SELECT SUM(\"4XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource", "id": "q2" } ]
           period = 300
           stat   = "Sum"
           region = var.aws_region
+          view   = "timeSeries"
           title  = "4XX Errors"
         }
       },
@@ -36,12 +36,12 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         width  = 12
         height = 6
         properties = {
-          metrics = [
-            ["AWS/ApiGateway", "5XXError", "ApiId", var.api_id]
-          ]
+          metrics = [ {
+            "expression": "SELECT SUM(\"5XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource", "id": "q3" } ]
           period = 300
           stat   = "Sum"
           region = var.aws_region
+          view   = "timeSeries"
           title  = "5XX Errors"
         }
       },
@@ -50,12 +50,12 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         width  = 12
         height = 6
         properties = {
-          metrics = [
-            ["AWS/ApiGateway", "Latency", "ApiId", var.api_id]
-          ]
+          metrics = [ {
+            "expression": "SELECT AVG(\"Latency\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource", "id": "q4" } ]
           period = 300
           stat   = "Average"
           region = var.aws_region
+          view   = "timeSeries"
           title  = "Latency"
         }
       }
