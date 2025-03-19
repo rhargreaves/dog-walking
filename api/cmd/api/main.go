@@ -32,6 +32,9 @@ func newRekognitionClient() rekognitioniface.RekognitionAPI {
 }
 
 func init() {
+	if !common.IsLocal() {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.Default()
 	r.Use(common.ErrorMiddleware)
 
