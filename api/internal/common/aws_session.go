@@ -20,13 +20,13 @@ func CreateS3Session() (*session.Session, error) {
 	return createSessionWithEndpoint(os.Getenv("AWS_S3_ENDPOINT_URL"))
 }
 
-func createSessionWithEndpoint(endpoint string) (*session.Session, error) {
+func createSessionWithEndpoint(localEndpoint string) (*session.Session, error) {
 	region := os.Getenv("AWS_REGION")
 	config := &aws.Config{
 		Region: &region,
 	}
 	if IsLocal() {
-		config.Endpoint = aws.String(endpoint)
+		config.Endpoint = aws.String(localEndpoint)
 		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
 		config.DisableSSL = aws.Bool(true)
 	}
