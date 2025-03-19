@@ -129,6 +129,7 @@ Resources:
               - logs:PutLogDelivery
               - logs:GetLogDelivery
               - logs:ListLogDeliveries
+              - logs:UpdateLogDelivery
             Resource: "*"
 
           - Effect: Allow
