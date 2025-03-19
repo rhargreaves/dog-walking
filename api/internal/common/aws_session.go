@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,33 +13,22 @@ func IsLocal() bool {
 }
 
 func CreateSession() (*session.Session, error) {
-	fmt.Printf("Using localstack: %t\n", IsLocal())
-
-	config := &aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	}
-	fmt.Printf("Creating config for region %s\n", *config.Region)
-
-	if IsLocal() {
-		config.Endpoint = aws.String(os.Getenv("AWS_ENDPOINT_URL"))
-		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
-		config.DisableSSL = aws.Bool(true)
-		fmt.Printf("Setting endpoint to %s\n", *config.Endpoint)
-	}
-
-	return session.NewSession(config)
+	return createSessionWithEndpoint(os.Getenv("AWS_ENDPOINT_URL"))
 }
 
 func CreateS3Session() (*session.Session, error) {
+	return createSessionWithEndpoint(os.Getenv("AWS_S3_ENDPOINT_URL"))
+}
+
+func createSessionWithEndpoint(endpoint string) (*session.Session, error) {
 	region := os.Getenv("AWS_REGION")
-	if IsLocal() {
-		return session.NewSession(&aws.Config{
-			Region:      &region,
-			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),
-			Credentials: credentials.NewStaticCredentials("test", "test", ""),
-		})
-	}
-	return session.NewSession(&aws.Config{
+	config := &aws.Config{
 		Region: &region,
-	})
+	}
+	if IsLocal() {
+		config.Endpoint = aws.String(endpoint)
+		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
+		config.DisableSSL = aws.Bool(true)
+	}
+	return session.NewSession(config)
 }
