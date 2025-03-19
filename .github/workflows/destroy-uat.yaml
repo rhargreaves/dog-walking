@@ -19,7 +19,8 @@ jobs:
         working-directory: ./infra
     env:
       ENV: uat
-      TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_hosted_zone_id }}
+      TF_VAR_hosted_zone_id: dummy
+      TF_VAR_sysadmin_password: dummy
 
     steps:
       - name: Checkout code
