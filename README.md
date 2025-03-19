@@ -1,5 +1,6 @@
 # Dog Walking Service
 [![Deploy UAT and Run Tests](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-uat.yaml/badge.svg)](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-uat.yaml)
+[![Deploy PROD & Test](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-prod.yaml/badge.svg)](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-prod.yaml)
 
 A service for helping dog owners find dog walkers
 
