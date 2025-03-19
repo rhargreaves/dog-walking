@@ -9,7 +9,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         height = 6
         properties = {
           metrics = [[{
-            expression = "SELECT SUM(\"Count\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource"
+            expression = "SELECT SUM(\"Count\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
             id = "q1"
           }]]
           period = 300
@@ -25,7 +25,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         height = 6
         properties = {
           metrics = [[{
-            expression = "SELECT SUM(\"4XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource"
+            expression = "SELECT SUM(\"4XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
             id = "q2"
           }]]
           period = 300
@@ -41,7 +41,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         height = 6
         properties = {
           metrics = [[{
-            expression = "SELECT SUM(\"5XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource"
+            expression = "SELECT SUM(\"5XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
             id = "q3"
           }]]
           period = 300
@@ -57,7 +57,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         height = 6
         properties = {
           metrics = [[{
-            expression = "SELECT AVG(\"Latency\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) GROUP BY \"Method\", Resource"
+            expression = "SELECT AVG(\"Latency\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
             id = "q4"
           }]]
           period = 300
