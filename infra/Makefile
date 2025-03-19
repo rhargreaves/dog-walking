@@ -42,7 +42,7 @@ unlock:
 .PHONY: unlock
 
 fmt:
-	$(DOCKER_TF) fmt
+	$(DOCKER_TF) fmt -recursive
 .PHONY: fmt
 
 import:
