@@ -10,7 +10,7 @@ import (
 
 func CreateS3Session() (*session.Session, error) {
 	region := os.Getenv("AWS_REGION")
-	if isLocal() {
+	if IsLocal() {
 		return session.NewSession(&aws.Config{
 			Region:      &region,
 			Endpoint:    aws.String(os.Getenv("AWS_S3_ENDPOINT_URL")),

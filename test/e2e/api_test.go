@@ -26,3 +26,41 @@ func TestApi_NotOnPort80(t *testing.T) {
 	require.Contains(t, err.Error(), "connection refused",
 		"Error should indicate connection refused")
 }
+
+func TestApi_AuthRequiredOnProtectedRoutes(t *testing.T) {
+	tests := []struct {
+		name     string
+		method   string
+		endpoint string
+	}{
+		{"POST /dogs", http.MethodPost, "/dogs"},
+		{"GET /dogs", http.MethodGet, "/dogs"},
+		{"GET /dogs/{id}", http.MethodGet, "/dogs/123"},
+		{"PUT /dogs/{id}", http.MethodPut, "/dogs/123"},
+		{"DELETE /dogs/{id}", http.MethodDelete, "/dogs/123"},
+		{"PUT /dogs/{id}/photo", http.MethodPut, "/dogs/123/photo"},
+		{"POST /dogs/{id}/photo/detect-breed", http.MethodPost, "/dogs/123/photo/detect-breed"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var resp *http.Response
+			switch tc.method {
+			case http.MethodGet:
+				resp = common.Get(t, tc.endpoint)
+			case http.MethodPost:
+				resp = common.PostJson(t, tc.endpoint, struct{}{})
+			case http.MethodPut:
+				resp = common.PutJson(t, tc.endpoint, struct{}{})
+			case http.MethodDelete:
+				resp = common.Delete(t, tc.endpoint)
+			}
+			defer resp.Body.Close()
+			expectedStatus := http.StatusUnauthorized
+			if common.IsLocal() { // SAM handles auth failure differently
+				expectedStatus = http.StatusForbidden
+			}
+			common.RequireStatus(t, resp, expectedStatus)
+		})
+	}
+}

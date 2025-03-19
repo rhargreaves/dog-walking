@@ -18,12 +18,12 @@ var (
 	jwtToken string
 )
 
-func isLocal() bool {
+func IsLocal() bool {
 	return os.Getenv("USE_LOCALSTACK") == "true"
 }
 
 func Authenticate() {
-	if isLocal() {
+	if IsLocal() {
 		fmt.Println("🔑 Authenticating with local credentials")
 		jwtToken = auth.CreateLocalJWT()
 	} else {
@@ -120,7 +120,7 @@ func logBody(t *testing.T, resp *http.Response) {
 }
 
 func SkipIfLocal(t *testing.T) {
-	if isLocal() {
+	if IsLocal() {
 		t.Skip("Skipping test on local environment")
 	}
 }
