@@ -44,3 +44,7 @@ unlock:
 fmt:
 	$(DOCKER_TF) fmt
 .PHONY: fmt
+
+import:
+	$(DOCKER_TF) -chdir=environments/$(ENV) import $(IMPORT_RES) $(IMPORT_ID)
+.PHONY: import

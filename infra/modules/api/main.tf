@@ -71,6 +71,11 @@ resource "aws_lambda_function" "api" {
   filename         = data.archive_file.bootstrap.output_path
   source_code_hash = data.archive_file.bootstrap.output_base64sha256
 
+  logging_config {
+    log_format = "Text"
+    log_group = aws_cloudwatch_log_group.lambda_logs.name
+  }
+
   environment {
     variables = {
       ENVIRONMENT = var.environment
@@ -81,6 +86,15 @@ resource "aws_lambda_function" "api" {
 
   tags = {
     Name = "${var.environment}-dog-walking-api"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${var.environment}-dog-walking-api"
+  retention_in_days = 7
+
+  tags = {
+    Name = "${var.environment}-dog-walking-api-logs"
   }
 }
 
