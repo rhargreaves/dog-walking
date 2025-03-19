@@ -4,6 +4,7 @@ ifeq ($(shell uname -s),Darwin)
 else
     export CONTAINER_HOST=172.17.0.1
 endif
+export LOCAL_JWT_SECRET=1234567890
 
 SHOW_LOGS_ON_FAILURE := false
 GO_IMAGE := golang:1.23.4-alpine
@@ -47,7 +48,7 @@ compile-local-auth:
 		mkdir build; \
 		go mod download; \
 		go install gotest.tools/gotestsum@latest; \
-		LOCAL_JWT_SECRET=1234567890 gotestsum --format testname ./...; \
+		LOCAL_JWT_SECRET=$(LOCAL_JWT_SECRET) gotestsum --format testname ./...; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
 .PHONY: compile-local-auth
 
