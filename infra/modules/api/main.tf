@@ -129,6 +129,8 @@ resource "aws_apigatewayv2_stage" "api" {
 
     content {
       route_key = route_settings.value
+      throttling_burst_limit = 10
+      throttling_rate_limit = 50
       detailed_metrics_enabled = true
     }
   }
