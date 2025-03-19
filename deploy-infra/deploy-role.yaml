@@ -169,6 +169,11 @@ Resources:
               - cognito-idp:*
             Resource: "*"
 
+          - Effect: Allow
+            Action:
+              - cloudwatch:*
+            Resource: "*"
+
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
