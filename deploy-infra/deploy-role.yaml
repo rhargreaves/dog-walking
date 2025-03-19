@@ -174,6 +174,19 @@ Resources:
               - cloudwatch:*
             Resource: "*"
 
+          - Effect: Allow
+            Action:
+              - sns:GetTopicAttributes
+              - sns:CreateTopic
+              - sns:DeleteTopic
+              - sns:ListTopics
+              - sns:Subscribe
+              - sns:Unsubscribe
+              - sns:ListSubscriptions
+              - sns:ListSubscriptionsByTopic
+              - sns:Publish
+            Resource: !Sub arn:aws:sns:*:${AWS::AccountId}:*-dog-walking-*
+
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
