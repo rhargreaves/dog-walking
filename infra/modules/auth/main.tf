@@ -9,14 +9,14 @@ resource "aws_cognito_user_pool" "pool" {
     require_uppercase = true
   }
 
-  username_attributes = ["email"]
+  username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
 
   schema {
     attribute_data_type = "String"
-    name               = "email"
-    required           = true
-    mutable            = true
+    name                = "email"
+    required            = true
+    mutable             = true
 
     string_attribute_constraints {
       min_length = 1
@@ -26,8 +26,8 @@ resource "aws_cognito_user_pool" "pool" {
 
   verification_message_template {
     default_email_option = "CONFIRM_WITH_CODE"
-    email_subject       = "Your verification code"
-    email_message       = "Your verification code is {####}"
+    email_subject        = "Your verification code"
+    email_message        = "Your verification code is {####}"
   }
 
   account_recovery_setting {
@@ -58,7 +58,7 @@ resource "aws_cognito_user_pool_client" "client" {
   }
 
   access_token_validity  = 1
-  id_token_validity     = 1
+  id_token_validity      = 1
   refresh_token_validity = 30
 }
 

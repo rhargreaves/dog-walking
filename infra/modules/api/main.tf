@@ -73,13 +73,13 @@ resource "aws_lambda_function" "api" {
 
   logging_config {
     log_format = "Text"
-    log_group = aws_cloudwatch_log_group.lambda_logs.name
+    log_group  = aws_cloudwatch_log_group.lambda_logs.name
   }
 
   environment {
     variables = {
-      ENVIRONMENT = var.environment
-      DOGS_TABLE_NAME = var.dogs_table_name
+      ENVIRONMENT       = var.environment
+      DOGS_TABLE_NAME   = var.dogs_table_name
       DOG_IMAGES_BUCKET = var.dog_images_bucket
     }
   }
@@ -115,14 +115,14 @@ resource "aws_apigatewayv2_stage" "api" {
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      ip             = "$context.identity.sourceIp"
-      requestTime    = "$context.requestTime"
-      httpMethod     = "$context.httpMethod"
-      routeKey       = "$context.routeKey"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId          = "$context.requestId"
+      ip                 = "$context.identity.sourceIp"
+      requestTime        = "$context.requestTime"
+      httpMethod         = "$context.httpMethod"
+      routeKey           = "$context.routeKey"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
       integrationLatency = "$context.integrationLatency"
     })
   }
@@ -142,10 +142,10 @@ resource "aws_cloudwatch_log_group" "api_logs" {
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = aws_apigatewayv2_api.api.id
-  integration_type = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.api.invoke_arn
-  integration_method = "POST"
+  api_id                 = aws_apigatewayv2_api.api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.api.invoke_arn
+  integration_method     = "POST"
   payload_format_version = "2.0"
 }
 
@@ -164,9 +164,9 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
 }
 
 resource "aws_apigatewayv2_route" "ping_route" {
-  api_id           = aws_apigatewayv2_api.api.id
-  route_key        = "GET /ping"
-  target           = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /ping"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 locals {
@@ -184,10 +184,10 @@ locals {
 resource "aws_apigatewayv2_route" "authed_routes" {
   for_each = { for route in local.authed_routes : route => route }
 
-  api_id           = aws_apigatewayv2_api.api.id
-  route_key        = each.value
-  target           = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-  authorizer_id    = aws_apigatewayv2_authorizer.cognito.id
+  api_id             = aws_apigatewayv2_api.api.id
+  route_key          = each.value
+  target             = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
   authorization_type = "JWT"
 }
 
@@ -196,7 +196,7 @@ resource "aws_lambda_permission" "api_gateway" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
 
 resource "aws_apigatewayv2_domain_name" "api" {

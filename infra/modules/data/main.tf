@@ -13,7 +13,7 @@ resource "aws_dynamodb_table" "dogs" {
   }
 
   tags = {
-    Name        = "${var.environment}-dogs-table"
+    Name = "${var.environment}-dogs-table"
   }
 }
 
