@@ -54,3 +54,13 @@ module "auth" {
   environment       = var.environment
   sysadmin_password = var.sysadmin_password
 }
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  service_name         = var.application_name
+  api_id               = module.api.api_id
+  lambda_function_name = module.api.lambda_function_name
+  environment          = var.environment
+  aws_region           = var.aws_region
+}
