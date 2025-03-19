@@ -124,6 +124,12 @@ resource "aws_apigatewayv2_stage" "api" {
   name        = "$default"
   auto_deploy = true
 
+  default_route_settings {
+    throttling_burst_limit = 5
+    throttling_rate_limit = 20
+    detailed_metrics_enabled = true
+  }
+
   dynamic "route_settings" {
     for_each = local.authed_routes
 
