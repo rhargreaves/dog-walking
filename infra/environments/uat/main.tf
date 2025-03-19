@@ -59,8 +59,7 @@ module "monitoring" {
   source = "../../modules/monitoring"
 
   application_name     = var.application_name
+  environment          = var.environment
   api_id               = module.api.api_id
   lambda_function_name = module.api.lambda_function_name
-  environment          = var.environment
-  aws_region           = var.aws_region
 }

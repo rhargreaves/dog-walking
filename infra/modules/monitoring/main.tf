@@ -1,3 +1,5 @@
+data "aws_region" "current" { }
+
 resource "aws_cloudwatch_dashboard" "api_dashboard" {
   dashboard_name = "${var.environment}-${var.application_name}-dashboard"
 
@@ -14,7 +16,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           }]]
           period = 300
           stat   = "Sum"
-          region = var.aws_region
+          region = data.aws_region.current.name
           view   = "timeSeries"
           title  = "Requests"
         }
@@ -30,7 +32,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           }]]
           period = 300
           stat   = "Sum"
-          region = var.aws_region
+          region = data.aws_region.current.name
           view   = "timeSeries"
           title  = "4XX Errors"
         }
@@ -46,7 +48,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           }]]
           period = 300
           stat   = "Sum"
-          region = var.aws_region
+          region = data.aws_region.current.name
           view   = "timeSeries"
           title  = "5XX Errors"
         }
@@ -62,7 +64,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
           }]]
           period = 300
           stat   = "Average"
-          region = var.aws_region
+          region = data.aws_region.current.name
           view   = "timeSeries"
           title  = "Latency"
         }
