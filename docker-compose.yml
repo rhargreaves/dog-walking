@@ -65,8 +65,8 @@ services:
       - DOG_IMAGES_BUCKET
       - COGNITO_USER_POOL_NAME
       - COGNITO_CLIENT_NAME
-      - COGNITO_USERNAME
-      - COGNITO_PASSWORD
+      - TEST_USERNAME
+      - TEST_PASSWORD
 
   e2e-test-local:
     depends_on:

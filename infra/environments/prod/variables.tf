@@ -33,8 +33,14 @@ variable "bootstrap_path" {
   type        = string
 }
 
+variable "sysadmin_username" {
+  description = "Username for user with full admin access"
+  type        = string
+  sensitive   = true
+}
+
 variable "sysadmin_password" {
-  description = "Password for the sysadmin user"
+  description = "Password for user with full admin access"
   type        = string
   sensitive   = true
 }

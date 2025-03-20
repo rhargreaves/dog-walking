@@ -5,6 +5,7 @@ else
     export CONTAINER_HOST=172.17.0.1
 endif
 export LOCAL_JWT_SECRET=1234567890
+export AWS_REGION=eu-west-1
 
 SHOW_LOGS_ON_FAILURE := false
 GO_IMAGE := golang:1.23.4-alpine
@@ -18,22 +19,26 @@ GO_CMD := docker run -i $(TTY_ARG) --rm \
 	$(GO_IMAGE) \
 	sh -ec
 
-export AWS_REGION=eu-west-1
-ifeq ($(ENV),uat)
-	export DOG_IMAGES_BUCKET=uat-dog-images
-	export API_BASE_URL=https://api.uat.dog-walking.roberthargreaves.com
-	export DOGS_TABLE_NAME=uat-dogs
-	export COGNITO_USER_POOL_NAME=uat-dog-walking
-	export COGNITO_CLIENT_NAME=uat-dog-walking-client
-endif
-ifeq ($(ENV),prod)
-	export DOG_IMAGES_BUCKET=prod-dog-images
-	export API_BASE_URL=https://api.dog-walking.roberthargreaves.com
-	export DOGS_TABLE_NAME=prod-dogs
-	export COGNITO_USER_POOL_NAME=prod-dog-walking
-	export COGNITO_CLIENT_NAME=prod-dog-walking-client
+ifndef ENV
+export ENV=local
+$(warning ENV is not set. Defaulting to 'local')
 endif
 
+ifeq ($(ENV),uat)
+export DOG_IMAGES_BUCKET=uat-dog-images
+export API_BASE_URL=https://api.uat.dog-walking.roberthargreaves.com
+export DOGS_TABLE_NAME=uat-dogs
+export COGNITO_USER_POOL_NAME=uat-dog-walking
+export COGNITO_CLIENT_NAME=uat-dog-walking-client
+endif
+
+ifeq ($(ENV),prod)
+export DOG_IMAGES_BUCKET=prod-dog-images
+export API_BASE_URL=https://api.dog-walking.roberthargreaves.com
+export DOGS_TABLE_NAME=prod-dogs
+export COGNITO_USER_POOL_NAME=prod-dog-walking
+export COGNITO_CLIENT_NAME=prod-dog-walking-client
+endif
 
 create-go-cache:
 	-docker volume create go-cache
@@ -82,7 +87,7 @@ test-local: build compile-local-auth
 	docker compose down
 .PHONY: test-local
 
-test:
+test: check-test-username check-test-password
 	docker compose run --build --rm e2e-test
 	docker compose down
 .PHONY: test
@@ -107,3 +112,17 @@ clean: clean-cache
 	-rm -rf api/build
 	docker compose down --rmi all --volumes --remove-orphans
 .PHONY: clean
+
+check-test-username:
+	@if [ -z "$(TEST_USERNAME)" ]; then \
+		echo "Error: TEST_USERNAME environment variable is not set"; \
+		exit 1; \
+	fi
+.PHONY: check-test-username
+
+check-test-password:
+	@if [ -z "$(TEST_PASSWORD)" ]; then \
+		echo "Error: TEST_PASSWORD environment variable is not set"; \
+		exit 1; \
+	fi
+.PHONY: check-test-password

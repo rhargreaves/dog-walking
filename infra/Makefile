@@ -2,13 +2,26 @@ TERRAFORM_IMAGE := hashicorp/terraform:latest
 TERRAFORM_WORKDIR := /workspace
 ENV ?= uat
 
+ifeq ($(HOSTED_ZONE_ID),)
+	$(warning HOSTED_ZONE_ID is not set. 'plan', 'apply' and 'destroy' will fail)
+endif
+
+ifeq ($(SYSADMIN_USERNAME),)
+	$(warning SYSADMIN_USERNAME is not set. 'plan', 'apply' and 'destroy' will fail)
+endif
+
+ifeq ($(SYSADMIN_PASSWORD),)
+	$(warning SYSADMIN_PASSWORD is not set. 'plan', 'apply' and 'destroy' will fail)
+endif
+
 DOCKER_TF := docker run --rm \
 	-v $(shell pwd):$(TERRAFORM_WORKDIR) \
 	-v $(shell pwd)/../api:/api \
 	-w $(TERRAFORM_WORKDIR) \
 	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
-	-e TF_VAR_hosted_zone_id \
-	-e TF_VAR_sysadmin_password \
+	-e TF_VAR_hosted_zone_id=$(HOSTED_ZONE_ID) \
+	-e TF_VAR_sysadmin_username=$(SYSADMIN_USERNAME) \
+	-e TF_VAR_sysadmin_password=$(SYSADMIN_PASSWORD) \
 	-e TF_VAR_bootstrap_path=/api/build/bootstrap \
 	$(TERRAFORM_IMAGE)
 

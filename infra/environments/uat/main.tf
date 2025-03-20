@@ -53,6 +53,7 @@ module "auth" {
 
   environment       = var.environment
   sysadmin_password = var.sysadmin_password
+  sysadmin_username = var.sysadmin_username
 }
 
 module "monitoring" {

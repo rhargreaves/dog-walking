@@ -71,10 +71,10 @@ resource "aws_cognito_user_group" "admin_group" {
 
 resource "aws_cognito_user" "sysadmin" {
   user_pool_id = aws_cognito_user_pool.pool.id
-  username     = "sysadmin@dog-walking.roberthargreaves.com"
+  username     = var.sysadmin_username
   password     = var.sysadmin_password
   attributes = {
-    email          = "sysadmin@dog-walking.roberthargreaves.com"
+    email          = var.sysadmin_username
     email_verified = true
   }
 }

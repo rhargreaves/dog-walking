@@ -52,6 +52,7 @@ module "auth" {
   source = "../../modules/auth"
 
   environment       = var.environment
+  sysadmin_username = var.sysadmin_username
   sysadmin_password = var.sysadmin_password
 }
 

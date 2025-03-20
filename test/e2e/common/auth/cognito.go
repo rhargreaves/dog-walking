@@ -24,13 +24,13 @@ func GetCognitoJWT() string {
 	userPoolId := findUserPoolByName(cognito, poolName)
 	clientId := findClientByName(cognito, userPoolId, clientName)
 
-	username := os.Getenv("COGNITO_USERNAME")
+	username := os.Getenv("TEST_USERNAME")
 	if username == "" {
-		log.Fatal("COGNITO_USERNAME environment variable is required")
+		log.Fatal("TEST_USERNAME environment variable is required")
 	}
-	password := os.Getenv("COGNITO_PASSWORD")
+	password := os.Getenv("TEST_PASSWORD")
 	if password == "" {
-		log.Fatal("COGNITO_PASSWORD environment variable is required")
+		log.Fatal("TEST_PASSWORD environment variable is required")
 	}
 	authInput := &cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String("USER_PASSWORD_AUTH"),
