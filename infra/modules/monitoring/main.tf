@@ -73,24 +73,6 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
   })
 }
 
-resource "aws_cloudwatch_metric_alarm" "api_errors" {
-  alarm_name          = "${var.environment}-${var.application_name}-api-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "5XXError"
-  namespace           = "AWS/ApiGateway"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "5"
-  alarm_description   = "This metric monitors API 5XX errors"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-
-  dimensions = {
-    ApiId = var.api_id
-    Stage = var.environment
-  }
-}
-
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "${var.environment}-${var.application_name}-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
