@@ -18,8 +18,8 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "domain_name" {
-  description = "The base domain name for the application"
+variable "api_base_host" {
+  description = "The base DNS name for the API"
   type        = string
 }
 

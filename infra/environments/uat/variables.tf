@@ -18,9 +18,9 @@ variable "availability_zones" {
   type = list(string)
 }
 
-variable "domain_name" {
+variable "api_base_host" {
   type        = string
-  description = "The base domain name for the application"
+  description = "The base DNS name for the API"
 }
 
 variable "hosted_zone_id" {

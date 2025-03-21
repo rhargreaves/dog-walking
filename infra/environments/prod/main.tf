@@ -37,7 +37,7 @@ module "api" {
   application_name           = var.application_name
   vpc_id                     = module.base.vpc_id
   private_subnet_ids         = module.base.private_subnet_ids
-  domain_name                = var.domain_name
+  api_base_host              = var.api_base_host
   hosted_zone_id             = var.hosted_zone_id
   dynamodb_access_policy_arn = module.data.dynamodb_access_policy_arn
   s3_access_policy_arn       = module.images.s3_access_policy_arn
