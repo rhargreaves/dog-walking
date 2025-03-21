@@ -58,9 +58,9 @@ variable "cognito_user_pool_id" {
   type        = string
 }
 
-variable "cognito_client_id" {
-  description = "The ID of the Cognito User Pool Client"
-  type        = string
+variable "cognito_client_ids" {
+  description = "The IDs of the Cognito User Pool Clients that can be used to authenticate with the API"
+  type        = list(string)
 }
 
 variable "cors_allowed_origin" {

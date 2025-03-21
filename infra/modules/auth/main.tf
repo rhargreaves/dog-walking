@@ -42,8 +42,8 @@ resource "aws_cognito_user_pool" "pool" {
   }
 }
 
-resource "aws_cognito_user_pool_client" "client" {
-  name         = "${var.environment}-dog-walking-client"
+resource "aws_cognito_user_pool_client" "api" {
+  name         = "${var.environment}-dog-walking-api"
   user_pool_id = aws_cognito_user_pool.pool.id
 
   explicit_auth_flows = [

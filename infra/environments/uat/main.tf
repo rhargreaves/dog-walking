@@ -44,7 +44,7 @@ module "api" {
   dogs_table_name            = module.data.dogs_table_name
   dog_images_bucket          = module.images.bucket_name
   bootstrap_path             = var.bootstrap_path
-  cognito_client_id          = module.auth.cognito_client_id
+  cognito_client_ids         = module.auth.cognito_client_ids
   cognito_user_pool_id       = module.auth.cognito_user_pool_id
   cors_allowed_origin        = var.cors_allowed_origin
 }
