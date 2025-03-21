@@ -1,7 +1,6 @@
 package dogs
 
 import (
-	"bytes"
 	"io"
 	"net/http"
 	"testing"
@@ -21,7 +20,7 @@ type Dog struct {
 }
 
 func createDog(t *testing.T, name string) Dog {
-	resp := common.PostJson(t, "/dogs", Dog{Name: name})
+	resp := common.PostJson(t, "/dogs", Dog{Name: name}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusCreated)
 
@@ -32,17 +31,6 @@ func createDog(t *testing.T, name string) Dog {
 	assert.NotEmpty(t, dog.ID, "Expected dog ID to be returned")
 
 	return dog
-}
-
-func putBytes(t *testing.T, url string, body []byte, contentType string) *http.Response {
-	req := common.NewAuthedRequest(t, http.MethodPut, url, bytes.NewReader(body))
-	req.Header.Set("Content-Type", contentType)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-	return resp
 }
 
 func getS3Object(t *testing.T, bucket string, key string) []byte {

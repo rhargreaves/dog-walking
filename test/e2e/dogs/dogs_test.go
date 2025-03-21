@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"bytes"
 	"net/http"
 	"testing"
 
@@ -17,7 +18,9 @@ func TestCreateDog(t *testing.T) {
 }
 
 func TestCreateDog_RejectsInvalidJson(t *testing.T) {
-	resp := common.PostBytes(t, "/dogs", []byte("foo"))
+	req := common.ApiRequest(t, http.MethodPost, "/dogs", true, bytes.NewBuffer([]byte("foo")))
+	req.Header.Set("Content-Type", "application/json")
+	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusBadRequest)
 }
@@ -26,7 +29,7 @@ func TestGetDog_ReturnsDogWhenExists(t *testing.T) {
 	const dogName = "Rover"
 	createdDog := createDog(t, dogName)
 
-	resp := common.Get(t, "/dogs/"+createdDog.ID)
+	resp := common.Get(t, "/dogs/"+createdDog.ID, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
@@ -38,7 +41,7 @@ func TestGetDog_ReturnsDogWhenExists(t *testing.T) {
 }
 
 func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := common.Get(t, "/dogs/123")
+	resp := common.Get(t, "/dogs/123", true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 
@@ -51,11 +54,11 @@ func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	resp := common.PutJson(t, "/dogs/"+dog.ID, Dog{Name: "Rose"})
+	resp := common.PutJson(t, "/dogs/"+dog.ID, Dog{Name: "Rose"}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	resp = common.Get(t, "/dogs/"+dog.ID)
+	resp = common.Get(t, "/dogs/"+dog.ID, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
@@ -67,11 +70,11 @@ func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 }
 
 func TestUpdateDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := common.PutJson(t, "/dogs/123", Dog{Name: "Mr. Peanutbutter"})
+	resp := common.PutJson(t, "/dogs/123", Dog{Name: "Mr. Peanutbutter"}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 
-	resp = common.Get(t, "/dogs/123")
+	resp = common.Get(t, "/dogs/123", true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 }
@@ -79,7 +82,7 @@ func TestUpdateDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 func TestListDogs(t *testing.T) {
 	createDog(t, "ListTest")
 
-	resp := common.Get(t, "/dogs")
+	resp := common.Get(t, "/dogs", true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
@@ -93,13 +96,13 @@ func TestListDogs(t *testing.T) {
 func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	resp := common.Delete(t, "/dogs/"+dog.ID)
+	resp := common.Delete(t, "/dogs/"+dog.ID, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 }
 
 func TestDeleteDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := common.Delete(t, "/dogs/123")
+	resp := common.Delete(t, "/dogs/123", true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 }

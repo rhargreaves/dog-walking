@@ -5,13 +5,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
 func TestApi_Running(t *testing.T) {
-	resp := common.Get(t, "/ping")
+	resp := common.Get(t, "/ping", false)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 }
@@ -47,20 +48,21 @@ func TestApi_AuthRequiredOnProtectedRoutes(t *testing.T) {
 			var resp *http.Response
 			switch tc.method {
 			case http.MethodGet:
-				resp = common.Get(t, tc.endpoint)
+				resp = common.Get(t, tc.endpoint, false)
 			case http.MethodPost:
-				resp = common.PostJson(t, tc.endpoint, struct{}{})
+				resp = common.PostJson(t, tc.endpoint, struct{}{}, false)
 			case http.MethodPut:
-				resp = common.PutJson(t, tc.endpoint, struct{}{})
+				resp = common.PutJson(t, tc.endpoint, struct{}{}, false)
 			case http.MethodDelete:
-				resp = common.Delete(t, tc.endpoint)
+				resp = common.Delete(t, tc.endpoint, false)
 			}
 			defer resp.Body.Close()
-			expectedStatus := http.StatusUnauthorized
-			if common.IsLocal() { // SAM handles auth failure differently
-				expectedStatus = http.StatusForbidden
-			}
-			common.RequireStatus(t, resp, expectedStatus)
+			common.RequireStatus(t, resp, http.StatusUnauthorized)
+
+			var messageResponse common.MessageResponse
+			common.DecodeJSON(t, resp, &messageResponse)
+			assert.Equal(t, "Unauthorized", messageResponse.Message,
+				"Expected error message to be returned")
 		})
 	}
 }

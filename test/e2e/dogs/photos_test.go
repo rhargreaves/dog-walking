@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,8 +17,10 @@ func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 	image, err := os.ReadFile(testCartoonDogImagePath)
 	require.NoError(t, err)
 
-	resp := putBytes(t, fmt.Sprintf("/dogs/%s/photo", dog.ID),
-		image, "image/jpeg")
+	req := common.ApiRequest(t, http.MethodPut, fmt.Sprintf("/dogs/%s/photo", dog.ID),
+		true, bytes.NewReader(image))
+	req.Header.Set("Content-Type", "image/jpeg")
+	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 	t.Log("Image uploaded successfully")
@@ -28,7 +31,10 @@ func TestUploadImage_PhotoUploadedToS3(t *testing.T) {
 }
 
 func TestUploadImage_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := putBytes(t, "/dogs/123/photo", []byte{}, "text/plain")
+	req := common.ApiRequest(t, http.MethodPut, "/dogs/123/photo",
+		true, bytes.NewReader([]byte{}))
+	req.Header.Set("Content-Type", "text/plain")
+	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 }

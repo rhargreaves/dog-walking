@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -38,14 +39,16 @@ func uploadImageAndDetectBreed(t *testing.T, dogID string, imagePath string) *ht
 	image, err := os.ReadFile(imagePath)
 	require.NoError(t, err)
 
-	resp := putBytes(t, fmt.Sprintf("/dogs/%s/photo", dogID),
-		image, "image/jpeg")
+	req := common.ApiRequest(t, http.MethodPut, fmt.Sprintf("/dogs/%s/photo", dogID),
+		true, bytes.NewReader(image))
+	req.Header.Set("Content-Type", "image/jpeg")
+	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
 	return common.PostJson(t,
 		fmt.Sprintf("/dogs/%s/photo/detect-breed", dogID),
-		DetectBreedRequest{})
+		DetectBreedRequest{}, true)
 }
 
 func TestDetectBreed_SuccessfulCases(t *testing.T) {
@@ -74,7 +77,7 @@ func TestDetectBreed_SuccessfulCases(t *testing.T) {
 			require.Equal(t, tc.expectedBreed, response.Breed)
 			require.Greater(t, response.Confidence, 55.0)
 
-			resp = common.Get(t, "/dogs/"+dog.ID)
+			resp = common.Get(t, "/dogs/"+dog.ID, true)
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusOK)
 

@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
@@ -62,7 +61,6 @@ func TestCors_PreflightRequest(t *testing.T) {
 
 func TestCors_DisallowedOrigin(t *testing.T) {
 	disallowedOrigin := "https://example.com"
-
 	resp := common.CorsPreflight(t, "/ping", disallowedOrigin, "GET")
 	defer resp.Body.Close()
 
@@ -72,18 +70,12 @@ func TestCors_DisallowedOrigin(t *testing.T) {
 
 func TestCors_NormalRequestWithAllowedOrigin(t *testing.T) {
 	allowedOrigin := allowedOrigin()
-	req, err := http.NewRequest(http.MethodGet, common.BaseUrl()+"/dogs", nil)
-	require.NoError(t, err, "failed to create GET request")
+	req := common.ApiRequest(t, http.MethodGet, "/dogs", true, nil)
 	req.Header.Set("Origin", allowedOrigin)
-	common.Authenticate()
-	jwtToken := common.GetJwtToken()
-	req.Header.Set("Authorization", "Bearer "+jwtToken)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	require.NoError(t, err, "failed to make GET request with Origin header")
+	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
-
 	common.RequireStatus(t, resp, http.StatusOK)
+
 	respAllowedOrigin := resp.Header.Get("Access-Control-Allow-Origin")
 	assert.Equal(t, allowedOrigin, respAllowedOrigin, "Access-Control-Allow-Origin should match in normal response")
 
