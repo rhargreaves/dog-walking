@@ -15,8 +15,8 @@ Resources:
         AllowOrigins:
           - "http://localhost:3001"
         AllowHeaders:
-          - "Content-Type"
-          - "Authorization"
+          - "content-type"
+          - "authorization"
         AllowMethods:
           - "*"
         MaxAge: 600
@@ -29,8 +29,8 @@ Resources:
         AllowOrigins:
           - "http://localhost:3001"
         AllowHeaders:
-          - "Content-Type"
-          - "Authorization"
+          - "content-type"
+          - "authorization"
         AllowMethods:
           - "*"
         MaxAge: 600

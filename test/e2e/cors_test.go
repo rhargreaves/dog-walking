@@ -51,8 +51,8 @@ func TestCors_PreflightRequest(t *testing.T) {
 			assert.Contains(t, allowMethods, endpoint.method, "Access-Control-Allow-Methods should contain the requested method")
 
 			allowHeaders := resp.Header.Get("Access-Control-Allow-Headers")
-			assert.Contains(t, allowHeaders, "Content-Type", "Access-Control-Allow-Headers should contain Content-Type")
-			assert.Contains(t, allowHeaders, "Authorization", "Access-Control-Allow-Headers should contain Authorization")
+			assert.Contains(t, allowHeaders, "content-type", "Access-Control-Allow-Headers should contain content-type")
+			assert.Contains(t, allowHeaders, "authorization", "Access-Control-Allow-Headers should contain authorization")
 
 			allowCredentials := resp.Header.Get("Access-Control-Allow-Credentials")
 			assert.Equal(t, "true", allowCredentials, "Access-Control-Allow-Credentials should be true")
