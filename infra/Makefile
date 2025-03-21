@@ -3,15 +3,15 @@ TERRAFORM_WORKDIR := /workspace
 ENV ?= uat
 
 ifeq ($(HOSTED_ZONE_ID),)
-	$(warning HOSTED_ZONE_ID is not set. 'plan', 'apply' and 'destroy' will fail)
+$(warning HOSTED_ZONE_ID is not set. 'plan', 'apply' and 'destroy' will fail)
 endif
 
 ifeq ($(SYSADMIN_USERNAME),)
-	$(warning SYSADMIN_USERNAME is not set. 'plan', 'apply' and 'destroy' will fail)
+$(warning SYSADMIN_USERNAME is not set. 'plan', 'apply' and 'destroy' will fail)
 endif
 
 ifeq ($(SYSADMIN_PASSWORD),)
-	$(warning SYSADMIN_PASSWORD is not set. 'plan', 'apply' and 'destroy' will fail)
+$(warning SYSADMIN_PASSWORD is not set. 'plan', 'apply' and 'destroy' will fail)
 endif
 
 DOCKER_TF := docker run --rm \
