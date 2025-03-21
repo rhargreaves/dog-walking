@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -37,7 +38,11 @@ type ErrorResponse struct {
 }
 
 func BaseUrl() string {
-	return os.Getenv("API_BASE_URL")
+	apiBaseUrl := os.Getenv("API_BASE_URL")
+	if apiBaseUrl == "" {
+		log.Fatal("API_BASE_URL environment variable is required")
+	}
+	return apiBaseUrl
 }
 
 func NewAuthedRequest(t *testing.T, method, endpoint string, body io.Reader) *http.Request {
