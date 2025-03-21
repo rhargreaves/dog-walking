@@ -70,7 +70,7 @@ services:
       - COGNITO_CLIENT_NAME
       - TEST_USERNAME
       - TEST_PASSWORD
-
+      - CORS_ALLOWED_ORIGIN
   e2e-test-local:
     depends_on:
       sam:
@@ -86,3 +86,4 @@ services:
       - USE_LOCALSTACK=true
       - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566
       - DOG_IMAGES_BUCKET=local-dog-images
+      - CORS_ALLOWED_ORIGIN=http://localhost:3001

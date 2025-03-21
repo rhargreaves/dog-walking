@@ -46,6 +46,7 @@ module "api" {
   bootstrap_path             = var.bootstrap_path
   cognito_client_id          = module.auth.cognito_client_id
   cognito_user_pool_id       = module.auth.cognito_user_pool_id
+  cors_allowed_origin        = var.cors_allowed_origin
 }
 
 module "auth" {

@@ -10,15 +10,19 @@ $(error ENV is not set.)
 endif
 
 ifeq ($(HOSTED_ZONE_ID),)
-$(warning HOSTED_ZONE_ID is not set. 'plan', 'apply' and 'destroy' will fail)
+$(error HOSTED_ZONE_ID is not set.)
 endif
 
 ifeq ($(SYSADMIN_USERNAME),)
-$(warning SYSADMIN_USERNAME is not set. 'plan', 'apply' and 'destroy' will fail)
+$(error SYSADMIN_USERNAME is not set.)
 endif
 
 ifeq ($(SYSADMIN_PASSWORD),)
-$(warning SYSADMIN_PASSWORD is not set. 'plan', 'apply' and 'destroy' will fail)
+$(error SYSADMIN_PASSWORD is not set.)
+endif
+
+ifeq ($(CORS_ALLOWED_ORIGIN),)
+$(error CORS_ALLOWED_ORIGIN is not set.)
 endif
 
 DOCKER_TF := docker run --rm \
@@ -29,6 +33,7 @@ DOCKER_TF := docker run --rm \
 	-e TF_VAR_hosted_zone_id=$(HOSTED_ZONE_ID) \
 	-e TF_VAR_sysadmin_username=$(SYSADMIN_USERNAME) \
 	-e TF_VAR_sysadmin_password=$(SYSADMIN_PASSWORD) \
+	-e TF_VAR_cors_allowed_origin=$(CORS_ALLOWED_ORIGIN) \
 	-e TF_VAR_bootstrap_path=/api/build/bootstrap \
 	$(TERRAFORM_IMAGE)
 

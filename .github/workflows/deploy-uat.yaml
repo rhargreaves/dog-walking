@@ -56,6 +56,7 @@ jobs:
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID }}
       SYSADMIN_USERNAME: ${{ secrets.SYSADMIN_USERNAME }}
       SYSADMIN_PASSWORD: ${{ secrets.SYSADMIN_PASSWORD }}
+      CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -98,6 +99,7 @@ jobs:
       COGNITO_CLIENT_NAME: uat-dog-walking-client
       TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

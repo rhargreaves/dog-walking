@@ -114,6 +114,13 @@ resource "aws_apigatewayv2_api" "api" {
   name          = "${var.environment}-dog-walking-api"
   protocol_type = "HTTP"
 
+  cors_configuration {
+    allow_origins     = [var.cors_allowed_origin]
+    allow_methods     = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers     = ["Content-Type", "Authorization"]
+    allow_credentials = true
+  }
+
   tags = {
     Name = "${var.environment}-dog-walking-api"
   }

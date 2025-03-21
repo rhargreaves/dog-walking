@@ -44,3 +44,8 @@ variable "sysadmin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "cors_allowed_origin" {
+  description = "The allowed origin for CORS"
+  type        = string
+}

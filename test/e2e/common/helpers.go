@@ -102,6 +102,19 @@ func Delete(t *testing.T, endpoint string) *http.Response {
 	return resp
 }
 
+func CorsPreflight(t *testing.T, endpoint string, origin string, method string) *http.Response {
+	req, err := http.NewRequest(http.MethodOptions, BaseUrl()+endpoint, nil)
+	require.NoError(t, err, "failed to create OPTIONS request")
+	req.Header.Set("Origin", origin)
+	req.Header.Set("Access-Control-Request-Method", method)
+	req.Header.Set("Access-Control-Request-Headers", "Content-Type,Authorization")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.NoError(t, err, "failed to make OPTIONS request")
+	return resp
+}
+
 func RequireStatus(t *testing.T, resp *http.Response, expectedStatus int) {
 	assert.Equal(t, expectedStatus, resp.StatusCode,
 		"expected status code %d", expectedStatus)

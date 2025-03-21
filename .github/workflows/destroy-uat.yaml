@@ -24,6 +24,7 @@ jobs:
       SYSADMIN_PASSWORD: ${{ secrets.SYSADMIN_PASSWORD }}
       API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com
       AWS_REGION: eu-west-1
+      CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

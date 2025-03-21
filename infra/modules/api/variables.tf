@@ -62,3 +62,8 @@ variable "cognito_client_id" {
   description = "The ID of the Cognito User Pool Client"
   type        = string
 }
+
+variable "cors_allowed_origin" {
+  description = "The allowed origin for CORS"
+  type        = string
+}
