@@ -1,6 +1,10 @@
 TERRAFORM_IMAGE := hashicorp/terraform:latest
 TERRAFORM_WORKDIR := /workspace
 
+ifneq ($(wildcard ../.env),)
+include ../.env
+endif
+
 ifeq ($(ENV),)
 $(error ENV is not set.)
 endif
