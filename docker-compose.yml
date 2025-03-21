@@ -15,9 +15,6 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
-    env_file:
-      - path: ./.env
-        required: false
     environment:
       - SAM_CLI_CONTAINER_CONNECTION_TIMEOUT=10
       - AWS_ENDPOINT_URL=http://localstack:4566
