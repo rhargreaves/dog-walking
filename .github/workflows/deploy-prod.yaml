@@ -13,6 +13,7 @@ permissions:
 
 env:
   ENV: prod
+  AWS_REGION: eu-west-1
   API_BASE_URL: https://api.dog-walking.roberthargreaves.com
 
 jobs:
@@ -49,7 +50,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: eu-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: make init
@@ -83,7 +84,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: eu-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Run e2e tests
         run: make test

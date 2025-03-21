@@ -19,6 +19,7 @@ permissions:
 env:
   ENV: uat
   API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com
+  AWS_REGION: eu-west-1
 
 jobs:
   build-api:
@@ -75,7 +76,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: eu-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: make init
@@ -108,7 +109,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: eu-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Run e2e tests
         run: make test

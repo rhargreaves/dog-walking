@@ -5,7 +5,6 @@ else
 export CONTAINER_HOST=172.17.0.1
 endif
 export LOCAL_JWT_SECRET=1234567890
-export AWS_REGION=eu-west-1
 
 ifneq ($(wildcard .env),)
 include .env
