@@ -43,10 +43,11 @@ Deployed using Terraform (change to the `infra` directory).
 
 ### Operations
 
-Ensure the following environment variables are set (see [.example.env](.example.env):
+Ensure the following environment variables are set (see [.example.env](.example.env)):
 
 ```sh
 ENV=
+API_BASE_URL=
 HOSTED_ZONE_ID=
 SYSADMIN_USERNAME=
 SYSADMIN_PASSWORD=
