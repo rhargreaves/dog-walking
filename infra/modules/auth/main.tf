@@ -62,6 +62,29 @@ resource "aws_cognito_user_pool_client" "client" {
   refresh_token_validity = 30
 }
 
+resource "aws_cognito_user_pool_client" "ui" {
+  name         = "${var.environment}-dog-walking-ui"
+  user_pool_id = aws_cognito_user_pool.pool.id
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+
+  generate_secret = false
+
+  token_validity_units {
+    access_token  = "hours"
+    id_token      = "hours"
+    refresh_token = "days"
+  }
+
+  access_token_validity  = 1
+  id_token_validity      = 1
+  refresh_token_validity = 30
+}
+
 resource "aws_cognito_user_group" "admin_group" {
   name         = "admins"
   user_pool_id = aws_cognito_user_pool.pool.id
