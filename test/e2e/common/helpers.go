@@ -19,6 +19,10 @@ var (
 	jwtToken string
 )
 
+func GetJwtToken() string {
+	return jwtToken
+}
+
 func IsLocal() bool {
 	return os.Getenv("USE_LOCALSTACK") == "true"
 }

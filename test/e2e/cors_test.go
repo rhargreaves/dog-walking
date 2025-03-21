@@ -72,10 +72,12 @@ func TestCors_DisallowedOrigin(t *testing.T) {
 
 func TestCors_NormalRequestWithAllowedOrigin(t *testing.T) {
 	allowedOrigin := allowedOrigin()
-
-	req, err := http.NewRequest(http.MethodGet, common.BaseUrl()+"/ping", nil)
+	req, err := http.NewRequest(http.MethodGet, common.BaseUrl()+"/dogs", nil)
 	require.NoError(t, err, "failed to create GET request")
 	req.Header.Set("Origin", allowedOrigin)
+	common.Authenticate()
+	jwtToken := common.GetJwtToken()
+	req.Header.Set("Authorization", "Bearer "+jwtToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	require.NoError(t, err, "failed to make GET request with Origin header")
