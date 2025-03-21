@@ -70,7 +70,7 @@ jobs:
     env:
       DOG_IMAGES_BUCKET: prod-dog-images
       COGNITO_USER_POOL_NAME: prod-dog-walking
-      COGNITO_CLIENT_NAME: prod-dog-walking-client
+      COGNITO_CLIENT_NAME: prod-dog-walking-api
       TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
