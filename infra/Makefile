@@ -1,6 +1,9 @@
 TERRAFORM_IMAGE := hashicorp/terraform:latest
 TERRAFORM_WORKDIR := /workspace
-ENV ?= uat
+
+ifeq ($(ENV),)
+$(error ENV is not set.)
+endif
 
 ifeq ($(HOSTED_ZONE_ID),)
 $(warning HOSTED_ZONE_ID is not set. 'plan', 'apply' and 'destroy' will fail)
