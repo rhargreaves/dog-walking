@@ -16,6 +16,10 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENV: uat
+  API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com
+
 jobs:
   build-api:
     name: Build & Test API
@@ -48,7 +52,6 @@ jobs:
       run:
         working-directory: ./infra
     env:
-      ENV: uat
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID }}
       SYSADMIN_USERNAME: ${{ secrets.SYSADMIN_USERNAME }}
       SYSADMIN_PASSWORD: ${{ secrets.SYSADMIN_PASSWORD }}
@@ -89,8 +92,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: uat
     env:
-      ENV: uat
-
+      DOG_IMAGES_BUCKET: uat-dog-images
+      COGNITO_USER_POOL_NAME: uat-dog-walking
+      COGNITO_CLIENT_NAME: uat-dog-walking-client
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -106,6 +112,3 @@ jobs:
 
       - name: Run e2e tests
         run: make test
-        env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}

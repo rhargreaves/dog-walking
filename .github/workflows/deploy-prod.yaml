@@ -11,6 +11,10 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENV: prod
+  API_BASE_URL: https://api.dog-walking.roberthargreaves.com
+
 jobs:
   deploy-prod:
     name: Deploy PROD
@@ -20,7 +24,6 @@ jobs:
       run:
         working-directory: ./infra
     env:
-      ENV: prod
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID }}
       SYSADMIN_USERNAME: ${{ secrets.SYSADMIN_USERNAME }}
       SYSADMIN_PASSWORD: ${{ secrets.SYSADMIN_PASSWORD }}
@@ -63,7 +66,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     env:
-      ENV: prod
+      DOG_IMAGES_BUCKET: prod-dog-images
+      COGNITO_USER_POOL_NAME: prod-dog-walking
+      COGNITO_CLIENT_NAME: prod-dog-walking-client
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
     steps:
       - name: Checkout code
@@ -80,6 +87,3 @@ jobs:
 
       - name: Run e2e tests
         run: make test
-        env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}

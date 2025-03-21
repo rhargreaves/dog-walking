@@ -21,10 +21,6 @@
 go.work
 go.work.sum
 
-# env file
-.env
-!.env.test
-
 # terraform
 plan.tfplan
 *.tfstate
@@ -32,3 +28,8 @@ plan.tfplan
 
 api/build/
 local-auth/build/
+
+# env files
+.env
+.*.env
+!.example.env

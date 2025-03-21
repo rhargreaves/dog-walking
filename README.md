@@ -20,6 +20,14 @@ The API is compiled to `out/bootstrap` ready to be deployed as a Lambda function
 make test-local
 ```
 
+### E2E Testing
+
+Ensure all environment variables in [.example.env](.example.env) have been set - either in a `.env` file or otherwise.
+
+```sh
+make test
+```
+
 Dependencies are swapped out as follows:
 
 | Production/UAT | Local |
@@ -31,15 +39,18 @@ Dependencies are swapped out as follows:
 
 ## Infrastructure
 
-Deployed using Terraform.
-
-```sh
-cd infra
-```
+Deployed using Terraform (change to the `infra` directory).
 
 ### Operations
 
-Configure environment: `export ENV=uat`
+Ensure the following environment variables are set (see [.example.env](.example.env):
+
+```sh
+ENV=
+HOSTED_ZONE_ID=
+SYSADMIN_USERNAME=
+SYSADMIN_PASSWORD=
+```
 
 * `make init`
 * `make plan`
