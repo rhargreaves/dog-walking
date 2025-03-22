@@ -138,10 +138,10 @@ resource "aws_apigatewayv2_stage" "api" {
   }
 
   dynamic "route_settings" {
-    for_each = local.authed_routes
+    for_each = aws_apigatewayv2_route.authed_routes
 
     content {
-      route_key = route_settings.value
+      route_key = route_settings.value.route_key
       throttling_burst_limit = 10
       throttling_rate_limit = 50
       detailed_metrics_enabled = true
