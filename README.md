@@ -60,7 +60,7 @@ SYSADMIN_PASSWORD=
 
 ## CI/CD
 
-Deployed using GitHub Actions (see status badges at the top of the repo). There are also actions for burning everything to the ground to save :moneybag:. They are scheduled to run every midnight.
+Deployed using GitHub Actions (see status badges at the top of the repo). There are also actions for burning everything to the ground to save :moneybag:.
 
 ### Baseline Infrastructure
 
