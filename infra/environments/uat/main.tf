@@ -9,15 +9,6 @@ provider "aws" {
   }
 }
 
-module "base" {
-  source = "../../modules/base"
-
-  environment        = var.environment
-  application_name   = var.application_name
-  vpc_cidr           = var.vpc_cidr
-  availability_zones = var.availability_zones
-}
-
 module "data" {
   source = "../../modules/data"
 
@@ -35,8 +26,6 @@ module "api" {
 
   environment                = var.environment
   application_name           = var.application_name
-  vpc_id                     = module.base.vpc_id
-  private_subnet_ids         = module.base.private_subnet_ids
   api_base_host              = var.api_base_host
   hosted_zone_id             = var.hosted_zone_id
   dynamodb_access_policy_arn = module.data.dynamodb_access_policy_arn

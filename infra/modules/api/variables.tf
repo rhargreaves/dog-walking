@@ -8,16 +8,6 @@ variable "application_name" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "The ID of the VPC"
-  type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs"
-  type        = list(string)
-}
-
 variable "api_base_host" {
   description = "The base DNS name for the API"
   type        = string

@@ -10,14 +10,6 @@ variable "application_name" {
   type = string
 }
 
-variable "vpc_cidr" {
-  type = string
-}
-
-variable "availability_zones" {
-  type = list(string)
-}
-
 variable "api_base_host" {
   type        = string
   description = "The base DNS name for the API"
