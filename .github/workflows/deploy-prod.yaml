@@ -15,6 +15,7 @@ env:
   ENV: prod
   AWS_REGION: eu-west-1
   API_BASE_URL: https://api.dog-walking.roberthargreaves.com
+  CLOUDFRONT_BASE_URL: https://images.dog-walking.roberthargreaves.com
 
 jobs:
   deploy-prod:

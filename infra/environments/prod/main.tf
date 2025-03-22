@@ -18,7 +18,9 @@ module "data" {
 module "images" {
   source = "../../modules/images"
 
-  environment = var.environment
+  environment      = var.environment
+  hosted_zone_id   = var.hosted_zone_id
+  images_cdn_host  = var.images_cdn_host
 }
 
 module "api" {

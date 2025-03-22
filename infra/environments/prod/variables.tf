@@ -41,3 +41,8 @@ variable "cors_allowed_origin" {
   description = "The allowed origin for CORS"
   type        = string
 }
+
+variable "images_cdn_host" {
+  description = "The fully qualified domain name for the images CDN"
+  type        = string
+}

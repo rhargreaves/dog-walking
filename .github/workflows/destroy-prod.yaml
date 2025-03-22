@@ -21,6 +21,7 @@ jobs:
       SYSADMIN_USERNAME: ${{ secrets.SYSADMIN_USERNAME }}
       SYSADMIN_PASSWORD: ${{ secrets.SYSADMIN_PASSWORD }}
       API_BASE_URL: https://api.dog-walking.roberthargreaves.com
+      CLOUDFRONT_BASE_URL: https://images.dog-walking.roberthargreaves.com
       AWS_REGION: eu-west-1
       CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
     steps:

@@ -19,6 +19,7 @@ permissions:
 env:
   ENV: uat
   API_BASE_URL: https://api.uat.dog-walking.roberthargreaves.com
+  CLOUDFRONT_BASE_URL: https://images.uat.dog-walking.roberthargreaves.com
   AWS_REGION: eu-west-1
 
 jobs:
