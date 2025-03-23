@@ -57,6 +57,10 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 		return
 	}
 
+	for i := range dogs {
+		dogs[i] = *dogWithPhotoUrl(&dogs[i])
+	}
+
 	c.JSON(http.StatusOK, dogs)
 }
 

@@ -65,3 +65,24 @@ func TestUploadImage_ImageUrlInDogResponse(t *testing.T) {
 		fetchedDog.PhotoUrl, "Expected photo URL to be returned")
 	assert.Equal(t, expectedHash, fetchedDog.PhotoHash, "Expected photo hash to be returned")
 }
+
+func TestUploadImage_ImageUrlInListDogsResponse(t *testing.T) {
+	dog := createDog(t, "Mr. Peanutbutter")
+
+	image, err := os.ReadFile(testCartoonDogImagePath)
+	require.NoError(t, err)
+	uploadImage(t, dog.ID, image)
+
+	resp := common.Get(t, "/dogs", true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	var fetchedDogs []Dog
+	common.DecodeJSON(t, resp, &fetchedDogs)
+
+	fetchedDog, found := FindFirst(fetchedDogs, func(dog Dog) bool {
+		return dog.PhotoUrl != ""
+	})
+	require.True(t, found, "Expected at least one dog to have a photo URL")
+	assert.NotEmpty(t, fetchedDog.PhotoHash, "Expected photo hash to be returned")
+}
