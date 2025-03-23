@@ -1,4 +1,9 @@
 locals {
+  public_routes = toset([
+    "GET /ping",
+    "GET /api-docs",
+    "GET /api-docs/{proxy+}"
+  ])
   authed_routes = toset([
     "POST /dogs",
     "GET /dogs",
@@ -200,21 +205,11 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
   }
 }
 
-resource "aws_apigatewayv2_route" "ping_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /ping"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
+resource "aws_apigatewayv2_route" "public_routes" {
+  for_each = local.public_routes
 
-resource "aws_apigatewayv2_route" "api_docs_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /api-docs/{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "api_docs_redirect_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /api-docs"
+  route_key = each.value
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
