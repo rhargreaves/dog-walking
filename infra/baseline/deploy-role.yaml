@@ -191,6 +191,11 @@ Resources:
               - sns:Publish
             Resource: !Sub arn:aws:sns:*:${AWS::AccountId}:*-dog-walking-*
 
+          - Effect: Allow
+            Action:
+              - cloudfront:*
+            Resource: "*"
+
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
