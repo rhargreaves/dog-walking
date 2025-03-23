@@ -95,7 +95,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: uat
     env:
-      DOG_IMAGES_BUCKET: uat-dog-images
       COGNITO_USER_POOL_NAME: uat-dog-walking
       COGNITO_CLIENT_NAME: uat-dog-walking-api
       TEST_USERNAME: ${{ secrets.TEST_USERNAME }}

@@ -1,14 +1,10 @@
 package dogs
 
 import (
-	"io"
 	"net/http"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
@@ -31,22 +27,4 @@ func createDog(t *testing.T, name string) Dog {
 	assert.NotEmpty(t, dog.ID, "Expected dog ID to be returned")
 
 	return dog
-}
-
-func getS3Object(t *testing.T, bucket string, key string) []byte {
-	sess, err := common.CreateS3Session()
-	require.NoError(t, err)
-
-	s3Client := s3.New(sess)
-	result, err := s3Client.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-	require.NoError(t, err)
-	defer result.Body.Close()
-
-	body, err := io.ReadAll(result.Body)
-	require.NoError(t, err)
-
-	return body
 }
