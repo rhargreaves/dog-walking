@@ -206,9 +206,9 @@ resource "aws_apigatewayv2_route" "ping_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_route" "swagger_route" {
+resource "aws_apigatewayv2_route" "api_docs_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /swagger/{proxy+}"
+  route_key = "GET /api-docs/{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 

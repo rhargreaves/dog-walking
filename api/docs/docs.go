@@ -372,11 +372,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "api.dog-walking.com",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{"https"},
-	Title:            "Dog Walking API",
-	Description:      "API for managing dogs in a dog walking service",
+	Title:            "Dog Walking Service API",
+	Description:      "API for managing dogs, etc",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

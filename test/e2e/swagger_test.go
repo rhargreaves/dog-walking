@@ -12,13 +12,13 @@ import (
 )
 
 func TestSwaggerDocumentation(t *testing.T) {
-	// Test access to Swagger UI
-	resp := common.Get(t, "/swagger/index.html", false)
+	// Test access to API Docs UI
+	resp := common.Get(t, "/api-docs/index.html", false)
 	defer resp.Body.Close()
 
-	// Check if Swagger UI is present
+	// Check if API Docs UI is present
 	if resp.StatusCode == http.StatusOK {
-		t.Log("✅ Swagger UI is accessible")
+		t.Log("✅ API documentation UI is accessible")
 
 		bodyBytes, err := io.ReadAll(resp.Body)
 		require.NoError(t, err, "Should be able to read response body")
@@ -28,11 +28,11 @@ func TestSwaggerDocumentation(t *testing.T) {
 		assert.Contains(t, htmlContent, "swagger-ui", "Response should contain Swagger UI HTML")
 
 		// Also check JSON spec is available
-		jsonResp := common.Get(t, "/swagger/doc.json", false)
+		jsonResp := common.Get(t, "/api-docs/doc.json", false)
 		defer jsonResp.Body.Close()
 
 		if jsonResp.StatusCode == http.StatusOK {
-			t.Log("✅ Swagger JSON spec is accessible")
+			t.Log("✅ API JSON spec is accessible")
 
 			// Verify it's valid JSON with expected fields
 			var swaggerSpec map[string]interface{}
@@ -61,9 +61,9 @@ func TestSwaggerDocumentation(t *testing.T) {
 			}
 			assert.Contains(t, paths, "/dogs", "Should document dogs endpoint")
 		} else {
-			t.Logf("⚠️ Swagger JSON spec is not accessible (status: %d) - this may be expected if Swagger is not fully deployed", jsonResp.StatusCode)
+			t.Logf("⚠️ API JSON spec is not accessible (status: %d) - this may be expected if API docs are not fully deployed", jsonResp.StatusCode)
 		}
 	} else {
-		t.Logf("⚠️ Swagger UI is not accessible (status: %d) - this may be expected if Swagger is not fully deployed", resp.StatusCode)
+		t.Logf("⚠️ API documentation UI is not accessible (status: %d) - this may be expected if API docs are not fully deployed", resp.StatusCode)
 	}
 }

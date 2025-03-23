@@ -4,12 +4,11 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "API for managing dogs in a dog walking service",
-        "title": "Dog Walking API",
+        "description": "API for managing dogs, etc",
+        "title": "Dog Walking Service API",
         "contact": {},
         "version": "1.0"
     },
-    "host": "api.dog-walking.com",
     "basePath": "/",
     "paths": {
         "/dogs": {

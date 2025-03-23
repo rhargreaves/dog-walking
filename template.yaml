@@ -130,5 +130,5 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApiNoAuth
-            Path: /swagger/{proxy+}
+            Path: /api-docs/{proxy+}
             Method: GET

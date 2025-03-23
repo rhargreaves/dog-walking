@@ -20,11 +20,10 @@ definitions:
       photoUrl:
         type: string
     type: object
-host: api.dog-walking.com
 info:
   contact: {}
-  description: API for managing dogs in a dog walking service
-  title: Dog Walking API
+  description: API for managing dogs, etc
+  title: Dog Walking Service API
   version: "1.0"
 paths:
   /dogs:

@@ -1,9 +1,8 @@
 package main
 
-// @title Dog Walking API
+// @title Dog Walking Service API
 // @version 1.0
-// @description API for managing dogs in a dog walking service
-// @host api.dog-walking.com
+// @description API for managing dogs, etc
 // @BasePath /
 // @schemes https
 
@@ -74,7 +73,7 @@ func init() {
 	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
 	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
 	r.POST("/dogs/:id/photo/detect-breed", dogPhotoHandler.DetectBreed)
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	ginLambda = ginadapter.NewV2(r)
 }
