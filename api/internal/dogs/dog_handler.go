@@ -35,6 +35,17 @@ func NewDogHandler(dogRepository DogRepository) DogHandler {
 	return &dogHandler{dogRepository: dogRepository}
 }
 
+// CreateDog godoc
+// @Summary Create a new dog
+// @Description Create a new dog with the provided details
+// @Tags dogs
+// @Accept json
+// @Produce json
+// @Param dog body models.Dog true "Dog information"
+// @Success 201 {object} models.Dog
+// @Failure 400 {object} common.APIError "Invalid request"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs [post]
 func (h *dogHandler) CreateDog(c *gin.Context) {
 	var dog models.Dog
 	if err := c.ShouldBindJSON(&dog); err != nil {
@@ -50,6 +61,14 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 	c.JSON(http.StatusCreated, dog)
 }
 
+// ListDogs godoc
+// @Summary List all dogs
+// @Description Get a list of all registered dogs
+// @Tags dogs
+// @Produce json
+// @Success 200 {array} models.Dog
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
 	dogs, err := h.dogRepository.List()
 	if err != nil {
@@ -64,6 +83,16 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 	c.JSON(http.StatusOK, dogs)
 }
 
+// GetDog godoc
+// @Summary Get a dog by ID
+// @Description Get details of a specific dog by its ID
+// @Tags dogs
+// @Produce json
+// @Param id path string true "Dog ID"
+// @Success 200 {object} models.Dog
+// @Failure 404 {object} common.APIError "Dog not found"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs/{id} [get]
 func (h *dogHandler) GetDog(c *gin.Context) {
 	id := c.Param("id")
 	dog, err := h.dogRepository.Get(id)
@@ -75,6 +104,19 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 	c.JSON(http.StatusOK, dogWithPhotoUrl(dog))
 }
 
+// UpdateDog godoc
+// @Summary Update a dog
+// @Description Update a dog's information by its ID
+// @Tags dogs
+// @Accept json
+// @Produce json
+// @Param id path string true "Dog ID"
+// @Param dog body models.Dog true "Updated dog information"
+// @Success 200 {object} models.Dog
+// @Failure 400 {object} common.APIError "Invalid request"
+// @Failure 404 {object} common.APIError "Dog not found"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs/{id} [put]
 func (h *dogHandler) UpdateDog(c *gin.Context) {
 	id := c.Param("id")
 	var dog models.Dog
@@ -91,6 +133,15 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 	c.JSON(http.StatusOK, dog)
 }
 
+// DeleteDog godoc
+// @Summary Delete a dog
+// @Description Delete a dog by its ID
+// @Tags dogs
+// @Param id path string true "Dog ID"
+// @Success 204 "No Content"
+// @Failure 404 {object} common.APIError "Dog not found"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs/{id} [delete]
 func (h *dogHandler) DeleteDog(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.dogRepository.Delete(id); err != nil {

@@ -1,5 +1,12 @@
 package main
 
+// @title Dog Walking API
+// @version 1.0
+// @description API for managing dogs in a dog walking service
+// @host api.dog-walking.com
+// @BasePath /
+// @schemes https
+
 import (
 	"context"
 	"net/http"
@@ -13,9 +20,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
+	_ "github.com/rhargreaves/dog-walking/api/docs"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs"
 	"github.com/rhargreaves/dog-walking/api/internal/rekognition_stub"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var ginLambda *ginadapter.GinLambdaV2
@@ -29,6 +39,17 @@ func newRekognitionClient() rekognitioniface.RekognitionAPI {
 		}))
 		return rekognition.New(sess)
 	}
+}
+
+// PingHandler godoc
+// @Summary Health check endpoint
+// @Description Returns OK if the API is running
+// @Tags health
+// @Produce plain
+// @Success 200 {string} string "OK"
+// @Router /ping [get]
+func PingHandler(c *gin.Context) {
+	c.String(http.StatusOK, "OK")
 }
 
 func init() {
@@ -45,9 +66,7 @@ func init() {
 	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "OK")
-	})
+	r.GET("/ping", PingHandler)
 	r.GET("/dogs", dogHandler.ListDogs)
 	r.GET("/dogs/:id", dogHandler.GetDog)
 	r.POST("/dogs", dogHandler.CreateDog)
@@ -55,6 +74,7 @@ func init() {
 	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
 	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
 	r.POST("/dogs/:id/photo/detect-breed", dogPhotoHandler.DetectBreed)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	ginLambda = ginadapter.NewV2(r)
 }

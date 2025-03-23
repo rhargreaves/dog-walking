@@ -26,6 +26,17 @@ func NewDogPhotoHandler(dogRepository DogRepository, dogPhotoRepository DogPhoto
 	}
 }
 
+// UploadDogPhoto godoc
+// @Summary Upload a dog's photo
+// @Description Upload a JPEG photo for a specific dog
+// @Tags dogs,photos
+// @Accept image/jpeg
+// @Param id path string true "Dog ID"
+// @Success 200 "OK"
+// @Failure 400 {object} common.APIError "Invalid content type or request"
+// @Failure 404 {object} common.APIError "Dog not found"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs/{id}/photo [put]
 func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 	id := c.Param("id")
 	_, err := h.dogRepository.Get(id)
@@ -51,6 +62,17 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// DetectBreed godoc
+// @Summary Detect a dog's breed from its photo
+// @Description Analyzes a previously uploaded photo to detect the dog's breed
+// @Tags dogs,photos
+// @Param id path string true "Dog ID"
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Returns id, breed, and confidence"
+// @Failure 400 {object} common.APIError "No dog detected or no specific breed detected"
+// @Failure 404 {object} common.APIError "Dog not found"
+// @Failure 500 {object} common.APIError "Internal server error"
+// @Router /dogs/{id}/photo/detect-breed [post]
 func (h *dogPhotoHandler) DetectBreed(c *gin.Context) {
 	id := c.Param("id")
 

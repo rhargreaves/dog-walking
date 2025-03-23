@@ -26,10 +26,10 @@ create-go-cache:
 	-docker volume create go-cache
 .PHONY: create-go-cache
 
-build: create-go-cache lint test-unit compile
+build: create-go-cache lint swagger-docs test-unit compile
 .PHONY: build
 
-compile: create-go-cache lint test-unit
+compile: create-go-cache lint swagger-docs test-unit
 	docker compose down
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
@@ -46,6 +46,12 @@ compile-local-auth:
 		LOCAL_JWT_SECRET=$(LOCAL_JWT_SECRET) gotestsum --format testname ./...; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
 .PHONY: compile-local-auth
+
+swagger-docs:
+	$(GO_CMD) "cd api; \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+		swag init -g cmd/api/main.go --output docs"
+.PHONY: swagger-docs
 
 lint:
 	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"

@@ -1,0 +1,243 @@
+basePath: /
+definitions:
+  common.APIError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.Dog:
+    properties:
+      breed:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      photoHash:
+        type: string
+      photoUrl:
+        type: string
+    type: object
+host: api.dog-walking.com
+info:
+  contact: {}
+  description: API for managing dogs in a dog walking service
+  title: Dog Walking API
+  version: "1.0"
+paths:
+  /dogs:
+    get:
+      description: Get a list of all registered dogs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Dog'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: List all dogs
+      tags:
+      - dogs
+    post:
+      consumes:
+      - application/json
+      description: Create a new dog with the provided details
+      parameters:
+      - description: Dog information
+        in: body
+        name: dog
+        required: true
+        schema:
+          $ref: '#/definitions/models.Dog'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Dog'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Create a new dog
+      tags:
+      - dogs
+  /dogs/{id}:
+    delete:
+      description: Delete a dog by its ID
+      parameters:
+      - description: Dog ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Dog not found
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Delete a dog
+      tags:
+      - dogs
+    get:
+      description: Get details of a specific dog by its ID
+      parameters:
+      - description: Dog ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Dog'
+        "404":
+          description: Dog not found
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Get a dog by ID
+      tags:
+      - dogs
+    put:
+      consumes:
+      - application/json
+      description: Update a dog's information by its ID
+      parameters:
+      - description: Dog ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated dog information
+        in: body
+        name: dog
+        required: true
+        schema:
+          $ref: '#/definitions/models.Dog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Dog'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "404":
+          description: Dog not found
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Update a dog
+      tags:
+      - dogs
+  /dogs/{id}/photo:
+    put:
+      consumes:
+      - image/jpeg
+      description: Upload a JPEG photo for a specific dog
+      parameters:
+      - description: Dog ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid content type or request
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "404":
+          description: Dog not found
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Upload a dog's photo
+      tags:
+      - dogs
+      - photos
+  /dogs/{id}/photo/detect-breed:
+    post:
+      description: Analyzes a previously uploaded photo to detect the dog's breed
+      parameters:
+      - description: Dog ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns id, breed, and confidence
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: No dog detected or no specific breed detected
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "404":
+          description: Dog not found
+          schema:
+            $ref: '#/definitions/common.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.APIError'
+      summary: Detect a dog's breed from its photo
+      tags:
+      - dogs
+      - photos
+  /ping:
+    get:
+      description: Returns OK if the API is running
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Health check endpoint
+      tags:
+      - health
+schemes:
+- https
+swagger: "2.0"
