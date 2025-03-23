@@ -10,9 +10,11 @@ import (
 )
 
 type Dog struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Breed string `json:"breed"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Breed     string `json:"breed"`
+	PhotoUrl  string `json:"photoUrl"`
+	PhotoHash string `json:"photoHash"`
 }
 
 func createDog(t *testing.T, name string) Dog {

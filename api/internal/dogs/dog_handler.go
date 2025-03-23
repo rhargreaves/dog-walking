@@ -2,7 +2,9 @@ package dogs
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
@@ -15,6 +17,14 @@ type DogHandler interface {
 	CreateDog(c *gin.Context)
 	UpdateDog(c *gin.Context)
 	DeleteDog(c *gin.Context)
+}
+
+func dogWithPhotoUrl(dog *models.Dog) *models.Dog {
+	if dog.PhotoHash != "" {
+		dog.PhotoUrl = fmt.Sprintf("%s/%s?h=%s",
+			os.Getenv("CLOUDFRONT_BASE_URL"), dog.ID, dog.PhotoHash)
+	}
+	return dog
 }
 
 type dogHandler struct {
@@ -58,7 +68,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dog)
+	c.JSON(http.StatusOK, dogWithPhotoUrl(dog))
 }
 
 func (h *dogHandler) UpdateDog(c *gin.Context) {

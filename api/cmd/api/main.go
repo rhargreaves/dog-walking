@@ -41,7 +41,7 @@ func init() {
 	dogRepository := dogs.NewDogRepository(os.Getenv("DOGS_TABLE_NAME"))
 	dogHandler := dogs.NewDogHandler(dogRepository)
 
-	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"))
+	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"), dogRepository)
 	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
 

@@ -274,6 +274,53 @@ func (_c *DogRepository_Update_Call) RunAndReturn(run func(string, *models.Dog) 
 	return _c
 }
 
+// UpdatePhotoHash provides a mock function with given fields: id, photoHash
+func (_m *DogRepository) UpdatePhotoHash(id string, photoHash string) error {
+	ret := _m.Called(id, photoHash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePhotoHash")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(id, photoHash)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DogRepository_UpdatePhotoHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePhotoHash'
+type DogRepository_UpdatePhotoHash_Call struct {
+	*mock.Call
+}
+
+// UpdatePhotoHash is a helper method to define mock.On call
+//   - id string
+//   - photoHash string
+func (_e *DogRepository_Expecter) UpdatePhotoHash(id interface{}, photoHash interface{}) *DogRepository_UpdatePhotoHash_Call {
+	return &DogRepository_UpdatePhotoHash_Call{Call: _e.mock.On("UpdatePhotoHash", id, photoHash)}
+}
+
+func (_c *DogRepository_UpdatePhotoHash_Call) Run(run func(id string, photoHash string)) *DogRepository_UpdatePhotoHash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *DogRepository_UpdatePhotoHash_Call) Return(_a0 error) *DogRepository_UpdatePhotoHash_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *DogRepository_UpdatePhotoHash_Call) RunAndReturn(run func(string, string) error) *DogRepository_UpdatePhotoHash_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewDogRepository creates a new instance of DogRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewDogRepository(t interface {
