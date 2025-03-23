@@ -29,28 +29,6 @@ import (
 
 var ginLambda *ginadapter.GinLambdaV2
 
-func newRekognitionClient() rekognitioniface.RekognitionAPI {
-	if common.IsLocal() {
-		return rekognition_stub.NewStubRekognitionClient()
-	} else {
-		sess := session.Must(session.NewSession(&aws.Config{
-			Region: aws.String(os.Getenv("AWS_REGION")),
-		}))
-		return rekognition.New(sess)
-	}
-}
-
-// PingHandler godoc
-// @Summary Health check endpoint
-// @Description Returns OK if the API is running
-// @Tags health
-// @Produce plain
-// @Success 200 {string} string "OK"
-// @Router /ping [get]
-func PingHandler(c *gin.Context) {
-	c.String(http.StatusOK, "OK")
-}
-
 func init() {
 	if !common.IsLocal() {
 		gin.SetMode(gin.ReleaseMode)
@@ -65,7 +43,7 @@ func init() {
 	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
 
-	r.GET("/ping", PingHandler)
+	r.GET("/ping", pingHandler)
 	r.GET("/dogs", dogHandler.ListDogs)
 	r.GET("/dogs/:id", dogHandler.GetDog)
 	r.POST("/dogs", dogHandler.CreateDog)
@@ -74,6 +52,9 @@ func init() {
 	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
 	r.POST("/dogs/:id/photo/detect-breed", dogPhotoHandler.DetectBreed)
 	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api-docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/api-docs/index.html")
+	})
 
 	ginLambda = ginadapter.NewV2(r)
 }
@@ -84,4 +65,26 @@ func handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 
 func main() {
 	lambda.Start(handler)
+}
+
+// PingHandler godoc
+// @Summary Health check endpoint
+// @Description Returns OK if the API is running
+// @Tags health
+// @Produce plain
+// @Success 200 {string} string "OK"
+// @Router /ping [get]
+func pingHandler(c *gin.Context) {
+	c.String(http.StatusOK, "OK")
+}
+
+func newRekognitionClient() rekognitioniface.RekognitionAPI {
+	if common.IsLocal() {
+		return rekognition_stub.NewStubRekognitionClient()
+	} else {
+		sess := session.Must(session.NewSession(&aws.Config{
+			Region: aws.String(os.Getenv("AWS_REGION")),
+		}))
+		return rekognition.New(sess)
+	}
 }

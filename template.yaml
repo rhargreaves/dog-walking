@@ -126,7 +126,13 @@ Resources:
             ApiId: !Ref HttpApi
             Path: /dogs/{id}/photo/detect-breed
             Method: POST
-        SwaggerUIAPI:
+        ApiDocsRedirect:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApiNoAuth
+            Path: /api-docs
+            Method: GET
+        ApiDocs:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApiNoAuth

@@ -67,3 +67,13 @@ func TestApiDocs_Available(t *testing.T) {
 		t.Logf("⚠️ API documentation UI is not accessible (status: %d) - this may be expected if API docs are not fully deployed", resp.StatusCode)
 	}
 }
+
+func TestApiDocs_RootRedirectsToIndex(t *testing.T) {
+	resp := common.Get(t, "/api-docs", false)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusMovedPermanently, resp.StatusCode,
+		"Should redirect to /api-docs/index.html")
+	require.Equal(t, "/api-docs/index.html", resp.Header.Get("Location"),
+		"Should redirect to /api-docs/index.html")
+}

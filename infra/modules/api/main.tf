@@ -212,6 +212,12 @@ resource "aws_apigatewayv2_route" "api_docs_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+resource "aws_apigatewayv2_route" "api_docs_redirect_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api-docs"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
 resource "aws_apigatewayv2_route" "authed_routes" {
   for_each = local.authed_routes
 

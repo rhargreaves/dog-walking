@@ -73,7 +73,11 @@ func authedRequest(t *testing.T, method, endpoint string, body io.Reader) *http.
 }
 
 func GetResponse(t *testing.T, req *http.Request) *http.Response {
-	client := &http.Client{}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	resp, err := client.Do(req)
 	require.NoError(t, err, "failed to fetch URL")
 	return resp
