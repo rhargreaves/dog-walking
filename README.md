@@ -58,6 +58,10 @@ SYSADMIN_PASSWORD=
 * `make apply`
 * `make destroy`
 
+## API Documentation
+
+Docs and OpenAPI specs are provided online via Swagger (`/api-docs`)
+
 ## CI/CD
 
 Deployed using GitHub Actions (see status badges at the top of the repo). There are also actions for burning everything to the ground to save :moneybag:.
