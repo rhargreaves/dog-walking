@@ -93,6 +93,7 @@ resource "aws_lambda_function" "api" {
       ENVIRONMENT       = var.environment
       DOGS_TABLE_NAME   = var.dogs_table_name
       DOG_IMAGES_BUCKET = var.dog_images_bucket
+      CLOUDFRONT_BASE_URL = "https://${var.images_cdn_host}"
     }
   }
 

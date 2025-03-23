@@ -28,6 +28,11 @@ variable "s3_access_policy_arn" {
   type        = string
 }
 
+variable "images_cdn_host" {
+  description = "The base DNS name for the images CDN"
+  type        = string
+}
+
 variable "dogs_table_name" {
   description = "Name of the DynamoDB table for dogs"
   type        = string

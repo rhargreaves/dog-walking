@@ -38,6 +38,7 @@ module "api" {
   cognito_client_ids         = module.auth.cognito_client_ids
   cognito_user_pool_id       = module.auth.cognito_user_pool_id
   cors_allowed_origin        = var.cors_allowed_origin
+  images_cdn_host            = var.images_cdn_host
 }
 
 module "auth" {
