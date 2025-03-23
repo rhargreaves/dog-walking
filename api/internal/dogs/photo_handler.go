@@ -68,7 +68,7 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 // @Tags dogs,photos
 // @Param id path string true "Dog ID"
 // @Produce json
-// @Success 200 {object} map[string]interface{} "Returns id, breed, and confidence"
+// @Success 200 {object} map[string]any "Returns id, breed, and confidence"
 // @Failure 400 {object} common.APIError "No dog detected or no specific breed detected"
 // @Failure 404 {object} common.APIError "Dog not found"
 // @Failure 500 {object} common.APIError "Internal server error"

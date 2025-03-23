@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSwaggerDocumentation(t *testing.T) {
+func TestApiDocs_Available(t *testing.T) {
 	// Test access to API Docs UI
 	resp := common.Get(t, "/api-docs/index.html", false)
 	defer resp.Body.Close()
@@ -35,7 +35,7 @@ func TestSwaggerDocumentation(t *testing.T) {
 			t.Log("✅ API JSON spec is accessible")
 
 			// Verify it's valid JSON with expected fields
-			var swaggerSpec map[string]interface{}
+			var swaggerSpec map[string]any
 			err := json.NewDecoder(jsonResp.Body).Decode(&swaggerSpec)
 			require.NoError(t, err, "Should return valid JSON")
 
@@ -45,16 +45,16 @@ func TestSwaggerDocumentation(t *testing.T) {
 			assert.Contains(t, swaggerSpec, "paths", "Should contain paths section")
 
 			// Verify API endpoints are documented
-			paths, ok := swaggerSpec["paths"].(map[string]interface{})
+			paths, ok := swaggerSpec["paths"].(map[string]any)
 			require.True(t, ok, "Paths should be a map")
 
 			// Check specific endpoints
 			assert.Contains(t, paths, "/ping", "Should document ping endpoint")
-			if pingPath, ok := paths["/ping"].(map[string]interface{}); ok {
+			if pingPath, ok := paths["/ping"].(map[string]any); ok {
 				assert.Contains(t, pingPath, "get", "Should document GET method for ping endpoint")
-				if getOp, ok := pingPath["get"].(map[string]interface{}); ok {
+				if getOp, ok := pingPath["get"].(map[string]any); ok {
 					assert.Contains(t, getOp, "tags", "Should have tags for ping endpoint")
-					tags, ok := getOp["tags"].([]interface{})
+					tags, ok := getOp["tags"].([]any)
 					assert.True(t, ok, "Tags should be an array")
 					assert.Contains(t, tags, "health", "Ping endpoint should be tagged with 'health'")
 				}
