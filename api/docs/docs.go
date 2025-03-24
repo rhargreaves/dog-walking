@@ -25,20 +25,34 @@ const docTemplate = `{
                     "dogs"
                 ],
                 "summary": "List all dogs",
+                "parameters": [
+                    {
+                        "maximum": 25,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 25,
+                        "description": "Limit the number of dogs returned",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A token to get the next page of results",
+                        "name": "nextToken",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Dog"
-                            }
+                            "$ref": "#/definitions/models.DogList"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     }
                 }
@@ -76,13 +90,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     }
                 }
@@ -117,13 +131,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Dog not found",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     }
                 }
@@ -168,19 +182,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Dog not found",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     }
                 }
@@ -207,13 +221,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Dog not found",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/common.APIError"
+                            "$ref": "#/definitions/common.APIErrorResponse"
                         }
                     }
                 }
@@ -346,6 +360,14 @@ const docTemplate = `{
                 }
             }
         },
+        "common.APIErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/common.APIError"
+                }
+            }
+        },
         "models.Dog": {
             "type": "object",
             "properties": {
@@ -362,6 +384,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "photoUrl": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DogList": {
+            "type": "object",
+            "properties": {
+                "dogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Dog"
+                    }
+                },
+                "nextToken": {
                     "type": "string"
                 }
             }

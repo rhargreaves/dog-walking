@@ -59,9 +59,9 @@ func TestApi_AuthRequiredOnProtectedRoutes(t *testing.T) {
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusUnauthorized)
 
-			var messageResponse common.MessageResponse
-			common.DecodeJSON(t, resp, &messageResponse)
-			assert.Equal(t, "Unauthorized", messageResponse.Message,
+			var response common.ApiGatewayError
+			common.DecodeJSON(t, resp, &response)
+			assert.Equal(t, "Unauthorized", response.Message,
 				"Expected error message to be returned")
 		})
 	}

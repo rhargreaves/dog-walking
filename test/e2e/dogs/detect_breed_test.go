@@ -107,9 +107,9 @@ func TestDetectBreed_ErrorCases(t *testing.T) {
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusBadRequest)
 
-			var response common.ErrorResponse
+			var response common.ApiErrorResponse
 			common.DecodeJSON(t, resp, &response)
-			require.Equal(t, "no dog detected", response.Error)
+			require.Equal(t, "no dog detected", response.Error.Message)
 		})
 	}
 }

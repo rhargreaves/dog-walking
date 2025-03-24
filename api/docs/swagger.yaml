@@ -7,6 +7,11 @@ definitions:
       message:
         type: string
     type: object
+  common.APIErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/common.APIError'
+    type: object
   models.Dog:
     properties:
       breed:
@@ -20,6 +25,15 @@ definitions:
       photoUrl:
         type: string
     type: object
+  models.DogList:
+    properties:
+      dogs:
+        items:
+          $ref: '#/definitions/models.Dog'
+        type: array
+      nextToken:
+        type: string
+    type: object
 info:
   contact: {}
   description: API for managing dogs, etc
@@ -29,19 +43,29 @@ paths:
   /dogs:
     get:
       description: Get a list of all registered dogs
+      parameters:
+      - default: 25
+        description: Limit the number of dogs returned
+        in: query
+        maximum: 25
+        minimum: 1
+        name: limit
+        type: integer
+      - description: A token to get the next page of results
+        in: query
+        name: nextToken
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.Dog'
-            type: array
+            $ref: '#/definitions/models.DogList'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
       summary: List all dogs
       tags:
       - dogs
@@ -66,11 +90,11 @@ paths:
         "400":
           description: Invalid request
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
       summary: Create a new dog
       tags:
       - dogs
@@ -89,11 +113,11 @@ paths:
         "404":
           description: Dog not found
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
       summary: Delete a dog
       tags:
       - dogs
@@ -115,11 +139,11 @@ paths:
         "404":
           description: Dog not found
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
       summary: Get a dog by ID
       tags:
       - dogs
@@ -149,15 +173,15 @@ paths:
         "400":
           description: Invalid request
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
         "404":
           description: Dog not found
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/common.APIError'
+            $ref: '#/definitions/common.APIErrorResponse'
       summary: Update a dog
       tags:
       - dogs

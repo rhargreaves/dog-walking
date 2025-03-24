@@ -45,9 +45,9 @@ func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 
-	var errorResponse common.ErrorResponse
+	var errorResponse common.ApiErrorResponse
 	common.DecodeJSON(t, resp, &errorResponse)
-	assert.Equal(t, "dog not found", errorResponse.Error,
+	assert.Equal(t, "dog not found", errorResponse.Error.Message,
 		"Expected error message to be returned")
 }
 

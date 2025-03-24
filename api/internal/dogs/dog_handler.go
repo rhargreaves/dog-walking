@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 
+	"github.com/creasty/defaults"
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
@@ -44,8 +44,8 @@ func NewDogHandler(dogRepository DogRepository) DogHandler {
 // @Produce json
 // @Param dog body models.Dog true "Dog information"
 // @Success 201 {object} models.Dog
-// @Failure 400 {object} common.APIError "Invalid request"
-// @Failure 500 {object} common.APIError "Internal server error"
+// @Failure 400 {object} common.APIErrorResponse "Invalid request"
+// @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [post]
 func (h *dogHandler) CreateDog(c *gin.Context) {
 	var dog models.Dog
@@ -62,29 +62,31 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 	c.JSON(http.StatusCreated, dog)
 }
 
+type DogListQuery struct {
+	Limit     int    `form:"limit" default:"25" binding:"min=1,max=25"`
+	NextToken string `form:"nextToken"`
+}
+
 // ListDogs godoc
 // @Summary List all dogs
 // @Description Get a list of all registered dogs
 // @Tags dogs
 // @Produce json
+// @Param limit query int false "Limit the number of dogs returned" default(25) minimum(1) maximum(25)
+// @Param nextToken query string false "A token to get the next page of results"
 // @Success 200 {object} models.DogList
-// @Failure 500 {object} common.APIError "Internal server error"
+// @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
-	limit := c.Query("limit")
-	nextToken := c.Query("nextToken")
+	var query DogListQuery
+	defaults.Set(&query)
 
-	var limitInt int = 25
-	if limit != "" {
-		var err error
-		limitInt, err = strconv.Atoi(limit)
-		if err != nil {
-			handleError(c, err)
-			return
-		}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		handleBindError(c, err)
+		return
 	}
 
-	dogs, err := h.dogRepository.List(limitInt, nextToken)
+	dogs, err := h.dogRepository.List(query.Limit, query.NextToken)
 	if err != nil {
 		handleError(c, err)
 		return
@@ -104,8 +106,8 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Dog ID"
 // @Success 200 {object} models.Dog
-// @Failure 404 {object} common.APIError "Dog not found"
-// @Failure 500 {object} common.APIError "Internal server error"
+// @Failure 404 {object} common.APIErrorResponse "Dog not found"
+// @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs/{id} [get]
 func (h *dogHandler) GetDog(c *gin.Context) {
 	id := c.Param("id")
@@ -127,9 +129,9 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 // @Param id path string true "Dog ID"
 // @Param dog body models.Dog true "Updated dog information"
 // @Success 200 {object} models.Dog
-// @Failure 400 {object} common.APIError "Invalid request"
-// @Failure 404 {object} common.APIError "Dog not found"
-// @Failure 500 {object} common.APIError "Internal server error"
+// @Failure 400 {object} common.APIErrorResponse "Invalid request"
+// @Failure 404 {object} common.APIErrorResponse "Dog not found"
+// @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs/{id} [put]
 func (h *dogHandler) UpdateDog(c *gin.Context) {
 	id := c.Param("id")
@@ -153,8 +155,8 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 // @Tags dogs
 // @Param id path string true "Dog ID"
 // @Success 204 "No Content"
-// @Failure 404 {object} common.APIError "Dog not found"
-// @Failure 500 {object} common.APIError "Internal server error"
+// @Failure 404 {object} common.APIErrorResponse "Dog not found"
+// @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs/{id} [delete]
 func (h *dogHandler) DeleteDog(c *gin.Context) {
 	id := c.Param("id")
