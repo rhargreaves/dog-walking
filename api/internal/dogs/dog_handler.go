@@ -67,7 +67,7 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 // @Description Get a list of all registered dogs
 // @Tags dogs
 // @Produce json
-// @Success 200 {array} models.Dog
+// @Success 200 {object} models.DogList
 // @Failure 500 {object} common.APIError "Internal server error"
 // @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
