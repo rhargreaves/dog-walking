@@ -9,19 +9,6 @@ import (
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
-type Dog struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Breed     string `json:"breed"`
-	PhotoUrl  string `json:"photoUrl"`
-	PhotoHash string `json:"photoHash"`
-}
-
-type DogList struct {
-	Dogs      []Dog  `json:"dogs"`
-	NextToken string `json:"nextToken"`
-}
-
 func createDog(t *testing.T, name string) Dog {
 	resp := common.PostJson(t, "/dogs", Dog{Name: name}, true)
 	defer resp.Body.Close()

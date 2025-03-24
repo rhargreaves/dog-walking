@@ -34,19 +34,6 @@ func IsLocal() bool {
 	return os.Getenv("USE_LOCALSTACK") == "true"
 }
 
-type ApiGatewayError struct {
-	Message string `json:"message"`
-}
-
-type ApiError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-type ApiErrorResponse struct {
-	Error ApiError `json:"error"`
-}
-
 func BaseUrl() string {
 	apiBaseUrl := os.Getenv("API_BASE_URL")
 	if apiBaseUrl == "" {
