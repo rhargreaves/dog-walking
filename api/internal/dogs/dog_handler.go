@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
@@ -70,14 +71,27 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 // @Failure 500 {object} common.APIError "Internal server error"
 // @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
-	dogs, err := h.dogRepository.List()
+	limit := c.Query("limit")
+	nextToken := c.Query("nextToken")
+
+	var limitInt int = 25
+	if limit != "" {
+		var err error
+		limitInt, err = strconv.Atoi(limit)
+		if err != nil {
+			handleError(c, err)
+			return
+		}
+	}
+
+	dogs, err := h.dogRepository.List(limitInt, nextToken)
 	if err != nil {
 		handleError(c, err)
 		return
 	}
 
-	for i := range dogs {
-		dogs[i] = *dogWithPhotoUrl(&dogs[i])
+	for i := range dogs.Dogs {
+		dogs.Dogs[i] = *dogWithPhotoUrl(&dogs.Dogs[i])
 	}
 
 	c.JSON(http.StatusOK, dogs)

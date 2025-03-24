@@ -170,29 +170,29 @@ func (_c *DogRepository_Get_Call) RunAndReturn(run func(string) (*models.Dog, er
 	return _c
 }
 
-// List provides a mock function with no fields
-func (_m *DogRepository) List() ([]models.Dog, error) {
-	ret := _m.Called()
+// List provides a mock function with given fields: limit, nextToken
+func (_m *DogRepository) List(limit int, nextToken string) (*models.DogList, error) {
+	ret := _m.Called(limit, nextToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
 	}
 
-	var r0 []models.Dog
+	var r0 *models.DogList
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]models.Dog, error)); ok {
-		return rf()
+	if rf, ok := ret.Get(0).(func(int, string) (*models.DogList, error)); ok {
+		return rf(limit, nextToken)
 	}
-	if rf, ok := ret.Get(0).(func() []models.Dog); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(int, string) *models.DogList); ok {
+		r0 = rf(limit, nextToken)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]models.Dog)
+			r0 = ret.Get(0).(*models.DogList)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(int, string) error); ok {
+		r1 = rf(limit, nextToken)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -206,23 +206,25 @@ type DogRepository_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-func (_e *DogRepository_Expecter) List() *DogRepository_List_Call {
-	return &DogRepository_List_Call{Call: _e.mock.On("List")}
+//   - limit int
+//   - nextToken string
+func (_e *DogRepository_Expecter) List(limit interface{}, nextToken interface{}) *DogRepository_List_Call {
+	return &DogRepository_List_Call{Call: _e.mock.On("List", limit, nextToken)}
 }
 
-func (_c *DogRepository_List_Call) Run(run func()) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) Run(run func(limit int, nextToken string)) *DogRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		run(args[0].(int), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *DogRepository_List_Call) Return(_a0 []models.Dog, _a1 error) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) Return(_a0 *models.DogList, _a1 error) *DogRepository_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *DogRepository_List_Call) RunAndReturn(run func() ([]models.Dog, error)) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) RunAndReturn(run func(int, string) (*models.DogList, error)) *DogRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

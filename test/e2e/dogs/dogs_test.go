@@ -86,11 +86,37 @@ func TestListDogs(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var dogs []Dog
+	var dogs DogList
 	common.DecodeJSON(t, resp, &dogs)
 
-	require.GreaterOrEqual(t, len(dogs), 1, "Expected at least 1 dog to be returned")
-	require.NotEmpty(t, dogs[0].ID, "Expected dog ID to be returned")
+	require.GreaterOrEqual(t, len(dogs.Dogs), 1, "Expected at least 1 dog to be returned")
+	require.NotEmpty(t, dogs.Dogs[0].ID, "Expected dog ID to be returned")
+}
+
+func TestListDogs_ReturnsNextTokenWhenMoreDogsExist(t *testing.T) {
+	createDog(t, "ListTest1")
+	createDog(t, "ListTest2")
+
+	resp := common.Get(t, "/dogs?limit=1", true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	var dogs DogList
+	common.DecodeJSON(t, resp, &dogs)
+
+	require.Equal(t, 1, len(dogs.Dogs), "Expected 1 dog to be returned")
+	require.NotEmpty(t, dogs.Dogs[0].ID, "Expected dog ID to be returned")
+	require.NotEmpty(t, dogs.NextToken, "Expected next token to be returned")
+
+	resp = common.Get(t, "/dogs?limit=1&nextToken="+dogs.NextToken, true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	var dogs2 DogList
+	common.DecodeJSON(t, resp, &dogs2)
+	dog2 := dogs2.Dogs[0]
+
+	require.NotEqual(t, dogs.Dogs[0].ID, dog2.ID, "Expected next token to return a different dog")
 }
 
 func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {

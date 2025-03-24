@@ -18,7 +18,7 @@ var ErrDogNotFound = errors.New("dog not found")
 
 type DogRepository interface {
 	Create(dog *models.Dog) error
-	List() ([]models.Dog, error)
+	List(limit int, nextToken string) (*models.DogList, error)
 	Get(id string) (*models.Dog, error)
 	Update(id string, dog *models.Dog) error
 	Delete(id string) error
@@ -53,9 +53,16 @@ func (r *dogRepository) Create(dog *models.Dog) error {
 	return nil
 }
 
-func (r *dogRepository) List() ([]models.Dog, error) {
+func (r *dogRepository) List(limit int, nextToken string) (*models.DogList, error) {
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(r.tableName),
+		Limit:     aws.Int64(int64(limit)),
+	}
+
+	if nextToken != "" {
+		input.ExclusiveStartKey = map[string]*dynamodb.AttributeValue{
+			"id": {S: aws.String(nextToken)},
+		}
 	}
 
 	result, err := r.dynamoDB.Scan(input)
@@ -69,7 +76,16 @@ func (r *dogRepository) List() ([]models.Dog, error) {
 		return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
 	}
 
-	return dogs, nil
+	nextToken = ""
+	lastEvaluatedKey := result.LastEvaluatedKey["id"]
+	if lastEvaluatedKey != nil {
+		nextToken = *lastEvaluatedKey.S
+	}
+
+	return &models.DogList{
+		Dogs:      dogs,
+		NextToken: nextToken,
+	}, nil
 }
 
 func (r *dogRepository) Get(id string) (*models.Dog, error) {

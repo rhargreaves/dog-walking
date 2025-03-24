@@ -17,6 +17,11 @@ type Dog struct {
 	PhotoHash string `json:"photoHash"`
 }
 
+type DogList struct {
+	Dogs      []Dog  `json:"dogs"`
+	NextToken string `json:"nextToken"`
+}
+
 func createDog(t *testing.T, name string) Dog {
 	resp := common.PostJson(t, "/dogs", Dog{Name: name}, true)
 	defer resp.Body.Close()

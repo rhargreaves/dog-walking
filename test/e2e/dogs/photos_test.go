@@ -77,10 +77,10 @@ func TestUploadImage_ImageUrlInListDogsResponse(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var fetchedDogs []Dog
+	var fetchedDogs DogList
 	common.DecodeJSON(t, resp, &fetchedDogs)
 
-	fetchedDog, found := FindFirst(fetchedDogs, func(dog Dog) bool {
+	fetchedDog, found := FindFirst(fetchedDogs.Dogs, func(dog Dog) bool {
 		return dog.PhotoUrl != ""
 	})
 	require.True(t, found, "Expected at least one dog to have a photo URL")
