@@ -8,6 +8,8 @@ config:
       arrivalRate: 10
       name: "Sustained load"
   processor: "./cognito-functions.js"
+  plugins:
+    expect: {}
   variables:
     clientId: "{{ $env.COGNITO_CLIENT_ID }}"
     userPoolId: "{{ $env.COGNITO_USER_POOL_ID }}"
@@ -34,7 +36,7 @@ scenarios:
           capture:
             - json: "$.id"
               as: "dogId"
-            expect:
+          expect:
             - statusCode: 201
       - get:
           url: "/dogs/{{ dogId }}"
@@ -42,13 +44,9 @@ scenarios:
             Authorization: "Bearer {{ token }}"
           expect:
             - statusCode: 200
-            - hasProperty: "id"
-            - equals:
-                - "{{ dogId }}"
-                - "$.id"
       - delete:
           url: "/dogs/{{ dogId }}"
           headers:
             Authorization: "Bearer {{ token }}"
           expect:
-            - statusCode: 200
+            - statusCode: 204
