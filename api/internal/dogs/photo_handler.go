@@ -13,16 +13,16 @@ type DogPhotoHandler interface {
 }
 
 type dogPhotoHandler struct {
-	dogRepository      DogRepository
-	dogPhotoRepository DogPhotoRepository
-	breedDetector      BreedDetector
+	dogRepository    DogRepository
+	dogPhotoUploader DogPhotoUploader
+	breedDetector    BreedDetector
 }
 
-func NewDogPhotoHandler(dogRepository DogRepository, dogPhotoRepository DogPhotoRepository, breedDetector BreedDetector) DogPhotoHandler {
+func NewDogPhotoHandler(dogRepository DogRepository, dogPhotoUploader DogPhotoUploader, breedDetector BreedDetector) DogPhotoHandler {
 	return &dogPhotoHandler{
-		dogRepository:      dogRepository,
-		dogPhotoRepository: dogPhotoRepository,
-		breedDetector:      breedDetector,
+		dogRepository:    dogRepository,
+		dogPhotoUploader: dogPhotoUploader,
+		breedDetector:    breedDetector,
 	}
 }
 
@@ -53,7 +53,7 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 		return
 	}
 
-	err = h.dogPhotoRepository.Upload(id, c.Request.Body, contentType)
+	err = h.dogPhotoUploader.Upload(id, c.Request.Body, contentType)
 	if err != nil {
 		handleError(c, err)
 		return

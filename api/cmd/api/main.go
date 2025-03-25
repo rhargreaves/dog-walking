@@ -39,9 +39,9 @@ func init() {
 	dogRepository := dogs.NewDogRepository(os.Getenv("DOGS_TABLE_NAME"))
 	dogHandler := dogs.NewDogHandler(dogRepository)
 
-	dogPhotoRepository := dogs.NewDogPhotoRepository(os.Getenv("DOG_IMAGES_BUCKET"), dogRepository)
+	dogPhotoUploader := dogs.NewDogPhotoUploader(os.Getenv("DOG_IMAGES_BUCKET"), dogRepository)
 	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
-	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoRepository, breedDetector)
+	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoUploader, breedDetector)
 
 	r.GET("/ping", pingHandler)
 	r.GET("/dogs", dogHandler.ListDogs)

@@ -9,20 +9,20 @@ import (
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 )
 
-type DogPhotoRepository interface {
+type DogPhotoUploader interface {
 	Upload(id string, fileData io.Reader, contentType string) error
 }
 
-type dogPhotoRepository struct {
+type s3DogPhotoUploader struct {
 	bucketName    string
 	dogRepository DogRepository
 }
 
-func NewDogPhotoRepository(bucketName string, dogRepository DogRepository) DogPhotoRepository {
-	return &dogPhotoRepository{bucketName: bucketName, dogRepository: dogRepository}
+func NewDogPhotoUploader(bucketName string, dogRepository DogRepository) DogPhotoUploader {
+	return &s3DogPhotoUploader{bucketName: bucketName, dogRepository: dogRepository}
 }
 
-func (r *dogPhotoRepository) Upload(id string, fileData io.Reader, contentType string) error {
+func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) error {
 	sess, err := common.CreateS3Session()
 	if err != nil {
 		return err
