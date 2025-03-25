@@ -173,13 +173,47 @@ func (r *dynamoDBDogRepository) Update(id string, dog *domain.Dog) error {
 		ExpressionAttributeNames: map[string]*string{
 			"#n": aws.String("name"),
 		},
-		UpdateExpression: aws.String("set #n = :name, breed = :breed"),
+		UpdateExpression: aws.String("set #n = :name," +
+			"breed = :breed," +
+			"sex = :sex," +
+			"isNeutered = :isNeutered," +
+			"energyLevel = :energyLevel," +
+			"size = :size," +
+			"socialization = :socialization," +
+			"specialInstructions = :specialInstructions," +
+			"dateOfBirth = :dateOfBirth"),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":name": {
 				S: aws.String(dog.Name),
 			},
 			":breed": {
 				S: aws.String(dog.Breed),
+			},
+			":sex": {
+				S: aws.String(dog.Sex),
+			},
+			":isNeutered": {
+				BOOL: aws.Bool(dog.IsNeutered),
+			},
+			":energyLevel": {
+				N: aws.String(strconv.Itoa(dog.EnergyLevel)),
+			},
+			":size": {
+				S: aws.String(dog.Size),
+			},
+			":socialization": {
+				M: map[string]*dynamodb.AttributeValue{
+					"goodWithChildren":  {BOOL: aws.Bool(dog.Socialization.GoodWithChildren)},
+					"goodWithPuppies":   {BOOL: aws.Bool(dog.Socialization.GoodWithPuppies)},
+					"goodWithLargeDogs": {BOOL: aws.Bool(dog.Socialization.GoodWithLargeDogs)},
+					"goodWithSmallDogs": {BOOL: aws.Bool(dog.Socialization.GoodWithSmallDogs)},
+				},
+			},
+			":specialInstructions": {
+				S: aws.String(dog.SpecialInstructions),
+			},
+			":dateOfBirth": {
+				S: aws.String(dog.DateOfBirth),
 			},
 		},
 		ConditionExpression: aws.String("attribute_exists(id)"),

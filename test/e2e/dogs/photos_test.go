@@ -31,7 +31,7 @@ func TestUploadImage_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 }
 
 func TestUploadImage_AccessibleViaCDN(t *testing.T) {
-	dog := createDog(t, CreateDogRequest{Name: "Mr. Peanutbutter"})
+	dog := createDog(t, CreateOrUpdateDogRequest{Name: "Mr. Peanutbutter"})
 
 	image, err := os.ReadFile(testCartoonDogImagePath)
 	require.NoError(t, err)
@@ -48,7 +48,7 @@ func TestUploadImage_AccessibleViaCDN(t *testing.T) {
 }
 
 func TestUploadImage_ImageUrlInDogResponse(t *testing.T) {
-	dog := createDog(t, CreateDogRequest{Name: "Mr. Peanutbutter"})
+	dog := createDog(t, CreateOrUpdateDogRequest{Name: "Mr. Peanutbutter"})
 
 	image, err := os.ReadFile(testCartoonDogImagePath)
 	require.NoError(t, err)

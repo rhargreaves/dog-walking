@@ -7,7 +7,7 @@ type Socialization struct {
 	GoodWithSmallDogs bool `json:"goodWithSmallDogs"`
 }
 
-type CreateDogRequest struct {
+type CreateOrUpdateDogRequest struct {
 	Name                string        `json:"name"`
 	Breed               string        `json:"breed"`
 	Sex                 string        `json:"sex" binding:"required,oneof=male female"`

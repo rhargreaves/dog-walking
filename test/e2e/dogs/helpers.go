@@ -16,7 +16,7 @@ func getDog(t *testing.T, id string) DogResponse {
 	return dog
 }
 
-func createDog(t *testing.T, request CreateDogRequest) DogResponse {
+func createDog(t *testing.T, request CreateOrUpdateDogRequest) DogResponse {
 	resp := common.PostJson(t, "/dogs", request, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusCreated)

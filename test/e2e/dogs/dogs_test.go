@@ -11,7 +11,7 @@ import (
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
-var testDog = CreateDogRequest{
+var testDog = CreateOrUpdateDogRequest{
 	Name:        "Rover",
 	Breed:       "Labrador",
 	Sex:         "male",
@@ -28,7 +28,24 @@ var testDog = CreateDogRequest{
 	DateOfBirth:         "2020-01-01",
 }
 
-var testListDog = CreateDogRequest{
+var testDog2 = CreateOrUpdateDogRequest{
+	Name:        "Echo",
+	Breed:       "Husky",
+	Sex:         "male",
+	IsNeutered:  false,
+	EnergyLevel: 5,
+	Size:        "large",
+	Socialization: Socialization{
+		GoodWithChildren:  false,
+		GoodWithPuppies:   false,
+		GoodWithLargeDogs: false,
+		GoodWithSmallDogs: false,
+	},
+	SpecialInstructions: "Don't let him out of the house",
+	DateOfBirth:         "2020-01-01",
+}
+
+var testListDog = CreateOrUpdateDogRequest{
 	Name:        "ListTest",
 	Breed:       "Husky",
 	Sex:         "male",
@@ -45,7 +62,7 @@ var testListDog = CreateDogRequest{
 	DateOfBirth:         "2020-01-01",
 }
 
-var testNameFilterDog = CreateDogRequest{
+var testNameFilterDog = CreateOrUpdateDogRequest{
 	Name:        "NameFilterTest",
 	Breed:       "Husky",
 	Sex:         "male",
@@ -121,7 +138,7 @@ func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	dog := createDog(t, testDog)
 
-	resp := common.PutJson(t, "/dogs/"+dog.ID, DogResponse{Name: "Rose"}, true)
+	resp := common.PutJson(t, "/dogs/"+dog.ID, testDog2, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
@@ -132,7 +149,18 @@ func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	var fetchedDog DogResponse
 	common.DecodeJSON(t, resp, &fetchedDog)
 
-	assert.Equal(t, "Rose", fetchedDog.Name, "Expected updated dog name to be returned")
+	assert.Equal(t, "Echo", fetchedDog.Name, "Expected updated dog name to be returned")
+	assert.Equal(t, "Husky", fetchedDog.Breed, "Expected updated dog breed to be returned")
+	assert.Equal(t, "male", fetchedDog.Sex, "Expected updated dog sex to be returned")
+	assert.False(t, fetchedDog.IsNeutered, "Expected updated dog isNeutered to be returned")
+	assert.Equal(t, 5, fetchedDog.EnergyLevel, "Expected updated dog energyLevel to be returned")
+	assert.Equal(t, "large", fetchedDog.Size, "Expected updated dog size to be returned")
+	assert.Equal(t, "Don't let him out of the house", fetchedDog.SpecialInstructions, "Expected updated dog specialInstructions to be returned")
+	assert.Equal(t, "2020-01-01", fetchedDog.DateOfBirth, "Expected updated dog dateOfBirth to be returned")
+	assert.Equal(t, false, fetchedDog.Socialization.GoodWithChildren, "Expected updated dog socialization.goodWithChildren to be returned")
+	assert.Equal(t, false, fetchedDog.Socialization.GoodWithPuppies, "Expected updated dog socialization.goodWithPuppies to be returned")
+	assert.Equal(t, false, fetchedDog.Socialization.GoodWithLargeDogs, "Expected updated dog socialization.goodWithLargeDogs to be returned")
+	assert.Equal(t, false, fetchedDog.Socialization.GoodWithSmallDogs, "Expected updated dog socialization.goodWithSmallDogs to be returned")
 	assert.Equal(t, dog.ID, fetchedDog.ID, "Expected dog ID to be returned")
 }
 

@@ -7,7 +7,6 @@ import (
 	"github.com/creasty/defaults"
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
-	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
 )
 
@@ -130,7 +129,7 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 		return
 	}
 
-	dog := domain.Dog{Name: request.Name, Breed: request.Breed}
+	dog := *model.FromCreateOrUpdateDogRequest(&request)
 	if err := h.dogRepository.Update(id, &dog); err != nil {
 		handleError(c, err)
 		return
