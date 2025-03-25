@@ -1,6 +1,6 @@
 package dogs
 
-type Dog struct {
+type DogResponse struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Breed     string `json:"breed"`
@@ -8,7 +8,15 @@ type Dog struct {
 	PhotoHash string `json:"photoHash"`
 }
 
-type DogList struct {
-	Dogs      []Dog  `json:"dogs"`
-	NextToken string `json:"nextToken"`
+type DogListResponse struct {
+	Dogs      []DogResponse `json:"dogs"`
+	NextToken string        `json:"nextToken"`
+}
+
+type DetectBreedRequest struct {
+}
+
+type DetectBreedResponse struct {
+	Breed      string  `json:"breed"`
+	Confidence float64 `json:"confidence"`
 }

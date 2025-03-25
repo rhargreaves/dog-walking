@@ -33,7 +33,7 @@ func TestGetDog_ReturnsDogWhenExists(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var fetchedDog Dog
+	var fetchedDog DogResponse
 	common.DecodeJSON(t, resp, &fetchedDog)
 
 	assert.Equal(t, dogName, fetchedDog.Name, "Expected dog name to be returned")
@@ -54,7 +54,7 @@ func TestGetDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
 func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	dog := createDog(t, "Rover")
 
-	resp := common.PutJson(t, "/dogs/"+dog.ID, Dog{Name: "Rose"}, true)
+	resp := common.PutJson(t, "/dogs/"+dog.ID, DogResponse{Name: "Rose"}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
@@ -62,7 +62,7 @@ func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var fetchedDog Dog
+	var fetchedDog DogResponse
 	common.DecodeJSON(t, resp, &fetchedDog)
 
 	assert.Equal(t, "Rose", fetchedDog.Name, "Expected updated dog name to be returned")
@@ -70,7 +70,7 @@ func TestUpdateDog_UpdatesDogWhenExists(t *testing.T) {
 }
 
 func TestUpdateDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
-	resp := common.PutJson(t, "/dogs/123", Dog{Name: "Mr. Peanutbutter"}, true)
+	resp := common.PutJson(t, "/dogs/123", DogResponse{Name: "Mr. Peanutbutter"}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusNotFound)
 
@@ -86,7 +86,7 @@ func TestListDogs_ReturnsAtLeastOneDog(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var dogs DogList
+	var dogs DogListResponse
 	common.DecodeJSON(t, resp, &dogs)
 
 	require.GreaterOrEqual(t, len(dogs.Dogs), 1, "Expected at least 1 dog to be returned")
@@ -101,7 +101,7 @@ func TestListDogs_ReturnsNextTokenWhenMoreDogsExist(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var dogs DogList
+	var dogs DogListResponse
 	common.DecodeJSON(t, resp, &dogs)
 
 	require.Equal(t, 1, len(dogs.Dogs), "Expected 1 dog to be returned")
@@ -111,7 +111,7 @@ func TestListDogs_ReturnsNextTokenWhenMoreDogsExist(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var dogsNextPage DogList
+	var dogsNextPage DogListResponse
 	common.DecodeJSON(t, resp, &dogsNextPage)
 	require.NotEqual(t, dogs.Dogs[0].ID, dogsNextPage.Dogs[0].ID, "Expected next token to return a different dog")
 }

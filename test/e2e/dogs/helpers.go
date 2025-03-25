@@ -9,12 +9,12 @@ import (
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
-func createDog(t *testing.T, name string) Dog {
-	resp := common.PostJson(t, "/dogs", Dog{Name: name}, true)
+func createDog(t *testing.T, name string) DogResponse {
+	resp := common.PostJson(t, "/dogs", DogResponse{Name: name}, true)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusCreated)
 
-	var dog Dog
+	var dog DogResponse
 	common.DecodeJSON(t, resp, &dog)
 
 	assert.Equal(t, name, dog.Name, "Expected dog name to be returned")

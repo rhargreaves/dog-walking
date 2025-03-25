@@ -73,7 +73,7 @@ func TestDetectBreed_SuccessfulCases(t *testing.T) {
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusOK)
 
-			var fetchedDog Dog
+			var fetchedDog DogResponse
 			common.DecodeJSON(t, resp, &fetchedDog)
 			require.Equal(t, tc.expectedBreed, fetchedDog.Breed)
 		})

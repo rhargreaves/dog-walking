@@ -58,7 +58,7 @@ func TestUploadImage_ImageUrlInDogResponse(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var fetchedDog Dog
+	var fetchedDog DogResponse
 	common.DecodeJSON(t, resp, &fetchedDog)
 	expectedHash := "443d6817146340599232418cfe7ef31b"
 	assert.Equal(t, os.Getenv("CLOUDFRONT_BASE_URL")+"/"+dog.ID+"?h="+expectedHash,
@@ -77,10 +77,10 @@ func TestUploadImage_ImageUrlInListDogsResponse(t *testing.T) {
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
 
-	var fetchedDogs DogList
+	var fetchedDogs DogListResponse
 	common.DecodeJSON(t, resp, &fetchedDogs)
 
-	fetchedDog, found := FindFirst(fetchedDogs.Dogs, func(dog Dog) bool {
+	fetchedDog, found := FindFirst(fetchedDogs.Dogs, func(dog DogResponse) bool {
 		return dog.PhotoUrl != ""
 	})
 	require.True(t, found, "Expected at least one dog to have a photo URL")
