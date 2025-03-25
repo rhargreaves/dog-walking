@@ -78,7 +78,7 @@ There are also some basic [dashboards](infra/modules/monitoring/main.tf) defined
 
 ## Load Testing
 
-See [load-test/README.md](load-test/README.md).
+See [load-test/README.md](load-test/README.md)
 
 ## Proof-of-concept tradeoffs
 
