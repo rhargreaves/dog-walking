@@ -76,6 +76,10 @@ There are [alarms](infra/modules/monitoring/main.tf) for alerting on endpoint er
 
 There are also some basic [dashboards](infra/modules/monitoring/main.tf) defined.
 
+## Load Testing
+
+See [load-test/README.md](load-test/README.md).
+
 ## Proof-of-concept tradeoffs
 
 I wanted to keep this project on a low-budget, and relatively low-complexity, so there are some decisions I made with regards to architecture:
