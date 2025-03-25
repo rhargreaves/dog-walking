@@ -49,7 +49,7 @@ func newRekognitionClient(isLocal bool, session *session.Session, s3session *ses
 	return rekognition.New(session)
 }
 
-func createSession(isLocal bool, isS3 bool) (*session.Session, error) {
+func createSession(isLocal bool, forS3 bool) (*session.Session, error) {
 	region := mustGetenv("AWS_REGION")
 	config := &aws.Config{
 		Region: &region,
@@ -59,7 +59,7 @@ func createSession(isLocal bool, isS3 bool) (*session.Session, error) {
 	}
 
 	var endpoint string
-	if isS3 {
+	if forS3 {
 		endpoint = mustGetenv("AWS_S3_ENDPOINT_URL")
 	} else {
 		endpoint = mustGetenv("AWS_ENDPOINT_URL")
