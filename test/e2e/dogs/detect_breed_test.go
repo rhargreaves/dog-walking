@@ -11,14 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type DetectBreedRequest struct {
-}
-
-type DetectBreedResponse struct {
-	Breed      string  `json:"breed"`
-	Confidence float64 `json:"confidence"`
-}
-
 type breedTestCase struct {
 	dogName       string
 	imagePath     string
