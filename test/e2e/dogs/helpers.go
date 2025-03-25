@@ -4,22 +4,24 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
-func createDog(t *testing.T, name string) DogResponse {
-	resp := common.PostJson(t, "/dogs", DogResponse{Name: name}, true)
+func getDog(t *testing.T, id string) DogResponse {
+	resp := common.Get(t, "/dogs/"+id, true)
 	defer resp.Body.Close()
-	common.RequireStatus(t, resp, http.StatusCreated)
-
+	common.RequireStatus(t, resp, http.StatusOK)
 	var dog DogResponse
 	common.DecodeJSON(t, resp, &dog)
+	return dog
+}
 
-	assert.Equal(t, name, dog.Name, "Expected dog name to be returned")
-	assert.NotEmpty(t, dog.ID, "Expected dog ID to be returned")
-
+func createDog(t *testing.T, request CreateDogRequest) DogResponse {
+	resp := common.PostJson(t, "/dogs", request, true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusCreated)
+	var dog DogResponse
+	common.DecodeJSON(t, resp, &dog)
 	return dog
 }
 

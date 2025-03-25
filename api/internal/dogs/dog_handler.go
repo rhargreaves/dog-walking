@@ -38,19 +38,19 @@ func NewDogHandler(dogHandlerConfig DogHandlerConfig, dogRepository DogRepositor
 // @Tags dogs
 // @Accept json
 // @Produce json
-// @Param dog body model.DogRequest true "Dog information"
+// @Param dog body model.CreateOrUpdateDogRequest true "Dog information"
 // @Success 201 {object} model.DogResponse
 // @Failure 400 {object} common.APIErrorResponse "Invalid request"
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [post]
 func (h *dogHandler) CreateDog(c *gin.Context) {
-	var request model.DogRequest
+	var request model.CreateOrUpdateDogRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		handleBindError(c, err)
 		return
 	}
 
-	dog := domain.Dog{Name: request.Name, Breed: request.Breed}
+	dog := *model.FromCreateOrUpdateDogRequest(&request)
 	if err := h.dogRepository.Create(&dog); err != nil {
 		handleError(c, err)
 		return
@@ -116,7 +116,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Dog ID"
-// @Param dog body model.DogRequest true "Updated dog information"
+// @Param dog body model.CreateOrUpdateDogRequest true "Updated dog information"
 // @Success 200 {object} model.DogResponse
 // @Failure 400 {object} common.APIErrorResponse "Invalid request"
 // @Failure 404 {object} common.APIErrorResponse "Dog not found"
@@ -124,7 +124,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 // @Router /dogs/{id} [put]
 func (h *dogHandler) UpdateDog(c *gin.Context) {
 	id := c.Param("id")
-	var request model.DogRequest
+	var request model.CreateOrUpdateDogRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		handleBindError(c, err)
 		return

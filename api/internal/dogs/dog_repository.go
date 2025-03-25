@@ -3,6 +3,7 @@ package dogs
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -44,8 +45,21 @@ func (r *dynamoDBDogRepository) Create(dog *domain.Dog) error {
 	input := &dynamodb.PutItemInput{
 		TableName: aws.String(r.config.TableName),
 		Item: map[string]*dynamodb.AttributeValue{
-			"id":   {S: aws.String(dog.ID)},
-			"name": {S: aws.String(dog.Name)},
+			"id":          {S: aws.String(dog.ID)},
+			"name":        {S: aws.String(dog.Name)},
+			"breed":       {S: aws.String(dog.Breed)},
+			"sex":         {S: aws.String(dog.Sex)},
+			"isNeutered":  {BOOL: aws.Bool(dog.IsNeutered)},
+			"energyLevel": {N: aws.String(strconv.Itoa(dog.EnergyLevel))},
+			"size":        {S: aws.String(dog.Size)},
+			"socialization": {M: map[string]*dynamodb.AttributeValue{
+				"goodWithChildren":  {BOOL: aws.Bool(dog.Socialization.GoodWithChildren)},
+				"goodWithPuppies":   {BOOL: aws.Bool(dog.Socialization.GoodWithPuppies)},
+				"goodWithLargeDogs": {BOOL: aws.Bool(dog.Socialization.GoodWithLargeDogs)},
+				"goodWithSmallDogs": {BOOL: aws.Bool(dog.Socialization.GoodWithSmallDogs)},
+			}},
+			"specialInstructions": {S: aws.String(dog.SpecialInstructions)},
+			"dateOfBirth":         {S: aws.String(dog.DateOfBirth)},
 		},
 	}
 

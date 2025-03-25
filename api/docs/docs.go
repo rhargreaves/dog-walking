@@ -82,7 +82,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DogRequest"
+                            "$ref": "#/definitions/model.CreateOrUpdateDogRequest"
                         }
                     }
                 ],
@@ -174,7 +174,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DogRequest"
+                            "$ref": "#/definitions/model.CreateOrUpdateDogRequest"
                         }
                     }
                 ],
@@ -387,6 +387,49 @@ const docTemplate = `{
                 }
             }
         },
+        "model.CreateOrUpdateDogRequest": {
+            "type": "object",
+            "properties": {
+                "breed": {
+                    "type": "string"
+                },
+                "dateOfBirth": {
+                    "type": "string"
+                },
+                "energyLevel": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "isNeutered": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ]
+                },
+                "size": {
+                    "type": "string",
+                    "enum": [
+                        "small",
+                        "medium",
+                        "large"
+                    ]
+                },
+                "socialization": {
+                    "$ref": "#/definitions/model.Socialization"
+                },
+                "specialInstructions": {
+                    "type": "string"
+                }
+            }
+        },
         "model.DogListResponse": {
             "type": "object",
             "properties": {
@@ -401,28 +444,30 @@ const docTemplate = `{
                 }
             }
         },
-        "model.DogRequest": {
+        "model.DogResponse": {
             "type": "object",
             "required": [
-                "name"
+                "energyLevel",
+                "sex",
+                "size"
             ],
             "properties": {
                 "breed": {
                     "type": "string"
                 },
-                "name": {
+                "dateOfBirth": {
                     "type": "string"
-                }
-            }
-        },
-        "model.DogResponse": {
-            "type": "object",
-            "properties": {
-                "breed": {
-                    "type": "string"
+                },
+                "energyLevel": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
                 },
                 "id": {
                     "type": "string"
+                },
+                "isNeutered": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -432,6 +477,44 @@ const docTemplate = `{
                 },
                 "photoUrl": {
                     "type": "string"
+                },
+                "sex": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ]
+                },
+                "size": {
+                    "type": "string",
+                    "enum": [
+                        "small",
+                        "medium",
+                        "large"
+                    ]
+                },
+                "socialization": {
+                    "$ref": "#/definitions/model.Socialization"
+                },
+                "specialInstructions": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Socialization": {
+            "type": "object",
+            "properties": {
+                "goodWithChildren": {
+                    "type": "boolean"
+                },
+                "goodWithLargeDogs": {
+                    "type": "boolean"
+                },
+                "goodWithPuppies": {
+                    "type": "boolean"
+                },
+                "goodWithSmallDogs": {
+                    "type": "boolean"
                 }
             }
         }

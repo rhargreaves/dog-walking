@@ -59,7 +59,7 @@ func TestDetectBreed_SuccessfulCases(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.dogName, func(t *testing.T) {
-			dog := createDog(t, tc.dogName)
+			dog := createDog(t, CreateDogRequest{Name: tc.dogName})
 			resp := uploadImageAndDetectBreed(t, dog.ID, tc.imagePath)
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusOK)
@@ -94,7 +94,7 @@ func TestDetectBreed_ErrorCases(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.dogName, func(t *testing.T) {
-			dog := createDog(t, tc.dogName)
+			dog := createDog(t, CreateDogRequest{Name: tc.dogName})
 			resp := uploadImageAndDetectBreed(t, dog.ID, tc.imagePath)
 			defer resp.Body.Close()
 			common.RequireStatus(t, resp, http.StatusBadRequest)

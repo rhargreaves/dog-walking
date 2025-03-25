@@ -21,6 +21,36 @@ definitions:
       id:
         type: string
     type: object
+  model.CreateOrUpdateDogRequest:
+    properties:
+      breed:
+        type: string
+      dateOfBirth:
+        type: string
+      energyLevel:
+        maximum: 5
+        minimum: 1
+        type: integer
+      isNeutered:
+        type: boolean
+      name:
+        type: string
+      sex:
+        enum:
+        - male
+        - female
+        type: string
+      size:
+        enum:
+        - small
+        - medium
+        - large
+        type: string
+      socialization:
+        $ref: '#/definitions/model.Socialization'
+      specialInstructions:
+        type: string
+    type: object
   model.DogListResponse:
     properties:
       dogs:
@@ -30,27 +60,56 @@ definitions:
       nextToken:
         type: string
     type: object
-  model.DogRequest:
-    properties:
-      breed:
-        type: string
-      name:
-        type: string
-    required:
-    - name
-    type: object
   model.DogResponse:
     properties:
       breed:
         type: string
+      dateOfBirth:
+        type: string
+      energyLevel:
+        maximum: 5
+        minimum: 1
+        type: integer
       id:
         type: string
+      isNeutered:
+        type: boolean
       name:
         type: string
       photoHash:
         type: string
       photoUrl:
         type: string
+      sex:
+        enum:
+        - male
+        - female
+        type: string
+      size:
+        enum:
+        - small
+        - medium
+        - large
+        type: string
+      socialization:
+        $ref: '#/definitions/model.Socialization'
+      specialInstructions:
+        type: string
+    required:
+    - energyLevel
+    - sex
+    - size
+    type: object
+  model.Socialization:
+    properties:
+      goodWithChildren:
+        type: boolean
+      goodWithLargeDogs:
+        type: boolean
+      goodWithPuppies:
+        type: boolean
+      goodWithSmallDogs:
+        type: boolean
     type: object
 info:
   contact: {}
@@ -101,7 +160,7 @@ paths:
         name: dog
         required: true
         schema:
-          $ref: '#/definitions/model.DogRequest'
+          $ref: '#/definitions/model.CreateOrUpdateDogRequest'
       produces:
       - application/json
       responses:
@@ -184,7 +243,7 @@ paths:
         name: dog
         required: true
         schema:
-          $ref: '#/definitions/model.DogRequest'
+          $ref: '#/definitions/model.CreateOrUpdateDogRequest'
       produces:
       - application/json
       responses:
