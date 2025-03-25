@@ -17,15 +17,19 @@ type BreedDetector interface {
 	DetectBreed(id string) (string, float64, error)
 }
 
-type breedDetector struct {
-	bucketName string
-	rekClient  rekognitioniface.RekognitionAPI
+type BreedDetectorConfig struct {
+	BucketName string
 }
 
-func NewBreedDetector(bucketName string, rekClient rekognitioniface.RekognitionAPI) BreedDetector {
+type breedDetector struct {
+	config    *BreedDetectorConfig
+	rekClient rekognitioniface.RekognitionAPI
+}
+
+func NewBreedDetector(breedDetectorConfig BreedDetectorConfig, rekClient rekognitioniface.RekognitionAPI) BreedDetector {
 	return &breedDetector{
-		bucketName: bucketName,
-		rekClient:  rekClient,
+		config:    &breedDetectorConfig,
+		rekClient: rekClient,
 	}
 }
 
@@ -33,7 +37,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 	input := &rekognition.DetectLabelsInput{
 		Image: &rekognition.Image{
 			S3Object: &rekognition.S3Object{
-				Bucket: aws.String(d.bucketName),
+				Bucket: aws.String(d.config.BucketName),
 				Name:   aws.String(id),
 			},
 		},

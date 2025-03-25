@@ -20,11 +20,16 @@ type DogHandler interface {
 }
 
 type dogHandler struct {
+	config        *DogHandlerConfig
 	dogRepository DogRepository
 }
 
-func NewDogHandler(dogRepository DogRepository) DogHandler {
-	return &dogHandler{dogRepository: dogRepository}
+type DogHandlerConfig struct {
+	ImagesCdnBaseUrl string
+}
+
+func NewDogHandler(dogHandlerConfig DogHandlerConfig, dogRepository DogRepository) DogHandler {
+	return &dogHandler{config: &dogHandlerConfig, dogRepository: dogRepository}
 }
 
 // CreateDog godoc
@@ -51,7 +56,7 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, model.ToDogResponse(&dog))
+	c.JSON(http.StatusCreated, model.ToDogResponse(&dog, h.config.ImagesCdnBaseUrl))
 }
 
 type DogListQuery struct {
@@ -84,7 +89,7 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.ToDogListResponse(dogs))
+	c.JSON(http.StatusOK, model.ToDogListResponse(dogs, h.config.ImagesCdnBaseUrl))
 }
 
 // GetDog godoc
@@ -105,7 +110,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.ToDogResponse(dog))
+	c.JSON(http.StatusOK, model.ToDogResponse(dog, h.config.ImagesCdnBaseUrl))
 }
 
 // UpdateDog godoc
@@ -135,7 +140,7 @@ func (h *dogHandler) UpdateDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.ToDogResponse(&dog))
+	c.JSON(http.StatusOK, model.ToDogResponse(&dog, h.config.ImagesCdnBaseUrl))
 }
 
 // DeleteDog godoc

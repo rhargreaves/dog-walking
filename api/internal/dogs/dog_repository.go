@@ -25,21 +25,25 @@ type DogRepository interface {
 	UpdatePhotoHash(id string, photoHash string) error
 }
 
-type dogRepository struct {
-	tableName string
-	dynamoDB  *dynamodb.DynamoDB
+type DynamoDBDogRepositoryConfig struct {
+	TableName string
 }
 
-func NewDogRepository(tableName string) DogRepository {
+type dynamoDBDogRepository struct {
+	config   *DynamoDBDogRepositoryConfig
+	dynamoDB *dynamodb.DynamoDB
+}
+
+func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig) DogRepository {
 	dynamoDB := dynamodb.New(session.Must(common.CreateSession()))
-	return &dogRepository{tableName: tableName, dynamoDB: dynamoDB}
+	return &dynamoDBDogRepository{config: &dynamoDBDogRepositoryConfig, dynamoDB: dynamoDB}
 }
 
-func (r *dogRepository) Create(dog *domain.Dog) error {
+func (r *dynamoDBDogRepository) Create(dog *domain.Dog) error {
 	dog.ID = uuid.New().String()
 
 	input := &dynamodb.PutItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.config.TableName),
 		Item: map[string]*dynamodb.AttributeValue{
 			"id":   {S: aws.String(dog.ID)},
 			"name": {S: aws.String(dog.Name)},
@@ -53,9 +57,9 @@ func (r *dogRepository) Create(dog *domain.Dog) error {
 	return nil
 }
 
-func (r *dogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
+func (r *dynamoDBDogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
 	input := &dynamodb.ScanInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.config.TableName),
 		Limit:     aws.Int64(int64(limit)),
 	}
 
@@ -88,9 +92,9 @@ func (r *dogRepository) List(limit int, nextToken string) (*domain.DogList, erro
 	}, nil
 }
 
-func (r *dogRepository) Get(id string) (*domain.Dog, error) {
+func (r *dynamoDBDogRepository) Get(id string) (*domain.Dog, error) {
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.config.TableName),
 		Key:       createKey(id),
 	}
 
@@ -112,9 +116,9 @@ func (r *dogRepository) Get(id string) (*domain.Dog, error) {
 	return &dog, nil
 }
 
-func (r *dogRepository) Update(id string, dog *domain.Dog) error {
+func (r *dynamoDBDogRepository) Update(id string, dog *domain.Dog) error {
 	input := &dynamodb.UpdateItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.config.TableName),
 		Key:       createKey(id),
 		ExpressionAttributeNames: map[string]*string{
 			"#n": aws.String("name"),
@@ -144,9 +148,9 @@ func (r *dogRepository) Update(id string, dog *domain.Dog) error {
 	return nil
 }
 
-func (r *dogRepository) UpdatePhotoHash(id string, photoHash string) error {
+func (r *dynamoDBDogRepository) UpdatePhotoHash(id string, photoHash string) error {
 	input := &dynamodb.UpdateItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.config.TableName),
 		Key:       createKey(id),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":photoHash": {S: aws.String(photoHash)},
@@ -163,9 +167,9 @@ func (r *dogRepository) UpdatePhotoHash(id string, photoHash string) error {
 	return nil
 }
 
-func (r *dogRepository) Delete(id string) error {
+func (r *dynamoDBDogRepository) Delete(id string) error {
 	input := &dynamodb.DeleteItemInput{
-		TableName:    aws.String(r.tableName),
+		TableName:    aws.String(r.config.TableName),
 		Key:          createKey(id),
 		ReturnValues: aws.String("ALL_OLD"),
 	}

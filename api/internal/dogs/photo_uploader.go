@@ -13,13 +13,17 @@ type DogPhotoUploader interface {
 	Upload(id string, fileData io.Reader, contentType string) error
 }
 
+type S3PhotoUploaderConfig struct {
+	BucketName string
+}
+
 type s3DogPhotoUploader struct {
-	bucketName    string
+	config        *S3PhotoUploaderConfig
 	dogRepository DogRepository
 }
 
-func NewDogPhotoUploader(bucketName string, dogRepository DogRepository) DogPhotoUploader {
-	return &s3DogPhotoUploader{bucketName: bucketName, dogRepository: dogRepository}
+func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, dogRepository DogRepository) DogPhotoUploader {
+	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, dogRepository: dogRepository}
 }
 
 func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) error {
@@ -30,7 +34,7 @@ func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType s
 
 	uploader := s3manager.NewUploader(sess)
 	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket:      aws.String(r.bucketName),
+		Bucket:      aws.String(r.config.BucketName),
 		Key:         aws.String(id),
 		Body:        fileData,
 		ContentType: aws.String(contentType),

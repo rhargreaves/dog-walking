@@ -36,11 +36,22 @@ func init() {
 	r := gin.Default()
 	r.Use(common.ErrorMiddleware)
 
-	dogRepository := dogs.NewDogRepository(os.Getenv("DOGS_TABLE_NAME"))
-	dogHandler := dogs.NewDogHandler(dogRepository)
+	dogRepository := dogs.NewDynamoDBDogRepository(dogs.DynamoDBDogRepositoryConfig{
+		TableName: os.Getenv("DOGS_TABLE_NAME"),
+	})
 
-	dogPhotoUploader := dogs.NewDogPhotoUploader(os.Getenv("DOG_IMAGES_BUCKET"), dogRepository)
-	breedDetector := dogs.NewBreedDetector(os.Getenv("DOG_IMAGES_BUCKET"), newRekognitionClient())
+	dogHandler := dogs.NewDogHandler(dogs.DogHandlerConfig{
+		ImagesCdnBaseUrl: os.Getenv("CLOUDFRONT_BASE_URL"),
+	}, dogRepository)
+
+	dogPhotoUploader := dogs.NewDogPhotoUploader(dogs.S3PhotoUploaderConfig{
+		BucketName: os.Getenv("DOG_IMAGES_BUCKET"),
+	}, dogRepository)
+
+	breedDetector := dogs.NewBreedDetector(dogs.BreedDetectorConfig{
+		BucketName: os.Getenv("DOG_IMAGES_BUCKET"),
+	}, newRekognitionClient())
+
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoUploader, breedDetector)
 
 	r.GET("/ping", pingHandler)

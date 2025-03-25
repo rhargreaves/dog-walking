@@ -37,7 +37,10 @@ func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 	}
 	dogRepository.EXPECT().List(numberOfDogs, "").Return(dogList, nil)
 
-	handler := NewDogHandler(dogRepository)
+	config := DogHandlerConfig{
+		ImagesCdnBaseUrl: "https://example.com",
+	}
+	handler := NewDogHandler(config, dogRepository)
 	router := setupRouter(handler)
 	req, _ := http.NewRequest("GET", "/dogs", nil)
 	resp := httptest.NewRecorder()
@@ -52,7 +55,10 @@ func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 
 func TestListDogs_ReturnsErrorWhenLimitTooHigh(t *testing.T) {
 	dogRepository := new(mocks.DogRepository)
-	handler := NewDogHandler(dogRepository)
+	config := DogHandlerConfig{
+		ImagesCdnBaseUrl: "https://example.com",
+	}
+	handler := NewDogHandler(config, dogRepository)
 
 	router := setupRouter(handler)
 	req, _ := http.NewRequest("GET", "/dogs?limit=26", nil)
@@ -71,7 +77,10 @@ func TestListDogs_ReturnsErrorWhenLimitTooHigh(t *testing.T) {
 
 func TestListDogs_ReturnsErrorWhenLimitTooLow(t *testing.T) {
 	dogRepository := new(mocks.DogRepository)
-	handler := NewDogHandler(dogRepository)
+	config := DogHandlerConfig{
+		ImagesCdnBaseUrl: "https://example.com",
+	}
+	handler := NewDogHandler(config, dogRepository)
 
 	router := setupRouter(handler)
 	req, _ := http.NewRequest("GET", "/dogs?limit=0", nil)

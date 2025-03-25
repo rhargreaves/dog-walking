@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
@@ -25,9 +24,9 @@ type DogListResponse struct {
 	NextToken string        `json:"nextToken"`
 }
 
-func ToDogResponse(dog *domain.Dog) *DogResponse {
+func ToDogResponse(dog *domain.Dog, imagesCdnBaseUrl string) *DogResponse {
 	photoUrl := fmt.Sprintf("%s/%s?h=%s",
-		os.Getenv("CLOUDFRONT_BASE_URL"), dog.ID, dog.PhotoHash)
+		imagesCdnBaseUrl, dog.ID, dog.PhotoHash)
 	return &DogResponse{
 		ID:        dog.ID,
 		Name:      dog.Name,
@@ -37,10 +36,10 @@ func ToDogResponse(dog *domain.Dog) *DogResponse {
 	}
 }
 
-func ToDogListResponse(dogs *domain.DogList) *DogListResponse {
+func ToDogListResponse(dogs *domain.DogList, imagesCdnBaseUrl string) *DogListResponse {
 	dogResponses := make([]DogResponse, len(dogs.Dogs))
 	for i, dog := range dogs.Dogs {
-		dogResponses[i] = *ToDogResponse(&dog)
+		dogResponses[i] = *ToDogResponse(&dog, imagesCdnBaseUrl)
 	}
 	return &DogListResponse{
 		Dogs:      dogResponses,
