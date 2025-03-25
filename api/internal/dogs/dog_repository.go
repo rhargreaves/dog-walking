@@ -11,16 +11,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
-	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
 var ErrDogNotFound = errors.New("dog not found")
 
 type DogRepository interface {
-	Create(dog *models.Dog) error
-	List(limit int, nextToken string) (*models.DogList, error)
-	Get(id string) (*models.Dog, error)
-	Update(id string, dog *models.Dog) error
+	Create(dog *domain.Dog) error
+	List(limit int, nextToken string) (*domain.DogList, error)
+	Get(id string) (*domain.Dog, error)
+	Update(id string, dog *domain.Dog) error
 	Delete(id string) error
 	UpdatePhotoHash(id string, photoHash string) error
 }
@@ -35,7 +35,7 @@ func NewDogRepository(tableName string) DogRepository {
 	return &dogRepository{tableName: tableName, dynamoDB: dynamoDB}
 }
 
-func (r *dogRepository) Create(dog *models.Dog) error {
+func (r *dogRepository) Create(dog *domain.Dog) error {
 	dog.ID = uuid.New().String()
 
 	input := &dynamodb.PutItemInput{
@@ -53,7 +53,7 @@ func (r *dogRepository) Create(dog *models.Dog) error {
 	return nil
 }
 
-func (r *dogRepository) List(limit int, nextToken string) (*models.DogList, error) {
+func (r *dogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(r.tableName),
 		Limit:     aws.Int64(int64(limit)),
@@ -70,7 +70,7 @@ func (r *dogRepository) List(limit int, nextToken string) (*models.DogList, erro
 		return nil, fmt.Errorf("failed to scan dogs table: %w", err)
 	}
 
-	var dogs []models.Dog
+	var dogs []domain.Dog
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
@@ -82,13 +82,13 @@ func (r *dogRepository) List(limit int, nextToken string) (*models.DogList, erro
 		nextToken = *lastEvaluatedKey.S
 	}
 
-	return &models.DogList{
+	return &domain.DogList{
 		Dogs:      dogs,
 		NextToken: nextToken,
 	}, nil
 }
 
-func (r *dogRepository) Get(id string) (*models.Dog, error) {
+func (r *dogRepository) Get(id string) (*domain.Dog, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(r.tableName),
 		Key:       createKey(id),
@@ -103,7 +103,7 @@ func (r *dogRepository) Get(id string) (*models.Dog, error) {
 		return nil, ErrDogNotFound
 	}
 
-	var dog models.Dog
+	var dog domain.Dog
 	err = dynamodbattribute.UnmarshalMap(result.Item, &dog)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal dog: %w", err)
@@ -112,7 +112,7 @@ func (r *dogRepository) Get(id string) (*models.Dog, error) {
 	return &dog, nil
 }
 
-func (r *dogRepository) Update(id string, dog *models.Dog) error {
+func (r *dogRepository) Update(id string, dog *domain.Dog) error {
 	input := &dynamodb.UpdateItemInput{
 		TableName: aws.String(r.tableName),
 		Key:       createKey(id),

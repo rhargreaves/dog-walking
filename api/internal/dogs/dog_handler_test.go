@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
-	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 	"github.com/rhargreaves/dog-walking/api/internal/mocks"
 	"github.com/stretchr/testify/require"
 )
@@ -25,12 +25,12 @@ func setupRouter(handler DogHandler) *gin.Engine {
 func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 	numberOfDogs := 25
 	dogRepository := new(mocks.DogRepository)
-	dogList := &models.DogList{
-		Dogs:      make([]models.Dog, numberOfDogs),
+	dogList := &domain.DogList{
+		Dogs:      make([]domain.Dog, numberOfDogs),
 		NextToken: "",
 	}
 	for i := range dogList.Dogs {
-		dogList.Dogs[i] = models.Dog{
+		dogList.Dogs[i] = domain.Dog{
 			ID:   fmt.Sprintf("dog-%d", i),
 			Name: fmt.Sprintf("Dog %d", i),
 		}
@@ -43,7 +43,7 @@ func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
-	var dogs models.DogList
+	var dogs domain.DogList
 	err := json.Unmarshal(resp.Body.Bytes(), &dogs)
 	require.NoError(t, err)
 

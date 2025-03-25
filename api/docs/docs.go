@@ -46,7 +46,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.DogList"
+                            "$ref": "#/definitions/model.DogListResponse"
                         }
                     },
                     "500": {
@@ -76,7 +76,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogRequest"
                         }
                     }
                 ],
@@ -84,7 +84,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "400": {
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "404": {
@@ -168,7 +168,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogRequest"
                         }
                     }
                 ],
@@ -176,7 +176,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "400": {
@@ -368,7 +368,35 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Dog": {
+        "model.DogListResponse": {
+            "type": "object",
+            "properties": {
+                "dogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.DogResponse"
+                    }
+                },
+                "nextToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DogRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "breed": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DogResponse": {
             "type": "object",
             "properties": {
                 "breed": {
@@ -384,20 +412,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "photoUrl": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.DogList": {
-            "type": "object",
-            "properties": {
-                "dogs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Dog"
-                    }
-                },
-                "nextToken": {
                     "type": "string"
                 }
             }

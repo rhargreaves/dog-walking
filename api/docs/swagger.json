@@ -42,7 +42,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.DogList"
+                            "$ref": "#/definitions/model.DogListResponse"
                         }
                     },
                     "500": {
@@ -72,7 +72,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogRequest"
                         }
                     }
                 ],
@@ -80,7 +80,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "400": {
@@ -121,7 +121,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "404": {
@@ -164,7 +164,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogRequest"
                         }
                     }
                 ],
@@ -172,7 +172,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Dog"
+                            "$ref": "#/definitions/model.DogResponse"
                         }
                     },
                     "400": {
@@ -364,7 +364,35 @@
                 }
             }
         },
-        "models.Dog": {
+        "model.DogListResponse": {
+            "type": "object",
+            "properties": {
+                "dogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.DogResponse"
+                    }
+                },
+                "nextToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DogRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "breed": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DogResponse": {
             "type": "object",
             "properties": {
                 "breed": {
@@ -380,20 +408,6 @@
                     "type": "string"
                 },
                 "photoUrl": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.DogList": {
-            "type": "object",
-            "properties": {
-                "dogs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Dog"
-                    }
-                },
-                "nextToken": {
                     "type": "string"
                 }
             }

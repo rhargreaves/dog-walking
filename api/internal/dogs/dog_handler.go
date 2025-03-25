@@ -2,14 +2,13 @@ package dogs
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/creasty/defaults"
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
-	"github.com/rhargreaves/dog-walking/api/internal/dogs/models"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
 )
 
 type DogHandler interface {
@@ -18,14 +17,6 @@ type DogHandler interface {
 	CreateDog(c *gin.Context)
 	UpdateDog(c *gin.Context)
 	DeleteDog(c *gin.Context)
-}
-
-func dogWithPhotoUrl(dog *models.Dog) *models.Dog {
-	if dog.PhotoHash != "" {
-		dog.PhotoUrl = fmt.Sprintf("%s/%s?h=%s",
-			os.Getenv("CLOUDFRONT_BASE_URL"), dog.ID, dog.PhotoHash)
-	}
-	return dog
 }
 
 type dogHandler struct {
@@ -42,24 +33,25 @@ func NewDogHandler(dogRepository DogRepository) DogHandler {
 // @Tags dogs
 // @Accept json
 // @Produce json
-// @Param dog body models.Dog true "Dog information"
-// @Success 201 {object} models.Dog
+// @Param dog body model.DogRequest true "Dog information"
+// @Success 201 {object} model.DogResponse
 // @Failure 400 {object} common.APIErrorResponse "Invalid request"
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [post]
 func (h *dogHandler) CreateDog(c *gin.Context) {
-	var dog models.Dog
-	if err := c.ShouldBindJSON(&dog); err != nil {
+	var request model.DogRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
 		handleBindError(c, err)
 		return
 	}
 
+	dog := domain.Dog{Name: request.Name, Breed: request.Breed}
 	if err := h.dogRepository.Create(&dog); err != nil {
 		handleError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, dog)
+	c.JSON(http.StatusCreated, model.ToDogResponse(&dog))
 }
 
 type DogListQuery struct {
@@ -74,7 +66,7 @@ type DogListQuery struct {
 // @Produce json
 // @Param limit query int false "Limit the number of dogs returned" default(25) minimum(1) maximum(25)
 // @Param nextToken query string false "A token to get the next page of results"
-// @Success 200 {object} models.DogList
+// @Success 200 {object} model.DogListResponse
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
@@ -92,11 +84,7 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 		return
 	}
 
-	for i := range dogs.Dogs {
-		dogs.Dogs[i] = *dogWithPhotoUrl(&dogs.Dogs[i])
-	}
-
-	c.JSON(http.StatusOK, dogs)
+	c.JSON(http.StatusOK, model.ToDogListResponse(dogs))
 }
 
 // GetDog godoc
@@ -105,7 +93,7 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 // @Tags dogs
 // @Produce json
 // @Param id path string true "Dog ID"
-// @Success 200 {object} models.Dog
+// @Success 200 {object} model.DogResponse
 // @Failure 404 {object} common.APIErrorResponse "Dog not found"
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs/{id} [get]
@@ -117,7 +105,7 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dogWithPhotoUrl(dog))
+	c.JSON(http.StatusOK, model.ToDogResponse(dog))
 }
 
 // UpdateDog godoc
@@ -127,26 +115,27 @@ func (h *dogHandler) GetDog(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Dog ID"
-// @Param dog body models.Dog true "Updated dog information"
-// @Success 200 {object} models.Dog
+// @Param dog body model.DogRequest true "Updated dog information"
+// @Success 200 {object} model.DogResponse
 // @Failure 400 {object} common.APIErrorResponse "Invalid request"
 // @Failure 404 {object} common.APIErrorResponse "Dog not found"
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs/{id} [put]
 func (h *dogHandler) UpdateDog(c *gin.Context) {
 	id := c.Param("id")
-	var dog models.Dog
-	if err := c.ShouldBindJSON(&dog); err != nil {
+	var request model.DogRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
 		handleBindError(c, err)
 		return
 	}
 
+	dog := domain.Dog{Name: request.Name, Breed: request.Breed}
 	if err := h.dogRepository.Update(id, &dog); err != nil {
 		handleError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, dog)
+	c.JSON(http.StatusOK, model.ToDogResponse(&dog))
 }
 
 // DeleteDog godoc

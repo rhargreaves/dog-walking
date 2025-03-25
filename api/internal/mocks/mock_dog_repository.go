@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	models "github.com/rhargreaves/dog-walking/api/internal/dogs/models"
+	domain "github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -21,7 +21,7 @@ func (_m *DogRepository) EXPECT() *DogRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: dog
-func (_m *DogRepository) Create(dog *models.Dog) error {
+func (_m *DogRepository) Create(dog *domain.Dog) error {
 	ret := _m.Called(dog)
 
 	if len(ret) == 0 {
@@ -29,7 +29,7 @@ func (_m *DogRepository) Create(dog *models.Dog) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*models.Dog) error); ok {
+	if rf, ok := ret.Get(0).(func(*domain.Dog) error); ok {
 		r0 = rf(dog)
 	} else {
 		r0 = ret.Error(0)
@@ -44,14 +44,14 @@ type DogRepository_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - dog *models.Dog
+//   - dog *domain.Dog
 func (_e *DogRepository_Expecter) Create(dog interface{}) *DogRepository_Create_Call {
 	return &DogRepository_Create_Call{Call: _e.mock.On("Create", dog)}
 }
 
-func (_c *DogRepository_Create_Call) Run(run func(dog *models.Dog)) *DogRepository_Create_Call {
+func (_c *DogRepository_Create_Call) Run(run func(dog *domain.Dog)) *DogRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*models.Dog))
+		run(args[0].(*domain.Dog))
 	})
 	return _c
 }
@@ -61,7 +61,7 @@ func (_c *DogRepository_Create_Call) Return(_a0 error) *DogRepository_Create_Cal
 	return _c
 }
 
-func (_c *DogRepository_Create_Call) RunAndReturn(run func(*models.Dog) error) *DogRepository_Create_Call {
+func (_c *DogRepository_Create_Call) RunAndReturn(run func(*domain.Dog) error) *DogRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -113,23 +113,23 @@ func (_c *DogRepository_Delete_Call) RunAndReturn(run func(string) error) *DogRe
 }
 
 // Get provides a mock function with given fields: id
-func (_m *DogRepository) Get(id string) (*models.Dog, error) {
+func (_m *DogRepository) Get(id string) (*domain.Dog, error) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
 	}
 
-	var r0 *models.Dog
+	var r0 *domain.Dog
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*models.Dog, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*domain.Dog, error)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(string) *models.Dog); ok {
+	if rf, ok := ret.Get(0).(func(string) *domain.Dog); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.Dog)
+			r0 = ret.Get(0).(*domain.Dog)
 		}
 	}
 
@@ -160,34 +160,34 @@ func (_c *DogRepository_Get_Call) Run(run func(id string)) *DogRepository_Get_Ca
 	return _c
 }
 
-func (_c *DogRepository_Get_Call) Return(_a0 *models.Dog, _a1 error) *DogRepository_Get_Call {
+func (_c *DogRepository_Get_Call) Return(_a0 *domain.Dog, _a1 error) *DogRepository_Get_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *DogRepository_Get_Call) RunAndReturn(run func(string) (*models.Dog, error)) *DogRepository_Get_Call {
+func (_c *DogRepository_Get_Call) RunAndReturn(run func(string) (*domain.Dog, error)) *DogRepository_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function with given fields: limit, nextToken
-func (_m *DogRepository) List(limit int, nextToken string) (*models.DogList, error) {
+func (_m *DogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
 	ret := _m.Called(limit, nextToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
 	}
 
-	var r0 *models.DogList
+	var r0 *domain.DogList
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int, string) (*models.DogList, error)); ok {
+	if rf, ok := ret.Get(0).(func(int, string) (*domain.DogList, error)); ok {
 		return rf(limit, nextToken)
 	}
-	if rf, ok := ret.Get(0).(func(int, string) *models.DogList); ok {
+	if rf, ok := ret.Get(0).(func(int, string) *domain.DogList); ok {
 		r0 = rf(limit, nextToken)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.DogList)
+			r0 = ret.Get(0).(*domain.DogList)
 		}
 	}
 
@@ -219,18 +219,18 @@ func (_c *DogRepository_List_Call) Run(run func(limit int, nextToken string)) *D
 	return _c
 }
 
-func (_c *DogRepository_List_Call) Return(_a0 *models.DogList, _a1 error) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) Return(_a0 *domain.DogList, _a1 error) *DogRepository_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *DogRepository_List_Call) RunAndReturn(run func(int, string) (*models.DogList, error)) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) RunAndReturn(run func(int, string) (*domain.DogList, error)) *DogRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function with given fields: id, dog
-func (_m *DogRepository) Update(id string, dog *models.Dog) error {
+func (_m *DogRepository) Update(id string, dog *domain.Dog) error {
 	ret := _m.Called(id, dog)
 
 	if len(ret) == 0 {
@@ -238,7 +238,7 @@ func (_m *DogRepository) Update(id string, dog *models.Dog) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, *models.Dog) error); ok {
+	if rf, ok := ret.Get(0).(func(string, *domain.Dog) error); ok {
 		r0 = rf(id, dog)
 	} else {
 		r0 = ret.Error(0)
@@ -254,14 +254,14 @@ type DogRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - id string
-//   - dog *models.Dog
+//   - dog *domain.Dog
 func (_e *DogRepository_Expecter) Update(id interface{}, dog interface{}) *DogRepository_Update_Call {
 	return &DogRepository_Update_Call{Call: _e.mock.On("Update", id, dog)}
 }
 
-func (_c *DogRepository_Update_Call) Run(run func(id string, dog *models.Dog)) *DogRepository_Update_Call {
+func (_c *DogRepository_Update_Call) Run(run func(id string, dog *domain.Dog)) *DogRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(*models.Dog))
+		run(args[0].(string), args[1].(*domain.Dog))
 	})
 	return _c
 }
@@ -271,7 +271,7 @@ func (_c *DogRepository_Update_Call) Return(_a0 error) *DogRepository_Update_Cal
 	return _c
 }
 
-func (_c *DogRepository_Update_Call) RunAndReturn(run func(string, *models.Dog) error) *DogRepository_Update_Call {
+func (_c *DogRepository_Update_Call) RunAndReturn(run func(string, *domain.Dog) error) *DogRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

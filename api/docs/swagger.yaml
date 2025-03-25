@@ -12,7 +12,25 @@ definitions:
       error:
         $ref: '#/definitions/common.APIError'
     type: object
-  models.Dog:
+  model.DogListResponse:
+    properties:
+      dogs:
+        items:
+          $ref: '#/definitions/model.DogResponse'
+        type: array
+      nextToken:
+        type: string
+    type: object
+  model.DogRequest:
+    properties:
+      breed:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  model.DogResponse:
     properties:
       breed:
         type: string
@@ -23,15 +41,6 @@ definitions:
       photoHash:
         type: string
       photoUrl:
-        type: string
-    type: object
-  models.DogList:
-    properties:
-      dogs:
-        items:
-          $ref: '#/definitions/models.Dog'
-        type: array
-      nextToken:
         type: string
     type: object
 info:
@@ -61,7 +70,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.DogList'
+            $ref: '#/definitions/model.DogListResponse'
         "500":
           description: Internal server error
           schema:
@@ -79,14 +88,14 @@ paths:
         name: dog
         required: true
         schema:
-          $ref: '#/definitions/models.Dog'
+          $ref: '#/definitions/model.DogRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Dog'
+            $ref: '#/definitions/model.DogResponse'
         "400":
           description: Invalid request
           schema:
@@ -135,7 +144,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Dog'
+            $ref: '#/definitions/model.DogResponse'
         "404":
           description: Dog not found
           schema:
@@ -162,14 +171,14 @@ paths:
         name: dog
         required: true
         schema:
-          $ref: '#/definitions/models.Dog'
+          $ref: '#/definitions/model.DogRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Dog'
+            $ref: '#/definitions/model.DogResponse'
         "400":
           description: Invalid request
           schema:
