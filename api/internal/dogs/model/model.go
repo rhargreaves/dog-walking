@@ -37,8 +37,10 @@ type BreedDetectionResultResponse struct {
 }
 
 func ToDogResponse(dog *domain.Dog, imagesCdnBaseUrl string) *DogResponse {
-	photoUrl := fmt.Sprintf("%s/%s?h=%s",
-		imagesCdnBaseUrl, dog.ID, dog.PhotoHash)
+	photoUrl := ""
+	if dog.PhotoHash != "" {
+		photoUrl = fmt.Sprintf("%s/%s?h=%s", imagesCdnBaseUrl, dog.ID, dog.PhotoHash)
+	}
 	return &DogResponse{
 		ID:        dog.ID,
 		Name:      dog.Name,
