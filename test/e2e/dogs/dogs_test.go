@@ -121,7 +121,7 @@ func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {
 
 	resp := common.Delete(t, "/dogs/"+dog.ID, true)
 	defer resp.Body.Close()
-	common.RequireStatus(t, resp, http.StatusOK)
+	common.RequireStatus(t, resp, http.StatusNoContent)
 }
 
 func TestDeleteDog_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {

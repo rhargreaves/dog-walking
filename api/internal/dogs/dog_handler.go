@@ -158,6 +158,8 @@ func (h *dogHandler) DeleteDog(c *gin.Context) {
 		handleError(c, err)
 		return
 	}
+
+	c.Status(http.StatusNoContent)
 }
 
 func handleError(c *gin.Context, err error) {
