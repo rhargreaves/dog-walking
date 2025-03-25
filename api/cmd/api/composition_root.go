@@ -32,7 +32,7 @@ func createHandlers(isLocal bool) (dogs.DogHandler, dogs.DogPhotoHandler) {
 	dogImagesBucket := mustGetenv("DOG_IMAGES_BUCKET")
 	dogPhotoUploader := dogs.NewDogPhotoUploader(dogs.S3PhotoUploaderConfig{
 		BucketName: dogImagesBucket,
-	}, dogRepository, s3session)
+	}, s3session)
 	rekognitionClient := newRekognitionClient(isLocal, session, s3session)
 	breedDetector := dogs.NewBreedDetector(dogs.BreedDetectorConfig{
 		BucketName: dogImagesBucket,

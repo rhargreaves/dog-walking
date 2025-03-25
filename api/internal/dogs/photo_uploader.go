@@ -10,7 +10,7 @@ import (
 )
 
 type DogPhotoUploader interface {
-	Upload(id string, fileData io.Reader, contentType string) error
+	Upload(id string, fileData io.Reader, contentType string) (string, error)
 }
 
 type S3PhotoUploaderConfig struct {
@@ -18,16 +18,15 @@ type S3PhotoUploaderConfig struct {
 }
 
 type s3DogPhotoUploader struct {
-	config        *S3PhotoUploaderConfig
-	dogRepository DogRepository
-	session       *session.Session
+	config  *S3PhotoUploaderConfig
+	session *session.Session
 }
 
-func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, dogRepository DogRepository, session *session.Session) DogPhotoUploader {
-	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, dogRepository: dogRepository, session: session}
+func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, session *session.Session) DogPhotoUploader {
+	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, session: session}
 }
 
-func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) error {
+func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) (string, error) {
 	uploader := s3manager.NewUploader(r.session)
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket:      aws.String(r.config.BucketName),
@@ -36,13 +35,8 @@ func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType s
 		ContentType: aws.String(contentType),
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	photoHash := strings.Replace(*result.ETag, "\"", "", 2)
-	err = r.dogRepository.UpdatePhotoHash(id, photoHash)
-	if err != nil {
-		return err
-	}
-	return err
+	return strings.Replace(*result.ETag, "\"", "", 2), nil
 }
