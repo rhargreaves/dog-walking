@@ -302,8 +302,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Returns id, breed, and confidence",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/model.BreedDetectionResultResponse"
                         }
                     },
                     "400": {
@@ -365,6 +364,20 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "$ref": "#/definitions/common.APIError"
+                }
+            }
+        },
+        "model.BreedDetectionResultResponse": {
+            "type": "object",
+            "properties": {
+                "breed": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
                 }
             }
         },
