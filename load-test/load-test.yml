@@ -1,0 +1,54 @@
+config:
+  target: "{{ $env.API_BASE_URL }}"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up phase"
+    - duration: 300
+      arrivalRate: 10
+      name: "Sustained load"
+  processor: "./cognito-functions.js"
+  variables:
+    clientId: "{{ $env.COGNITO_CLIENT_ID }}"
+    userPoolId: "{{ $env.COGNITO_USER_POOL_ID }}"
+    region: "{{ $env.AWS_REGION }}"
+    username: "{{ $env.TEST_USERNAME }}"
+    password: "{{ $env.TEST_PASSWORD }}"
+
+scenarios:
+  - name: "Basic create, retrieve, delete dog test"
+    beforeScenario: "getCognitoToken"
+    flow:
+      - get:
+          url: "/ping"
+          expect:
+            - statusCode: 200
+      - post:
+          url: "/dogs"
+          headers:
+            Authorization: "Bearer {{ token }}"
+            Content-Type: "application/json"
+          json:
+            name: "Test Dog {{ $randomNumber(0, 1000) }}"
+            breed: "Mixed"
+          capture:
+            - json: "$.id"
+              as: "dogId"
+            expect:
+            - statusCode: 201
+      - get:
+          url: "/dogs/{{ dogId }}"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200
+            - hasProperty: "id"
+            - equals:
+                - "{{ dogId }}"
+                - "$.id"
+      - delete:
+          url: "/dogs/{{ dogId }}"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200

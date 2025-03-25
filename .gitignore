@@ -33,3 +33,5 @@ local-auth/build/
 .env
 .*.env
 !.example.env
+
+node_modules/

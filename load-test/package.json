@@ -1,0 +1,14 @@
+{
+	"name": "api-load-test",
+	"version": "1.0.0",
+	"description": "Load testing script for the Dog Walking API with Cognito authentication",
+	"main": "load-test.yml",
+	"scripts": {
+		"test": "artillery run --env-file .env load-test.yml"
+	},
+	"dependencies": {
+		"artillery": "^2.0.0",
+		"@aws-sdk/client-cognito-identity-provider": "^3.0.0",
+		"@aws-sdk/credential-provider-cognito-identity": "^3.0.0"
+	}
+}
