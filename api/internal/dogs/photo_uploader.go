@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/rhargreaves/dog-walking/api/internal/common"
 )
 
 type DogPhotoUploader interface {
@@ -14,28 +14,21 @@ type DogPhotoUploader interface {
 }
 
 type S3PhotoUploaderConfig struct {
-	BucketName    string
-	IsLocal       bool
-	LocalEndpoint string
-	Region        string
+	BucketName string
 }
 
 type s3DogPhotoUploader struct {
 	config        *S3PhotoUploaderConfig
 	dogRepository DogRepository
+	session       *session.Session
 }
 
-func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, dogRepository DogRepository) DogPhotoUploader {
-	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, dogRepository: dogRepository}
+func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, dogRepository DogRepository, session *session.Session) DogPhotoUploader {
+	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, dogRepository: dogRepository, session: session}
 }
 
 func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) error {
-	sess, err := common.CreateSession(r.config.IsLocal, r.config.LocalEndpoint, r.config.Region)
-	if err != nil {
-		return err
-	}
-
-	uploader := s3manager.NewUploader(sess)
+	uploader := s3manager.NewUploader(r.session)
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket:      aws.String(r.config.BucketName),
 		Key:         aws.String(id),

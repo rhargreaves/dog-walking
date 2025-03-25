@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
-	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
@@ -26,10 +25,7 @@ type DogRepository interface {
 }
 
 type DynamoDBDogRepositoryConfig struct {
-	TableName     string
-	IsLocal       bool
-	LocalEndpoint string
-	Region        string
+	TableName string
 }
 
 type dynamoDBDogRepository struct {
@@ -37,14 +33,8 @@ type dynamoDBDogRepository struct {
 	dynamoDB *dynamodb.DynamoDB
 }
 
-func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig) DogRepository {
-	dynamoDB := dynamodb.New(session.Must(
-		common.CreateSession(
-			dynamoDBDogRepositoryConfig.IsLocal,
-			dynamoDBDogRepositoryConfig.LocalEndpoint,
-			dynamoDBDogRepositoryConfig.Region,
-		),
-	))
+func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig, session *session.Session) DogRepository {
+	dynamoDB := dynamodb.New(session)
 	return &dynamoDBDogRepository{config: &dynamoDBDogRepositoryConfig, dynamoDB: dynamoDB}
 }
 

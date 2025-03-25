@@ -8,33 +8,23 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/api/internal/common"
 )
 
 type stubRekognitionClient struct {
 	rekognitioniface.RekognitionAPI
-	config *StubRekognitionClientConfig
+	session *session.Session
 }
 
-type StubRekognitionClientConfig struct {
-	IsLocal       bool
-	LocalEndpoint string
-	Region        string
-}
-
-func NewStubRekognitionClient(config StubRekognitionClientConfig) rekognitioniface.RekognitionAPI {
-	return &stubRekognitionClient{config: &config}
+func NewStubRekognitionClient(session *session.Session) rekognitioniface.RekognitionAPI {
+	return &stubRekognitionClient{session: session}
 }
 
 func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
-	session, err := common.CreateSession(m.config.IsLocal, m.config.LocalEndpoint, m.config.Region)
-	if err != nil {
-		return nil, err
-	}
-	s3client := s3.New(session)
+	s3client := s3.New(m.session)
 	image, err := s3client.GetObject(&s3.GetObjectInput{
 		Bucket: input.Image.S3Object.Bucket,
 		Key:    input.Image.S3Object.Name,
