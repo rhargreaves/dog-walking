@@ -37,6 +37,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Filter dogs by partial name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "A token to get the next page of results",
                         "name": "nextToken",
                         "in": "query"

@@ -69,6 +69,10 @@ paths:
         minimum: 1
         name: limit
         type: integer
+      - description: Filter dogs by partial name
+        in: query
+        name: name
+        type: string
       - description: A token to get the next page of results
         in: query
         name: nextToken

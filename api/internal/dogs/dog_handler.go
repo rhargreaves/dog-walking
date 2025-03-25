@@ -65,6 +65,7 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 // @Tags dogs
 // @Produce json
 // @Param limit query int false "Limit the number of dogs returned" default(25) minimum(1) maximum(25)
+// @Param name query string false "Filter dogs by partial name"
 // @Param nextToken query string false "A token to get the next page of results"
 // @Success 200 {object} model.DogListResponse
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
