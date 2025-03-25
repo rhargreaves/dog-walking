@@ -47,6 +47,6 @@ func (m *testRekognitionClient) DetectLabelsWithContext(ctx aws.Context, input *
 
 func TestDetectBreed_ReturnsNoSpecificBreedWhenOnlyDogLabelIsPresent(t *testing.T) {
 	detector := NewBreedDetector(BreedDetectorConfig{BucketName: dummyBucket}, NewTestRekognitionClient())
-	_, _, err := detector.DetectBreed(dummyImage)
+	_, err := detector.DetectBreed(dummyImage)
 	require.Equal(t, ErrNoSpecificBreedDetected, err)
 }

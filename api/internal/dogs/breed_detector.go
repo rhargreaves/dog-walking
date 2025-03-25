@@ -8,13 +8,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
 var ErrNoDogDetected = errors.New("no dog detected")
 var ErrNoSpecificBreedDetected = errors.New("no specific breed detected")
 
 type BreedDetector interface {
-	DetectBreed(id string) (string, float64, error)
+	DetectBreed(id string) (*domain.BreedDetectionResult, error)
 }
 
 type BreedDetectorConfig struct {
@@ -33,7 +34,7 @@ func NewBreedDetector(breedDetectorConfig BreedDetectorConfig, rekClient rekogni
 	}
 }
 
-func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
+func (d *breedDetector) DetectBreed(id string) (*domain.BreedDetectionResult, error) {
 	input := &rekognition.DetectLabelsInput{
 		Image: &rekognition.Image{
 			S3Object: &rekognition.S3Object{
@@ -60,7 +61,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 
 	result, err := d.rekClient.DetectLabels(input)
 	if err != nil {
-		return "", 0, fmt.Errorf("failed to detect labels: %w", err)
+		return nil, fmt.Errorf("failed to detect labels: %w", err)
 	}
 
 	// First check if it's a dog
@@ -72,7 +73,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 		}
 	}
 	if !isDog {
-		return "", 0, ErrNoDogDetected
+		return nil, ErrNoDogDetected
 	}
 
 	// Look for breed-specific labels
@@ -88,7 +89,7 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 	}
 
 	if len(breedLabels) == 0 {
-		return "", 0, ErrNoSpecificBreedDetected
+		return nil, ErrNoSpecificBreedDetected
 	}
 
 	// Sort by confidence (highest first)
@@ -97,8 +98,8 @@ func (d *breedDetector) DetectBreed(id string) (string, float64, error) {
 	})
 
 	// Return the highest confidence breed
-	topBreed := *breedLabels[0].Name
-	confidence := *breedLabels[0].Confidence
-
-	return topBreed, confidence, nil
+	return &domain.BreedDetectionResult{
+		Breed:      *breedLabels[0].Name,
+		Confidence: *breedLabels[0].Confidence,
+	}, nil
 }

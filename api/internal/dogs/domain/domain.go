@@ -11,3 +11,8 @@ type DogList struct {
 	Dogs      []Dog
 	NextToken string
 }
+
+type BreedDetectionResult struct {
+	Breed      string
+	Confidence float64
+}

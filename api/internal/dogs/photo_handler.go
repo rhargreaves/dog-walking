@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
 )
 
 type DogPhotoHandler interface {
@@ -68,7 +69,7 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 // @Tags dogs,photos
 // @Param id path string true "Dog ID"
 // @Produce json
-// @Success 200 {object} map[string]any "Returns id, breed, and confidence"
+// @Success 200 {object} model.BreedDetectionResultResponse "Returns id, breed, and confidence"
 // @Failure 400 {object} common.APIError "No dog detected or no specific breed detected"
 // @Failure 404 {object} common.APIError "Dog not found"
 // @Failure 500 {object} common.APIError "Internal server error"
@@ -83,7 +84,7 @@ func (h *dogPhotoHandler) DetectBreed(c *gin.Context) {
 		return
 	}
 
-	breed, confidence, err := h.breedDetector.DetectBreed(id)
+	breedResult, err := h.breedDetector.DetectBreed(id)
 	if err != nil {
 		if err == ErrNoDogDetected || err == ErrNoSpecificBreedDetected {
 			c.Error(common.APIError{
@@ -97,16 +98,12 @@ func (h *dogPhotoHandler) DetectBreed(c *gin.Context) {
 	}
 
 	// Update the dog's breed in the database
-	dog.Breed = breed
+	dog.Breed = breedResult.Breed
 	err = h.dogRepository.Update(id, dog)
 	if err != nil {
 		handleError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"id":         id,
-		"breed":      breed,
-		"confidence": confidence,
-	})
+	c.JSON(http.StatusOK, model.ToBreedDetectionResultResponse(id, breedResult))
 }

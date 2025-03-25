@@ -51,7 +51,7 @@ func TestUploadPhoto_ReturnsBadRequest_WhenImageIsNotADog(t *testing.T) {
 	dogRepository := new(mocks.DogRepository)
 	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
 	breedDetector := new(mocks.BreedDetector)
-	breedDetector.EXPECT().DetectBreed(dogId).Return("", 0.0, ErrNoDogDetected)
+	breedDetector.EXPECT().DetectBreed(dogId).Return(nil, ErrNoDogDetected)
 	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
 
 	w := httptest.NewRecorder()
@@ -73,7 +73,7 @@ func TestUploadPhoto_ReturnsBadRequest_WhenNoSpecificBreedOfDogIsDetected(t *tes
 	dogRepository := new(mocks.DogRepository)
 	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
 	breedDetector := new(mocks.BreedDetector)
-	breedDetector.EXPECT().DetectBreed(dogId).Return("", 0.0, ErrNoSpecificBreedDetected)
+	breedDetector.EXPECT().DetectBreed(dogId).Return(nil, ErrNoSpecificBreedDetected)
 	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
 
 	w := httptest.NewRecorder()
