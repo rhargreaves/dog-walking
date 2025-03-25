@@ -59,11 +59,6 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 	c.JSON(http.StatusCreated, model.ToDogResponse(&dog, h.config.ImagesCdnBaseUrl))
 }
 
-type DogListQuery struct {
-	Limit     int    `form:"limit" default:"25" binding:"min=1,max=25"`
-	NextToken string `form:"nextToken"`
-}
-
 // ListDogs godoc
 // @Summary List all dogs
 // @Description Get a list of all registered dogs
@@ -75,7 +70,7 @@ type DogListQuery struct {
 // @Failure 500 {object} common.APIErrorResponse "Internal server error"
 // @Router /dogs [get]
 func (h *dogHandler) ListDogs(c *gin.Context) {
-	var query DogListQuery
+	var query model.DogListQuery
 	defaults.Set(&query)
 
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -83,7 +78,7 @@ func (h *dogHandler) ListDogs(c *gin.Context) {
 		return
 	}
 
-	dogs, err := h.dogRepository.List(query.Limit, query.NextToken)
+	dogs, err := h.dogRepository.List(query.Limit, query.Name, query.NextToken)
 	if err != nil {
 		handleError(c, err)
 		return

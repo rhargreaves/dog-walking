@@ -36,7 +36,7 @@ func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 			Name: fmt.Sprintf("Dog %d", i),
 		}
 	}
-	dogRepository.EXPECT().List(numberOfDogs, "").Return(dogList, nil)
+	dogRepository.EXPECT().List(numberOfDogs, "", "").Return(dogList, nil)
 
 	config := DogHandlerConfig{
 		ImagesCdnBaseUrl: "https://example.com",
@@ -100,7 +100,7 @@ func TestListDogs_ReturnsErrorWhenLimitTooLow(t *testing.T) {
 
 func TestListDogs_ReturnsPhotoUrlForDogsWithPhoto(t *testing.T) {
 	dogRepository := new(mocks.DogRepository)
-	dogRepository.EXPECT().List(25, "").Return(&domain.DogList{
+	dogRepository.EXPECT().List(25, "", "").Return(&domain.DogList{
 		Dogs: []domain.Dog{
 			{ID: "1", Name: "Dog 1", PhotoHash: "1234567890"},
 			{ID: "2", Name: "Dog 2", PhotoHash: "0987654321"},

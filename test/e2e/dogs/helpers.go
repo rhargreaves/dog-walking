@@ -23,6 +23,12 @@ func createDog(t *testing.T, name string) DogResponse {
 	return dog
 }
 
+func deleteDog(t *testing.T, id string) {
+	resp := common.Delete(t, "/dogs/"+id, true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusNoContent)
+}
+
 func FindFirst[T any](items []T, predicate func(T) bool) (T, bool) {
 	for _, item := range items {
 		if predicate(item) {

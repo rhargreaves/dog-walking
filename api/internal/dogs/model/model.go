@@ -6,6 +6,12 @@ import (
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
+type DogListQuery struct {
+	Limit     int    `form:"limit" default:"25" binding:"min=1,max=25"`
+	NextToken string `form:"nextToken"`
+	Name      string `form:"name"`
+}
+
 type DogRequest struct {
 	Name  string `json:"name" binding:"required"`
 	Breed string `json:"breed,omitempty"`

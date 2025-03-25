@@ -116,6 +116,24 @@ func TestListDogs_ReturnsNextTokenWhenMoreDogsExist(t *testing.T) {
 	require.NotEqual(t, dogs.Dogs[0].ID, dogsNextPage.Dogs[0].ID, "Expected next token to return a different dog")
 }
 
+func TestListDogs_ReturnsDogsFilteredByName(t *testing.T) {
+	createDog(t, "NameFilterTest1")
+	createDog(t, "NameFilterTest2")
+
+	resp := common.Get(t, "/dogs?limit=2&name=NameFilterTest", true)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+
+	var dogs DogListResponse
+	common.DecodeJSON(t, resp, &dogs)
+
+	assert.Equal(t, 2, len(dogs.Dogs), "Expected 2 dogs to be returned")
+	for _, dog := range dogs.Dogs {
+		assert.Contains(t, dog.Name, "NameFilterTest", "Expected dog name to contain 'NameFilterTest'")
+		deleteDog(t, dog.ID)
+	}
+}
+
 func TestDeleteDog_DeletesDogWhenExists(t *testing.T) {
 	dog := createDog(t, "Rover")
 

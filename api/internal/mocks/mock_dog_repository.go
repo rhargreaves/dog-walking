@@ -170,9 +170,9 @@ func (_c *DogRepository_Get_Call) RunAndReturn(run func(string) (*domain.Dog, er
 	return _c
 }
 
-// List provides a mock function with given fields: limit, nextToken
-func (_m *DogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
-	ret := _m.Called(limit, nextToken)
+// List provides a mock function with given fields: limit, name, nextToken
+func (_m *DogRepository) List(limit int, name string, nextToken string) (*domain.DogList, error) {
+	ret := _m.Called(limit, name, nextToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
@@ -180,19 +180,19 @@ func (_m *DogRepository) List(limit int, nextToken string) (*domain.DogList, err
 
 	var r0 *domain.DogList
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int, string) (*domain.DogList, error)); ok {
-		return rf(limit, nextToken)
+	if rf, ok := ret.Get(0).(func(int, string, string) (*domain.DogList, error)); ok {
+		return rf(limit, name, nextToken)
 	}
-	if rf, ok := ret.Get(0).(func(int, string) *domain.DogList); ok {
-		r0 = rf(limit, nextToken)
+	if rf, ok := ret.Get(0).(func(int, string, string) *domain.DogList); ok {
+		r0 = rf(limit, name, nextToken)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*domain.DogList)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int, string) error); ok {
-		r1 = rf(limit, nextToken)
+	if rf, ok := ret.Get(1).(func(int, string, string) error); ok {
+		r1 = rf(limit, name, nextToken)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -207,14 +207,15 @@ type DogRepository_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - limit int
+//   - name string
 //   - nextToken string
-func (_e *DogRepository_Expecter) List(limit interface{}, nextToken interface{}) *DogRepository_List_Call {
-	return &DogRepository_List_Call{Call: _e.mock.On("List", limit, nextToken)}
+func (_e *DogRepository_Expecter) List(limit interface{}, name interface{}, nextToken interface{}) *DogRepository_List_Call {
+	return &DogRepository_List_Call{Call: _e.mock.On("List", limit, name, nextToken)}
 }
 
-func (_c *DogRepository_List_Call) Run(run func(limit int, nextToken string)) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) Run(run func(limit int, name string, nextToken string)) *DogRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(int), args[1].(string))
+		run(args[0].(int), args[1].(string), args[2].(string))
 	})
 	return _c
 }
@@ -224,7 +225,7 @@ func (_c *DogRepository_List_Call) Return(_a0 *domain.DogList, _a1 error) *DogRe
 	return _c
 }
 
-func (_c *DogRepository_List_Call) RunAndReturn(run func(int, string) (*domain.DogList, error)) *DogRepository_List_Call {
+func (_c *DogRepository_List_Call) RunAndReturn(run func(int, string, string) (*domain.DogList, error)) *DogRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

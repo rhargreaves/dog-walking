@@ -17,7 +17,7 @@ var ErrDogNotFound = errors.New("dog not found")
 
 type DogRepository interface {
 	Create(dog *domain.Dog) error
-	List(limit int, nextToken string) (*domain.DogList, error)
+	List(limit int, name string, nextToken string) (*domain.DogList, error)
 	Get(id string) (*domain.Dog, error)
 	Update(id string, dog *domain.Dog) error
 	Delete(id string) error
@@ -56,33 +56,70 @@ func (r *dynamoDBDogRepository) Create(dog *domain.Dog) error {
 	return nil
 }
 
-func (r *dynamoDBDogRepository) List(limit int, nextToken string) (*domain.DogList, error) {
-	input := &dynamodb.ScanInput{
-		TableName: aws.String(r.config.TableName),
-		Limit:     aws.Int64(int64(limit)),
-	}
+func (r *dynamoDBDogRepository) List(limit int, name string, nextToken string) (*domain.DogList, error) {
+	var dogs []domain.Dog
+	var lastEvaluatedKey map[string]*dynamodb.AttributeValue
+	var lastProcessedKey map[string]*dynamodb.AttributeValue
 
 	if nextToken != "" {
-		input.ExclusiveStartKey = map[string]*dynamodb.AttributeValue{
+		lastEvaluatedKey = map[string]*dynamodb.AttributeValue{
 			"id": {S: aws.String(nextToken)},
 		}
 	}
 
-	result, err := r.dynamoDB.Scan(input)
-	if err != nil {
-		return nil, fmt.Errorf("failed to scan dogs table: %w", err)
+	// Keep scanning until we have enough items or reach the end of the table
+	for len(dogs) < limit {
+		input := &dynamodb.ScanInput{
+			TableName:         aws.String(r.config.TableName),
+			ExclusiveStartKey: lastEvaluatedKey,
+			Limit:             aws.Int64(25),
+		}
+
+		if name != "" {
+			input.ExpressionAttributeNames = map[string]*string{
+				"#n": aws.String("name"),
+			}
+			input.ExpressionAttributeValues = map[string]*dynamodb.AttributeValue{
+				":name": {S: aws.String(name)},
+			}
+			input.FilterExpression = aws.String("contains(#n, :name)")
+		}
+
+		result, err := r.dynamoDB.Scan(input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan dogs table: %w", err)
+		}
+
+		var batchDogs []domain.Dog
+		err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &batchDogs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
+		}
+
+		// Process items one by one to maintain accurate pagination
+		for _, dog := range batchDogs {
+			if len(dogs) >= limit {
+				// Store the last processed key for the next page
+				lastProcessedKey = map[string]*dynamodb.AttributeValue{
+					"id": {S: aws.String(dog.ID)},
+				}
+				break
+			}
+			dogs = append(dogs, dog)
+		}
+
+		lastEvaluatedKey = result.LastEvaluatedKey
+		if lastEvaluatedKey == nil {
+			break
+		}
 	}
 
-	var dogs []domain.Dog
-	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dogs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal dogs: %w", err)
-	}
-
+	// Set the next token based on the last processed item
 	nextToken = ""
-	lastEvaluatedKey := result.LastEvaluatedKey["id"]
-	if lastEvaluatedKey != nil {
-		nextToken = *lastEvaluatedKey.S
+	if lastProcessedKey != nil {
+		nextToken = *lastProcessedKey["id"].S
+	} else if lastEvaluatedKey != nil {
+		nextToken = *lastEvaluatedKey["id"].S
 	}
 
 	return &domain.DogList{
