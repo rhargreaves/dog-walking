@@ -30,14 +30,19 @@ import (
 var ginLambda *ginadapter.GinLambdaV2
 
 func init() {
-	if !common.IsLocal() {
+	isLocal := os.Getenv("USE_LOCALSTACK") == "true"
+
+	if !isLocal {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
 	r.Use(common.ErrorMiddleware)
 
 	dogRepository := dogs.NewDynamoDBDogRepository(dogs.DynamoDBDogRepositoryConfig{
-		TableName: os.Getenv("DOGS_TABLE_NAME"),
+		TableName:     os.Getenv("DOGS_TABLE_NAME"),
+		IsLocal:       isLocal,
+		LocalEndpoint: os.Getenv("AWS_ENDPOINT_URL"),
+		Region:        os.Getenv("AWS_REGION"),
 	})
 
 	dogHandler := dogs.NewDogHandler(dogs.DogHandlerConfig{
@@ -45,12 +50,16 @@ func init() {
 	}, dogRepository)
 
 	dogPhotoUploader := dogs.NewDogPhotoUploader(dogs.S3PhotoUploaderConfig{
-		BucketName: os.Getenv("DOG_IMAGES_BUCKET"),
+		BucketName:    os.Getenv("DOG_IMAGES_BUCKET"),
+		IsLocal:       isLocal,
+		LocalEndpoint: os.Getenv("AWS_S3_ENDPOINT_URL"),
+		Region:        os.Getenv("AWS_REGION"),
 	}, dogRepository)
 
+	rekognitionClient := newRekognitionClient(isLocal)
 	breedDetector := dogs.NewBreedDetector(dogs.BreedDetectorConfig{
 		BucketName: os.Getenv("DOG_IMAGES_BUCKET"),
-	}, newRekognitionClient())
+	}, rekognitionClient)
 
 	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoUploader, breedDetector)
 
@@ -89,9 +98,13 @@ func pingHandler(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
-func newRekognitionClient() rekognitioniface.RekognitionAPI {
-	if common.IsLocal() {
-		return rekognition_stub.NewStubRekognitionClient()
+func newRekognitionClient(isLocal bool) rekognitioniface.RekognitionAPI {
+	if isLocal {
+		return rekognition_stub.NewStubRekognitionClient(rekognition_stub.StubRekognitionClientConfig{
+			IsLocal:       isLocal,
+			LocalEndpoint: os.Getenv("AWS_S3_ENDPOINT_URL"),
+			Region:        os.Getenv("AWS_REGION"),
+		})
 	} else {
 		sess := session.Must(session.NewSession(&aws.Config{
 			Region: aws.String(os.Getenv("AWS_REGION")),

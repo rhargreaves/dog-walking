@@ -14,7 +14,10 @@ type DogPhotoUploader interface {
 }
 
 type S3PhotoUploaderConfig struct {
-	BucketName string
+	BucketName    string
+	IsLocal       bool
+	LocalEndpoint string
+	Region        string
 }
 
 type s3DogPhotoUploader struct {
@@ -27,7 +30,7 @@ func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, dogReposit
 }
 
 func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) error {
-	sess, err := common.CreateS3Session()
+	sess, err := common.CreateSession(r.config.IsLocal, r.config.LocalEndpoint, r.config.Region)
 	if err != nil {
 		return err
 	}

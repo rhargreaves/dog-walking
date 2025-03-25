@@ -16,14 +16,21 @@ import (
 
 type stubRekognitionClient struct {
 	rekognitioniface.RekognitionAPI
+	config *StubRekognitionClientConfig
 }
 
-func NewStubRekognitionClient() rekognitioniface.RekognitionAPI {
-	return &stubRekognitionClient{}
+type StubRekognitionClientConfig struct {
+	IsLocal       bool
+	LocalEndpoint string
+	Region        string
+}
+
+func NewStubRekognitionClient(config StubRekognitionClientConfig) rekognitioniface.RekognitionAPI {
+	return &stubRekognitionClient{config: &config}
 }
 
 func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
-	session, err := common.CreateS3Session()
+	session, err := common.CreateSession(m.config.IsLocal, m.config.LocalEndpoint, m.config.Region)
 	if err != nil {
 		return nil, err
 	}

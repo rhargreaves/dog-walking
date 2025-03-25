@@ -26,7 +26,10 @@ type DogRepository interface {
 }
 
 type DynamoDBDogRepositoryConfig struct {
-	TableName string
+	TableName     string
+	IsLocal       bool
+	LocalEndpoint string
+	Region        string
 }
 
 type dynamoDBDogRepository struct {
@@ -35,7 +38,13 @@ type dynamoDBDogRepository struct {
 }
 
 func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig) DogRepository {
-	dynamoDB := dynamodb.New(session.Must(common.CreateSession()))
+	dynamoDB := dynamodb.New(session.Must(
+		common.CreateSession(
+			dynamoDBDogRepositoryConfig.IsLocal,
+			dynamoDBDogRepositoryConfig.LocalEndpoint,
+			dynamoDBDogRepositoryConfig.Region,
+		),
+	))
 	return &dynamoDBDogRepository{config: &dynamoDBDogRepositoryConfig, dynamoDB: dynamoDB}
 }
 
