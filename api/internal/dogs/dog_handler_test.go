@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
 	"github.com/rhargreaves/dog-walking/api/internal/mocks"
 	"github.com/stretchr/testify/require"
 )
@@ -95,4 +96,32 @@ func TestListDogs_ReturnsErrorWhenLimitTooLow(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusBadRequest, apiError.Error.Code)
 	require.Equal(t, "Key: 'DogListQuery.Limit' Error:Field validation for 'Limit' failed on the 'min' tag", apiError.Error.Message)
+}
+
+func TestListDogs_ReturnsPhotoUrlForDogsWithPhoto(t *testing.T) {
+	dogRepository := new(mocks.DogRepository)
+	dogRepository.EXPECT().List(25, "").Return(&domain.DogList{
+		Dogs: []domain.Dog{
+			{ID: "1", Name: "Dog 1", PhotoHash: "1234567890"},
+			{ID: "2", Name: "Dog 2", PhotoHash: "0987654321"},
+		},
+		NextToken: "",
+	}, nil)
+
+	config := DogHandlerConfig{
+		ImagesCdnBaseUrl: "https://example.com",
+	}
+	handler := NewDogHandler(config, dogRepository)
+	router := setupRouter(handler)
+	req, _ := http.NewRequest("GET", "/dogs", nil)
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+	require.Equal(t, http.StatusOK, resp.Code)
+
+	var dogs model.DogListResponse
+	err := json.Unmarshal(resp.Body.Bytes(), &dogs)
+	require.NoError(t, err)
+	require.Equal(t, 2, len(dogs.Dogs))
+	require.Equal(t, "https://example.com/1?h=1234567890", dogs.Dogs[0].PhotoUrl)
+	require.Equal(t, "https://example.com/2?h=0987654321", dogs.Dogs[1].PhotoUrl)
 }
