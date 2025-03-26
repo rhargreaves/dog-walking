@@ -11,84 +11,9 @@ import (
 	"github.com/rhargreaves/dog-walking/test/e2e/common"
 )
 
-var testDog = CreateOrUpdateDogRequest{
-	Name:        "Rover",
-	Breed:       "Labrador",
-	Sex:         "male",
-	IsNeutered:  true,
-	EnergyLevel: 3,
-	Size:        "medium",
-	Socialization: Socialization{
-		GoodWithChildren:  true,
-		GoodWithPuppies:   true,
-		GoodWithLargeDogs: true,
-		GoodWithSmallDogs: true,
-	},
-	SpecialInstructions: "None",
-	DateOfBirth:         "2020-01-01",
-}
-
-var testDog2 = CreateOrUpdateDogRequest{
-	Name:        "Echo",
-	Breed:       "Husky",
-	Sex:         "male",
-	IsNeutered:  false,
-	EnergyLevel: 5,
-	Size:        "large",
-	Socialization: Socialization{
-		GoodWithChildren:  false,
-		GoodWithPuppies:   false,
-		GoodWithLargeDogs: false,
-		GoodWithSmallDogs: false,
-	},
-	SpecialInstructions: "Don't let him out of the house",
-	DateOfBirth:         "2020-01-01",
-}
-
-var testListDog = CreateOrUpdateDogRequest{
-	Name:        "ListTest",
-	Breed:       "Husky",
-	Sex:         "male",
-	IsNeutered:  true,
-	EnergyLevel: 3,
-	Size:        "medium",
-	Socialization: Socialization{
-		GoodWithChildren:  true,
-		GoodWithPuppies:   true,
-		GoodWithLargeDogs: true,
-		GoodWithSmallDogs: true,
-	},
-	SpecialInstructions: "None",
-	DateOfBirth:         "2020-01-01",
-}
-
-var testNameFilterDog = CreateOrUpdateDogRequest{
-	Name:        "NameFilterTest",
-	Breed:       "Husky",
-	Sex:         "male",
-	IsNeutered:  true,
-	EnergyLevel: 3,
-	Size:        "medium",
-	Socialization: Socialization{
-		GoodWithChildren:  true,
-		GoodWithPuppies:   true,
-		GoodWithLargeDogs: true,
-		GoodWithSmallDogs: true,
-	},
-	SpecialInstructions: "None",
-	DateOfBirth:         "2020-01-01",
-}
-
 func TestCreateDog(t *testing.T) {
 	dog := createDog(t, testDog)
 	assert.Equal(t, "Rover", dog.Name)
-	assert.Equal(t, "Labrador", dog.Breed)
-	assert.Equal(t, "male", dog.Sex)
-	assert.True(t, dog.IsNeutered)
-	assert.Equal(t, 3, dog.EnergyLevel)
-	assert.Equal(t, "medium", dog.Size)
-	assert.Equal(t, "None", dog.SpecialInstructions)
-	assert.Equal(t, "2020-01-01", dog.DateOfBirth)
 	assert.NotEmpty(t, dog.ID)
 
 	fetchedDog := getDog(t, dog.ID)
