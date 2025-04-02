@@ -33,7 +33,7 @@ Resources:
           - Effect: Allow
             Action:
               - lambda:*
-            Resource: !Sub arn:aws:lambda:*:${AWS::AccountId}:function:*-dog-walking-api
+            Resource: !Sub arn:aws:lambda:*:${AWS::AccountId}:function:*-dog-walking-*
 
           - Effect: Allow
             Action:
