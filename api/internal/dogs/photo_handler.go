@@ -54,13 +54,13 @@ func (h *dogPhotoHandler) UploadDogPhoto(c *gin.Context) {
 		return
 	}
 
-	photoHash, err := h.dogPhotoUploader.Upload(id, c.Request.Body, contentType)
+	_, err = h.dogPhotoUploader.Upload(id, c.Request.Body, contentType)
 	if err != nil {
 		handleError(c, err)
 		return
 	}
 
-	err = h.dogRepository.UpdatePhotoHash(id, photoHash)
+	err = h.dogRepository.UpdatePhotoStatus(id, "pending")
 	if err != nil {
 		handleError(c, err)
 		return

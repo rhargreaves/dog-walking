@@ -22,20 +22,20 @@ GO_CMD := docker run -i $(TTY_ARG) --rm \
 	$(GO_IMAGE) \
 	sh -ec
 
+build: create-go-cache lint swagger-docs test-unit compile-api compile-photo-moderator
+.PHONY: build
+
 create-go-cache:
 	-docker volume create go-cache
 .PHONY: create-go-cache
 
-build: create-go-cache lint swagger-docs test-unit compile
-.PHONY: build
-
-compile: create-go-cache lint swagger-docs test-unit
+compile-api: create-go-cache lint swagger-docs test-unit
 	docker compose down
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
 		mkdir build; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
-.PHONY: compile
+.PHONY: compile-api
 
 compile-local-auth:
 	$(GO_CMD) "cd local-auth; \
@@ -46,6 +46,14 @@ compile-local-auth:
 		LOCAL_JWT_SECRET=$(LOCAL_JWT_SECRET) gotestsum --format testname ./...; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
 .PHONY: compile-local-auth
+
+compile-photo-moderator:
+	$(GO_CMD) "cd photo-moderator; \
+		rm -rf build; \
+		mkdir build; \
+		go mod download; \
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
+.PHONY: compile-photo-moderator
 
 swagger-docs:
 	$(GO_CMD) "cd api; \
@@ -95,6 +103,11 @@ test-e2e-local:
 clean-cache:
 	-docker volume rm go-mod-cache
 .PHONY: clean-cache
+
+down:
+	docker ps --filter network=dog-walking_default -q | xargs -r docker kill
+	docker compose down --volumes --remove-orphans
+.PHONY: down
 
 clean: clean-cache
 	-rm -rf api/build

@@ -1,7 +1,25 @@
-// for CloudFront certificates (must be in us-east-1)
-provider "aws" {
+provider "aws" { // for CloudFront certificates (must be in us-east-1)
   alias  = "us_east_1"
   region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "pending_dog_images" {
+  bucket = "${var.environment}-pending-dog-images"
+
+  force_destroy = true
+
+  tags = {
+    Name = "${var.environment}-pending-dog-images"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "pending_dog_images" {
+  bucket = aws_s3_bucket.pending_dog_images.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket" "dog_images" {
@@ -33,19 +51,21 @@ data "aws_iam_policy_document" "s3_access" {
     ]
     resources = [
       aws_s3_bucket.dog_images.arn,
-      "${aws_s3_bucket.dog_images.arn}/*"
+      "${aws_s3_bucket.dog_images.arn}/*",
+      aws_s3_bucket.pending_dog_images.arn,
+      "${aws_s3_bucket.pending_dog_images.arn}/*"
     ]
   }
 }
 
 resource "aws_iam_policy" "s3_access" {
   name        = "${var.environment}-dog-walking-s3-access"
-  description = "Policy for accessing S3 dog images bucket"
+  description = "Policy for accessing S3 dog images buckets"
   policy      = data.aws_iam_policy_document.s3_access.json
 }
 
 resource "aws_cloudfront_origin_access_identity" "dog_images" {
-  comment = "OAI for ${var.environment} dog images bucket"
+  comment = "OAI for ${var.environment} dog images buckets"
 }
 
 resource "aws_s3_bucket_policy" "dog_images" {

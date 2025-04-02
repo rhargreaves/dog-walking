@@ -45,6 +45,12 @@ jobs:
           name: bootstrap
           path: api/build/bootstrap
 
+      - name: Upload compiled Photo Moderator
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap
+          path: photo-moderator/build/bootstrap
+
   deploy-uat:
     name: Deploy UAT
     runs-on: ubuntu-latest
@@ -65,14 +71,20 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Create directory for compiled API
-        run: mkdir -p ../api/build
+      - name: Create directory for lambda binaries
+        run: mkdir -p ../api/build ../photo-moderator/build
 
       - name: Download compiled API
         uses: actions/download-artifact@v4
         with:
           name: bootstrap
           path: api/build
+
+      - name: Download compiled Photo Moderator
+        uses: actions/download-artifact@v4
+        with:
+          name: bootstrap
+          path: photo-moderator/build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2

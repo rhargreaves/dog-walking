@@ -19,6 +19,7 @@ type Dog struct {
 	Socialization       Socialization
 	SpecialInstructions string
 	DateOfBirth         string
+	PhotoStatus         string
 }
 
 type DogList struct {
