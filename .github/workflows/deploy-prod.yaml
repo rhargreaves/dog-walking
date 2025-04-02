@@ -48,6 +48,14 @@ jobs:
           workflow: deploy-uat.yaml
           workflow_conclusion: success
 
+      - name: Download compiled Photo Moderator
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          name: bootstrap
+          path: photo-moderator/build
+          workflow: deploy-uat.yaml
+          workflow_conclusion: success
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
