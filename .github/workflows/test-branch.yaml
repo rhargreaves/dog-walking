@@ -1,0 +1,40 @@
+name: Test Feature Branch
+
+on:
+  push:
+    branches-ignore: [ main ]
+    paths-ignore:
+      - '*.md'
+      - '.github/workflows/destroy-uat.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: test-branch
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-api:
+    name: Build & Test API
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API
+        run: make build
+
+      - name: Test API
+        run: make test-local
+
+      - name: Upload compiled API
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap
+          path: api/build/bootstrap
