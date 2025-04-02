@@ -4,6 +4,11 @@
 
 A service for helping dog owners find dog walkers
 
+## Architecture
+
+<img src="docs/arch.png" alt="architecture diagram" />
+
+
 ## API & Photo Moderator S3 Trigger
 
 ### Build
