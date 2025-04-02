@@ -475,6 +475,9 @@ const docTemplate = `{
                 "photoHash": {
                     "type": "string"
                 },
+                "photoStatus": {
+                    "type": "string"
+                },
                 "photoUrl": {
                     "type": "string"
                 },

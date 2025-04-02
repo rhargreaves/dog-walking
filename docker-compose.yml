@@ -30,6 +30,7 @@ services:
       --docker-network dog-walking_default
       --skip-pull-image
       --warm-containers EAGER
+      --debug
 
   localstack:
     image: localstack/localstack:latest
@@ -49,6 +50,7 @@ services:
       default:
         aliases:
           - local-dog-images.s3.localhost.localstack.cloud
+          - local-pending-dog-images.s3.localhost.localstack.cloud
 
   e2e-test:
     build:
@@ -71,6 +73,7 @@ services:
       - TEST_PASSWORD
       - CORS_ALLOWED_ORIGIN
       - CLOUDFRONT_BASE_URL
+
   e2e-test-local:
     depends_on:
       sam:
@@ -79,7 +82,13 @@ services:
       context: test/e2e
       dockerfile: Dockerfile
     container_name: e2e-test-local
+    volumes:
+      - .:/proj
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - COMPOSE_PROJECT_NAME=dog-walking
+      - CONTAINER_HOST
+      - PROJECT_ROOT
       - API_BASE_URL=http://sam:3000
       - LOCAL_JWT_SECRET
       - AWS_REGION=eu-west-1
@@ -87,3 +96,27 @@ services:
       - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566
       - CORS_ALLOWED_ORIGIN=http://localhost:3001
       - CLOUDFRONT_BASE_URL=http://local-dog-images.s3.localhost.localstack.cloud:4566
+      - PENDING_DOG_IMAGES_BUCKET=local-pending-dog-images
+
+  # local-s3-trigger-emulator:
+  #   depends_on:
+  #     sam:
+  #       condition: service_healthy
+  #   build:
+  #     context: local-s3-trigger-emulator
+  #     dockerfile: Dockerfile
+  #   container_name: local-s3-trigger-emulator
+  #   environment:
+  #     - AWS_REGION=eu-west-1
+  #     - AWS_S3_ENDPOINT_URL=http://s3.localhost.localstack.cloud:4566
+  #     - AWS_ACCESS_KEY_ID=test
+  #     - AWS_SECRET_ACCESS_KEY=test
+  #     - AWS_SESSION_TOKEN=test
+  #     - AWS_ENDPOINT_URL=http://localstack:4566
+  #   command: >
+  #     /app/s3-trigger-emulator
+  #     --bucket-name local-pending-dog-images
+  #     --lambda-url http://sam:3000
+  #     --event-type ObjectCreated:Put
+  #     --region eu-west-1
+  #     --interval 5s

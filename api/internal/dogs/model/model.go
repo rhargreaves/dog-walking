@@ -44,6 +44,7 @@ type DogResponse struct {
 	DateOfBirth         string        `json:"dateOfBirth,omitempty"`
 	PhotoUrl            string        `json:"photoUrl,omitempty"`
 	PhotoHash           string        `json:"photoHash,omitempty"`
+	PhotoStatus         string        `json:"photoStatus,omitempty"`
 }
 
 type DogListResponse struct {
@@ -80,6 +81,7 @@ func ToDogResponse(dog *domain.Dog, imagesCdnBaseUrl string) *DogResponse {
 		DateOfBirth:         dog.DateOfBirth,
 		PhotoUrl:            photoUrl,
 		PhotoHash:           dog.PhotoHash,
+		PhotoStatus:         dog.PhotoStatus,
 	}
 }
 

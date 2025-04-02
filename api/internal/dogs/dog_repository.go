@@ -23,6 +23,7 @@ type DogRepository interface {
 	Update(id string, dog *domain.Dog) error
 	Delete(id string) error
 	UpdatePhotoHash(id string, photoHash string) error
+	UpdatePhotoStatus(id string, photoStatus string) error
 }
 
 type DynamoDBDogRepositoryConfig struct {
@@ -246,6 +247,25 @@ func (r *dynamoDBDogRepository) UpdatePhotoHash(id string, photoHash string) err
 	_, err := r.dynamoDB.UpdateItem(input)
 	if err != nil {
 		return fmt.Errorf("failed to update dog photo hash: %w", err)
+	}
+
+	return nil
+}
+
+func (r *dynamoDBDogRepository) UpdatePhotoStatus(id string, photoStatus string) error {
+	input := &dynamodb.UpdateItemInput{
+		TableName: aws.String(r.config.TableName),
+		Key:       createKey(id),
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":photoStatus": {S: aws.String(photoStatus)},
+		},
+		UpdateExpression:    aws.String("set photoStatus = :photoStatus"),
+		ConditionExpression: aws.String("attribute_exists(id)"),
+	}
+
+	_, err := r.dynamoDB.UpdateItem(input)
+	if err != nil {
+		return fmt.Errorf("failed to update dog photo status: %w", err)
 	}
 
 	return nil

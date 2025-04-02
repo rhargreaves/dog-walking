@@ -1,5 +1,6 @@
 FROM golang:1.23.4-alpine
-WORKDIR /app
+RUN apk add --no-cache docker docker-compose
+WORKDIR /e2e-test
 COPY . .
 RUN go mod download && \
 	go install gotest.tools/gotestsum@latest

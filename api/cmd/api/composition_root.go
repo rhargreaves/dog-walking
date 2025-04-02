@@ -29,7 +29,7 @@ func createHandlers(isLocal bool) (dogs.DogHandler, dogs.DogPhotoHandler) {
 	if err != nil {
 		log.Fatalf("Failed to create S3 session: %v", err)
 	}
-	dogImagesBucket := mustGetenv("DOG_IMAGES_BUCKET")
+	dogImagesBucket := mustGetenv("PENDING_DOG_IMAGES_BUCKET")
 	dogPhotoUploader := dogs.NewDogPhotoUploader(dogs.S3PhotoUploaderConfig{
 		BucketName: dogImagesBucket,
 	}, s3session)

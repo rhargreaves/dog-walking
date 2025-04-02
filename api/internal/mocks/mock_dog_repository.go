@@ -324,6 +324,53 @@ func (_c *DogRepository_UpdatePhotoHash_Call) RunAndReturn(run func(string, stri
 	return _c
 }
 
+// UpdatePhotoStatus provides a mock function with given fields: id, photoStatus
+func (_m *DogRepository) UpdatePhotoStatus(id string, photoStatus string) error {
+	ret := _m.Called(id, photoStatus)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePhotoStatus")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(id, photoStatus)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DogRepository_UpdatePhotoStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePhotoStatus'
+type DogRepository_UpdatePhotoStatus_Call struct {
+	*mock.Call
+}
+
+// UpdatePhotoStatus is a helper method to define mock.On call
+//   - id string
+//   - photoStatus string
+func (_e *DogRepository_Expecter) UpdatePhotoStatus(id interface{}, photoStatus interface{}) *DogRepository_UpdatePhotoStatus_Call {
+	return &DogRepository_UpdatePhotoStatus_Call{Call: _e.mock.On("UpdatePhotoStatus", id, photoStatus)}
+}
+
+func (_c *DogRepository_UpdatePhotoStatus_Call) Run(run func(id string, photoStatus string)) *DogRepository_UpdatePhotoStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *DogRepository_UpdatePhotoStatus_Call) Return(_a0 error) *DogRepository_UpdatePhotoStatus_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *DogRepository_UpdatePhotoStatus_Call) RunAndReturn(run func(string, string) error) *DogRepository_UpdatePhotoStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewDogRepository creates a new instance of DogRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewDogRepository(t interface {

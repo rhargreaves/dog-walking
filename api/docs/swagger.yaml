@@ -78,6 +78,8 @@ definitions:
         type: string
       photoHash:
         type: string
+      photoStatus:
+        type: string
       photoUrl:
         type: string
       sex:

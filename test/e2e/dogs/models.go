@@ -32,6 +32,7 @@ type DogResponse struct {
 	DateOfBirth         string        `json:"dateOfBirth,omitempty"`
 	PhotoUrl            string        `json:"photoUrl"`
 	PhotoHash           string        `json:"photoHash"`
+	PhotoStatus         string        `json:"photoStatus"`
 }
 
 type DogListResponse struct {
