@@ -26,7 +26,9 @@ func handler(ctx context.Context, req events.S3Event) error {
 		fmt.Printf("Source bucket: %s, source key: %s\n", sourceBucket, sourceKey)
 
 		approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
-		err := approvePhoto(sourceBucket, sourceKey, approvedDogPhotosBucket)
+		dogTableName := os.Getenv("DOGS_TABLE_NAME")
+
+		err := approvePhoto(sourceBucket, sourceKey, approvedDogPhotosBucket, dogTableName)
 		if err != nil {
 			fmt.Printf("Error approving photo: %s\n", err)
 			return err
@@ -36,14 +38,15 @@ func handler(ctx context.Context, req events.S3Event) error {
 	return nil
 }
 
-func approvePhoto(pendingPhotosBucket string, dogId string, approvedPhotosBucket string) error {
+func approvePhoto(pendingPhotosBucket string, dogId string, approvedPhotosBucket string,
+	dogTableName string) error {
 	photoHash, err := moveS3Object(pendingPhotosBucket, dogId, approvedPhotosBucket)
 	if err != nil {
 		fmt.Printf("Error moving object to approved bucket: %s\n", err)
 		return err
 	}
 
-	err = updatePhotoStatus(dogId, photoHash)
+	err = updatePhotoStatus(dogId, photoHash, dogTableName)
 	if err != nil {
 		fmt.Printf("Error updating photo status: %s\n", err)
 		return err
@@ -52,11 +55,10 @@ func approvePhoto(pendingPhotosBucket string, dogId string, approvedPhotosBucket
 	return nil
 }
 
-func updatePhotoStatus(dogId string, photoHash string) error {
-	dogTable := os.Getenv("DOGS_TABLE_NAME")
+func updatePhotoStatus(dogId string, photoHash string, dogTableName string) error {
 	dynamodbSvc := dynamodb.New(session.Must(common.CreateSession()))
 	_, err := dynamodbSvc.UpdateItem(&dynamodb.UpdateItemInput{
-		TableName: aws.String(dogTable),
+		TableName: aws.String(dogTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(dogId),
@@ -76,7 +78,7 @@ func updatePhotoStatus(dogId string, photoHash string) error {
 }
 
 func moveS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
-	photoHash, err := copyS3Object(sourceBucket, sourceKey, destinationBucket)
+	hash, err := copyS3Object(sourceBucket, sourceKey, destinationBucket)
 	if err != nil {
 		fmt.Printf("Error copying object to destination bucket: %s\n", err)
 		return "", err
@@ -87,7 +89,7 @@ func moveS3Object(sourceBucket string, sourceKey string, destinationBucket strin
 		fmt.Printf("Error deleting object from source bucket: %s\n", err)
 		return "", err
 	}
-	return photoHash, nil
+	return hash, nil
 }
 
 func copyS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
@@ -101,8 +103,8 @@ func copyS3Object(sourceBucket string, sourceKey string, destinationBucket strin
 		fmt.Printf("Error copying object to destination bucket: %s\n", err)
 		return "", err
 	}
-	photoHash := strings.Trim(*res.CopyObjectResult.ETag, "\"")
-	return photoHash, nil
+	hash := strings.Trim(*res.CopyObjectResult.ETag, "\"")
+	return hash, nil
 }
 
 func deleteS3Object(bucket string, key string) error {
