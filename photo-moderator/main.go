@@ -19,6 +19,34 @@ func main() {
 	lambda.Start(handler)
 }
 
+func handler(ctx context.Context, req events.S3Event) error {
+	for _, record := range req.Records {
+		sourceBucket := record.S3.Bucket.Name
+		sourceKey := record.S3.Object.Key
+		fmt.Printf("Source bucket: %s, source key: %s\n", sourceBucket, sourceKey)
+
+		approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
+		photoHash, err := copyS3Object(sourceBucket, sourceKey, approvedDogPhotosBucket)
+		if err != nil {
+			fmt.Printf("Error copying object to approved bucket: %s\n", err)
+			return err
+		}
+
+		err = deleteS3Object(sourceBucket, sourceKey)
+		if err != nil {
+			fmt.Printf("Error deleting object from source bucket: %s\n", err)
+			return err
+		}
+
+		err = approvePhoto(sourceKey, photoHash)
+		if err != nil {
+			fmt.Printf("Error updating photo status: %s\n", err)
+			return err
+		}
+	}
+	return nil
+}
+
 func approvePhoto(dogId string, photoHash string) error {
 	dogTable := os.Getenv("DOGS_TABLE_NAME")
 	dynamodbSvc := dynamodb.New(session.Must(common.CreateSession()))
@@ -42,44 +70,26 @@ func approvePhoto(dogId string, photoHash string) error {
 	return err
 }
 
-func handler(ctx context.Context, req events.S3Event) error {
-	for _, record := range req.Records {
-		sourceBucket := record.S3.Bucket.Name
-		sourceKey := record.S3.Object.Key
-		fmt.Printf("Source bucket: %s, source key: %s\n", sourceBucket, sourceKey)
-
-		// move image to the dog-photos bucket
-		approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
-		fmt.Printf("Approved dog photos bucket: %s\n", approvedDogPhotosBucket)
-
-		// move the object to the dog-photos bucket
-		s3svc := s3.New(session.Must(common.CreateS3Session()))
-		res, err := s3svc.CopyObject(&s3.CopyObjectInput{
-			Bucket:     aws.String(approvedDogPhotosBucket),
-			CopySource: aws.String(fmt.Sprintf("%s/%s", sourceBucket, sourceKey)),
-			Key:        aws.String(sourceKey),
-		})
-		if err != nil {
-			fmt.Printf("Error moving object to approved bucket: %s\n", err)
-			return err
-		}
-		photoHash := strings.Trim(*res.CopyObjectResult.ETag, "\"")
-
-		// delete the object from the pending-dog-images bucket
-		_, err = s3svc.DeleteObject(&s3.DeleteObjectInput{
-			Bucket: aws.String(sourceBucket),
-			Key:    aws.String(sourceKey),
-		})
-		if err != nil {
-			fmt.Printf("Error deleting object from pending bucket: %s\n", err)
-			return err
-		}
-
-		err = approvePhoto(sourceKey, photoHash)
-		if err != nil {
-			fmt.Printf("Error updating photo status: %s\n", err)
-			return err
-		}
+func copyS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
+	s3svc := s3.New(session.Must(common.CreateS3Session()))
+	res, err := s3svc.CopyObject(&s3.CopyObjectInput{
+		Bucket:     aws.String(destinationBucket),
+		CopySource: aws.String(fmt.Sprintf("%s/%s", sourceBucket, sourceKey)),
+		Key:        aws.String(sourceKey),
+	})
+	if err != nil {
+		fmt.Printf("Error copying object to destination bucket: %s\n", err)
+		return "", err
 	}
-	return nil
+	photoHash := strings.Trim(*res.CopyObjectResult.ETag, "\"")
+	return photoHash, nil
+}
+
+func deleteS3Object(bucket string, key string) error {
+	s3svc := s3.New(session.Must(common.CreateS3Session()))
+	_, err := s3svc.DeleteObject(&s3.DeleteObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	return err
 }
