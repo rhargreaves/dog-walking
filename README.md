@@ -4,7 +4,7 @@
 
 A service for helping dog owners find dog walkers
 
-## API
+## API & Photo Moderator S3 Trigger
 
 ### Build
 
@@ -12,7 +12,7 @@ A service for helping dog owners find dog walkers
 make build
 ```
 
-The API is compiled to `out/bootstrap` ready to be deployed as a Lambda function.
+The API & Photo Moderator S3 trigger are compiled to `api/build/bootstrap` and `photo-moderator/build/bootstrap` respectively.
 
 ### Local Testing
 
@@ -36,6 +36,8 @@ Dependencies are swapped out as follows:
 | AWS DynamoDB   | Localstack DynamoDB |
 | AWS S3   | Localstack S3 |
 | AWS Rekognition   | Lookup based on [image MD5](api/internal/rekognition_stub/hashes.go) |
+
+In addition, locally, the Photo Moderator S3 trigger is manually ran as part of the E2E tests when a photo is uploaded. This is because neither Localstack nor AWS SAM can effectively emulate the S3 trigger behaviour themselves.
 
 ## Infrastructure
 
