@@ -37,8 +37,8 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Create directory for compiled API
-        run: mkdir -p ../api/build
+      - name: Create directory for lambda binaries
+        run: mkdir -p ../api/build ../photo-moderator/build
 
       - name: Download compiled API
         uses: dawidd6/action-download-artifact@v3
@@ -47,11 +47,6 @@ jobs:
           path: api/build
           workflow: deploy-uat.yaml
           workflow_conclusion: success
-
-      - name: Rename bootstraps
-        run: |
-          mv api/build/api api/build/bootstrap
-          mv photo-moderator/build/photo-moderator photo-moderator/build/bootstrap
 
       - name: Download compiled Photo Moderator
         uses: dawidd6/action-download-artifact@v3
