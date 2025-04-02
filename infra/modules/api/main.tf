@@ -95,10 +95,10 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      ENVIRONMENT                    = var.environment
-      DOGS_TABLE_NAME                = var.dogs_table_name
-      PENDING_DOG_IMAGES_BUCKET_NAME = var.pending_dog_images_bucket_name
-      CLOUDFRONT_BASE_URL            = "https://${var.images_cdn_host}"
+      ENVIRONMENT               = var.environment
+      DOGS_TABLE_NAME           = var.dogs_table_name
+      PENDING_DOG_IMAGES_BUCKET = var.pending_dog_images_bucket_name
+      CLOUDFRONT_BASE_URL       = "https://${var.images_cdn_host}"
     }
   }
 
