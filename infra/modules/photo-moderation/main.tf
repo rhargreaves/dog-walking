@@ -1,6 +1,6 @@
 
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.environment}-photo-moderation-lambda-role"
+  name = "${var.environment}-dog-walking-photo-moderation-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -14,12 +14,12 @@ resource "aws_iam_role" "lambda_role" {
   })
 
   tags = {
-    Name = "${var.environment}-photo-moderation-lambda-role"
+    Name = "${var.environment}-dog-walking-photo-moderation-lambda-role"
   }
 }
 
 resource "aws_iam_policy" "rekognition_access" {
-  name        = "${var.environment}-photo-moderation-rekognition-access"
+  name        = "${var.environment}-dog-walking-photo-moderation-rekognition-access"
   description = "Policy for accessing AWS Rekognition services"
 
   policy = jsonencode({
@@ -63,7 +63,7 @@ data "archive_file" "bootstrap" {
 }
 
 resource "aws_lambda_function" "photo_moderation" {
-  function_name = "${var.environment}-photo-moderation"
+  function_name = "${var.environment}-dog-walking-photo-moderation"
   role          = aws_iam_role.lambda_role.arn
   handler       = "main"
   runtime       = "provided.al2023"
@@ -86,16 +86,16 @@ resource "aws_lambda_function" "photo_moderation" {
   }
 
   tags = {
-    Name = "${var.environment}-photo-moderation"
+    Name = "${var.environment}-dog-walking-photo-moderation"
   }
 }
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${var.environment}-photo-moderation"
+  name              = "/aws/lambda/${var.environment}-dog-walking-photo-moderation"
   retention_in_days = 7
 
   tags = {
-    Name = "${var.environment}-photo-moderation-logs"
+    Name = "${var.environment}-dog-walking-photo-moderation-logs"
   }
 }
 
