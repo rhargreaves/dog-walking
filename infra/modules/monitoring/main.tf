@@ -1,4 +1,4 @@
-data "aws_region" "current" { }
+data "aws_region" "current" {}
 
 resource "aws_cloudwatch_dashboard" "api_dashboard" {
   dashboard_name = "${var.environment}-${var.application_name}-dashboard"
@@ -12,7 +12,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         properties = {
           metrics = [[{
             expression = "SELECT SUM(\"Count\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
-            id = "q1"
+            id         = "q1"
           }]]
           period = 300
           stat   = "Sum"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         properties = {
           metrics = [[{
             expression = "SELECT SUM(\"4XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
-            id = "q2"
+            id         = "q2"
           }]]
           period = 300
           stat   = "Sum"
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         properties = {
           metrics = [[{
             expression = "SELECT SUM(\"5XXError\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
-            id = "q3"
+            id         = "q3"
           }]]
           period = 300
           stat   = "Sum"
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_dashboard" "api_dashboard" {
         properties = {
           metrics = [[{
             expression = "SELECT AVG(\"Latency\") FROM SCHEMA(\"AWS/ApiGateway\", ApiId,\"Method\",Resource,Stage) WHERE ApiId = '${var.api_id}' GROUP BY \"Method\", Resource"
-            id = "q4"
+            id         = "q4"
           }]]
           period = 300
           stat   = "Average"
@@ -92,11 +92,11 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 
 resource "aws_cloudwatch_metric_alarm" "endpoint_error_rate" {
   for_each = {
-    "create-dog" = { path = "/dogs", method = "POST" },
-    "list-dogs" = { path = "/dogs", method = "GET" },
-    "get-dog" = { path = "/dogs/{id}", method = "GET" },
-    "update-dog" = { path = "/dogs/{id}", method = "PUT" },
-    "delete-dog" = { path = "/dogs/{id}", method = "DELETE" },
+    "create-dog"       = { path = "/dogs", method = "POST" },
+    "list-dogs"        = { path = "/dogs", method = "GET" },
+    "get-dog"          = { path = "/dogs/{id}", method = "GET" },
+    "update-dog"       = { path = "/dogs/{id}", method = "PUT" },
+    "delete-dog"       = { path = "/dogs/{id}", method = "DELETE" },
     "upload-dog-photo" = { path = "/dogs/{id}/photo", method = "PUT" },
     "detect-dog-breed" = { path = "/dogs/{id}/photo/detect-breed", method = "POST" }
   }
@@ -106,7 +106,7 @@ resource "aws_cloudwatch_metric_alarm" "endpoint_error_rate" {
   evaluation_periods        = 12
   threshold                 = 1
   alarm_description         = "Error rate > 1% for ${each.key}"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
+  alarm_actions             = [aws_sns_topic.alerts.arn]
   insufficient_data_actions = []
 
   metric_query {
@@ -127,9 +127,9 @@ resource "aws_cloudwatch_metric_alarm" "endpoint_error_rate" {
       unit        = "Count"
 
       dimensions = {
-        ApiId = var.api_id
+        ApiId    = var.api_id
         Resource = each.value.path
-        Method = each.value.method
+        Method   = each.value.method
       }
     }
   }
@@ -145,9 +145,9 @@ resource "aws_cloudwatch_metric_alarm" "endpoint_error_rate" {
       unit        = "Count"
 
       dimensions = {
-        ApiId = var.api_id
+        ApiId    = var.api_id
         Resource = each.value.path
-        Method = each.value.method
+        Method   = each.value.method
       }
     }
   }

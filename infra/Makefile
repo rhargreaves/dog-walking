@@ -28,13 +28,15 @@ endif
 DOCKER_TF := docker run --rm \
 	-v $(shell pwd):$(TERRAFORM_WORKDIR) \
 	-v $(shell pwd)/../api:/api \
+	-v $(shell pwd)/../photo-moderator:/photo-moderator \
 	-w $(TERRAFORM_WORKDIR) \
 	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
 	-e TF_VAR_hosted_zone_id=$(HOSTED_ZONE_ID) \
 	-e TF_VAR_sysadmin_username=$(SYSADMIN_USERNAME) \
 	-e TF_VAR_sysadmin_password=$(SYSADMIN_PASSWORD) \
 	-e TF_VAR_cors_allowed_origin=$(CORS_ALLOWED_ORIGIN) \
-	-e TF_VAR_bootstrap_path=/api/build/bootstrap \
+	-e TF_VAR_api_bootstrap_path=/api/build/bootstrap \
+	-e TF_VAR_photo_moderation_bootstrap_path=/photo-moderator/build/bootstrap \
 	$(TERRAFORM_IMAGE)
 
 deploy: init plan apply
@@ -44,7 +46,7 @@ init:
 	$(DOCKER_TF) -chdir=environments/$(ENV) init
 .PHONY: init
 
-plan:
+plan: fmt
 	$(DOCKER_TF) -chdir=environments/$(ENV) plan -out=plan.tfplan
 .PHONY: plan
 

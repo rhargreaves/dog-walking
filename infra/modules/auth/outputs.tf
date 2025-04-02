@@ -10,8 +10,8 @@ output "cognito_user_pool_arn" {
 
 output "cognito_client_ids" {
   description = "The IDs of the Cognito User Pool Clients that can be used to authenticate with the API"
-  value       = [
+  value = [
     aws_cognito_user_pool_client.api.id,
     aws_cognito_user_pool_client.ui.id
-    ]
+  ]
 }

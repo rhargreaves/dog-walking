@@ -95,9 +95,9 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      ENVIRONMENT       = var.environment
-      DOGS_TABLE_NAME   = var.dogs_table_name
-      DOG_IMAGES_BUCKET = var.dog_images_bucket
+      ENVIRONMENT         = var.environment
+      DOGS_TABLE_NAME     = var.dogs_table_name
+      DOG_IMAGES_BUCKET   = var.dog_images_bucket
       CLOUDFRONT_BASE_URL = "https://${var.images_cdn_host}"
     }
   }
@@ -138,8 +138,8 @@ resource "aws_apigatewayv2_stage" "api" {
   auto_deploy = true
 
   default_route_settings {
-    throttling_burst_limit = 5
-    throttling_rate_limit = 20
+    throttling_burst_limit   = 5
+    throttling_rate_limit    = 20
     detailed_metrics_enabled = true
   }
 
@@ -147,9 +147,9 @@ resource "aws_apigatewayv2_stage" "api" {
     for_each = aws_apigatewayv2_route.authed_routes
 
     content {
-      route_key = route_settings.value.route_key
-      throttling_burst_limit = 10
-      throttling_rate_limit = 50
+      route_key                = route_settings.value.route_key
+      throttling_burst_limit   = 10
+      throttling_rate_limit    = 50
       detailed_metrics_enabled = true
     }
   }

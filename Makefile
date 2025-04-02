@@ -22,20 +22,20 @@ GO_CMD := docker run -i $(TTY_ARG) --rm \
 	$(GO_IMAGE) \
 	sh -ec
 
+build: create-go-cache lint swagger-docs test-unit compile-api compile-photo-moderator
+.PHONY: build
+
 create-go-cache:
 	-docker volume create go-cache
 .PHONY: create-go-cache
 
-build: create-go-cache lint swagger-docs test-unit compile compile-photo-moderator
-.PHONY: build
-
-compile: create-go-cache lint swagger-docs test-unit
+compile-api: create-go-cache lint swagger-docs test-unit
 	docker compose down
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
 		mkdir build; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
-.PHONY: compile
+.PHONY: compile-api
 
 compile-local-auth:
 	$(GO_CMD) "cd local-auth; \
@@ -81,17 +81,6 @@ test-local: build compile-local-auth
 			docker compose logs; \
 		fi; \ exit 1)
 	docker compose down
-.PHONY: test-local
-
-sam-invoke:
-	docker compose exec sam sam local invoke \
-      --container-host-interface 0.0.0.0 \
-      --container-host $(CONTAINER_HOST) \
-      --docker-volume-basedir $(PROJECT_ROOT) \
-      --docker-network dog-walking_default \
-      --skip-pull-image \
-      --debug \
-      PhotoModeratorFunction
 .PHONY: test-local
 
 test: check-test-username check-test-password

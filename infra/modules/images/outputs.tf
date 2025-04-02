@@ -2,6 +2,10 @@ output "bucket_name" {
   value = aws_s3_bucket.dog_images.bucket
 }
 
+output "pending_dog_images_bucket_name" {
+  value = aws_s3_bucket.pending_dog_images.bucket
+}
+
 output "bucket_arn" {
   value = aws_s3_bucket.dog_images.arn
 }

@@ -38,3 +38,9 @@ jobs:
         with:
           name: bootstrap
           path: api/build/bootstrap
+
+      - name: Upload compiled Photo Moderator
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap
+          path: photo-moderator/build/bootstrap
