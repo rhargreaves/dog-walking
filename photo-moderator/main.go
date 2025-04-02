@@ -26,28 +26,33 @@ func handler(ctx context.Context, req events.S3Event) error {
 		fmt.Printf("Source bucket: %s, source key: %s\n", sourceBucket, sourceKey)
 
 		approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
-		photoHash, err := copyS3Object(sourceBucket, sourceKey, approvedDogPhotosBucket)
+		err := approvePhoto(sourceBucket, sourceKey, approvedDogPhotosBucket)
 		if err != nil {
-			fmt.Printf("Error copying object to approved bucket: %s\n", err)
+			fmt.Printf("Error approving photo: %s\n", err)
 			return err
 		}
 
-		err = deleteS3Object(sourceBucket, sourceKey)
-		if err != nil {
-			fmt.Printf("Error deleting object from source bucket: %s\n", err)
-			return err
-		}
-
-		err = approvePhoto(sourceKey, photoHash)
-		if err != nil {
-			fmt.Printf("Error updating photo status: %s\n", err)
-			return err
-		}
 	}
 	return nil
 }
 
-func approvePhoto(dogId string, photoHash string) error {
+func approvePhoto(pendingPhotosBucket string, dogId string, approvedPhotosBucket string) error {
+	photoHash, err := moveS3Object(pendingPhotosBucket, dogId, approvedPhotosBucket)
+	if err != nil {
+		fmt.Printf("Error moving object to approved bucket: %s\n", err)
+		return err
+	}
+
+	err = updatePhotoStatus(dogId, photoHash)
+	if err != nil {
+		fmt.Printf("Error updating photo status: %s\n", err)
+		return err
+	}
+
+	return nil
+}
+
+func updatePhotoStatus(dogId string, photoHash string) error {
 	dogTable := os.Getenv("DOGS_TABLE_NAME")
 	dynamodbSvc := dynamodb.New(session.Must(common.CreateSession()))
 	_, err := dynamodbSvc.UpdateItem(&dynamodb.UpdateItemInput{
@@ -68,6 +73,21 @@ func approvePhoto(dogId string, photoHash string) error {
 		},
 	})
 	return err
+}
+
+func moveS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
+	photoHash, err := copyS3Object(sourceBucket, sourceKey, destinationBucket)
+	if err != nil {
+		fmt.Printf("Error copying object to destination bucket: %s\n", err)
+		return "", err
+	}
+
+	err = deleteS3Object(sourceBucket, sourceKey)
+	if err != nil {
+		fmt.Printf("Error deleting object from source bucket: %s\n", err)
+		return "", err
+	}
+	return photoHash, nil
 }
 
 func copyS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
