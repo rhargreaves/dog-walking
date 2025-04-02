@@ -42,11 +42,11 @@ DOCKER_TF := docker run --rm \
 deploy: init plan apply
 .PHONY: deploy
 
-init: validate fmt
+init: fmt
 	$(DOCKER_TF) -chdir=environments/$(ENV) init
 .PHONY: init
 
-plan: init
+plan: init validate
 	$(DOCKER_TF) -chdir=environments/$(ENV) plan -out=plan.tfplan
 .PHONY: plan
 
