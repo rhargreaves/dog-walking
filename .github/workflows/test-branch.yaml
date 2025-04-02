@@ -36,11 +36,11 @@ jobs:
       - name: Upload compiled API
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap
+          name: api
           path: api/build/bootstrap
 
       - name: Upload compiled Photo Moderator
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap
+          name: photo-moderator
           path: photo-moderator/build/bootstrap

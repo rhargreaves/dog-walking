@@ -43,15 +43,20 @@ jobs:
       - name: Download compiled API
         uses: dawidd6/action-download-artifact@v3
         with:
-          name: bootstrap
+          name: api
           path: api/build
           workflow: deploy-uat.yaml
           workflow_conclusion: success
 
+      - name: Rename bootstraps
+        run: |
+          mv api/build/api api/build/bootstrap
+          mv photo-moderator/build/photo-moderator photo-moderator/build/bootstrap
+
       - name: Download compiled Photo Moderator
         uses: dawidd6/action-download-artifact@v3
         with:
-          name: bootstrap
+          name: photo-moderator
           path: photo-moderator/build
           workflow: deploy-uat.yaml
           workflow_conclusion: success

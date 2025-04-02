@@ -42,13 +42,13 @@ jobs:
       - name: Upload compiled API
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap
+          name: api
           path: api/build/bootstrap
 
       - name: Upload compiled Photo Moderator
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap
+          name: photo-moderator
           path: photo-moderator/build/bootstrap
 
   deploy-uat:
@@ -77,14 +77,19 @@ jobs:
       - name: Download compiled API
         uses: actions/download-artifact@v4
         with:
-          name: bootstrap
+          name: api
           path: api/build
 
       - name: Download compiled Photo Moderator
         uses: actions/download-artifact@v4
         with:
-          name: bootstrap
+          name: photo-moderator
           path: photo-moderator/build
+
+      - name: Rename bootstraps
+        run: |
+          mv api/build/api api/build/bootstrap
+          mv photo-moderator/build/photo-moderator photo-moderator/build/bootstrap
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
