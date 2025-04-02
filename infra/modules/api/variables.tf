@@ -43,6 +43,11 @@ variable "dog_images_bucket" {
   type        = string
 }
 
+variable "pending_dog_images_bucket_name" {
+  description = "Name of the S3 bucket for pending dog images"
+  type        = string
+}
+
 variable "bootstrap_path" {
   description = "Path to the bootstrap file"
   type        = string

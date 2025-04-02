@@ -71,7 +71,6 @@ Resources:
           AWS_ENDPOINT_URL: http://localstack:4566
           AWS_S3_ENDPOINT_URL: http://s3.localhost.localstack.cloud:4566
           DOGS_TABLE_NAME: local-dogs
-          DOG_IMAGES_BUCKET: local-dog-images
           PENDING_DOG_IMAGES_BUCKET: local-pending-dog-images
           CORS_ALLOWED_ORIGIN: http://localhost:3001
           CLOUDFRONT_BASE_URL: http://local-dog-images.s3.localhost.localstack.cloud:4566
