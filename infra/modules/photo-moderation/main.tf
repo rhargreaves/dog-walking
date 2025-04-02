@@ -99,12 +99,8 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
   }
 }
 
-data "aws_s3_bucket" "pending_dog_images_bucket" {
-  bucket = var.pending_dog_images_bucket_name
-}
-
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = data.aws_s3_bucket.pending_dog_images_bucket.id
+  bucket = var.pending_dog_images_bucket_name
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.photo_moderation.arn
@@ -119,5 +115,5 @@ resource "aws_lambda_permission" "allow_bucket_invoke" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.photo_moderation.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = data.aws_s3_bucket.pending_dog_images_bucket.arn
+  source_arn    = var.pending_dog_images_bucket_arn
 }

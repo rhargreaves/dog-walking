@@ -67,5 +67,6 @@ module "photo_moderation" {
   dogs_table_name                = module.data.dogs_table_name
   dog_images_bucket              = module.images.bucket_name
   pending_dog_images_bucket_name = module.images.pending_dog_images_bucket_name
+  pending_dog_images_bucket_arn  = module.images.pending_dog_images_bucket_arn
   bootstrap_path                 = var.photo_moderation_bootstrap_path
 }

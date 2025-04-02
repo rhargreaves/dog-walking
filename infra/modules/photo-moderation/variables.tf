@@ -19,6 +19,10 @@ variable "pending_dog_images_bucket_name" {
   type = string
 }
 
+variable "pending_dog_images_bucket_arn" {
+  type = string
+}
+
 variable "dog_images_bucket" {
   type = string
 }
