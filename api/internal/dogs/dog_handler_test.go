@@ -11,7 +11,6 @@ import (
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
-	"github.com/rhargreaves/dog-walking/api/internal/mocks"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,18 +24,12 @@ func setupRouter(handler DogHandler) *gin.Engine {
 
 func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 	numberOfDogs := 25
-	dogRepository := new(mocks.DogRepository)
-	dogList := &domain.DogList{
-		Dogs:      make([]domain.Dog, numberOfDogs),
-		NextToken: "",
-	}
-	for i := range dogList.Dogs {
-		dogList.Dogs[i] = domain.Dog{
-			ID:   fmt.Sprintf("dog-%d", i),
+	dogRepository := NewFakeDogRepository()
+	for i := 0; i < numberOfDogs; i++ {
+		dogRepository.Create(domain.Dog{
 			Name: fmt.Sprintf("Dog %d", i),
-		}
+		})
 	}
-	dogRepository.EXPECT().List(numberOfDogs, "", "").Return(dogList, nil)
 
 	config := DogHandlerConfig{
 		ImagesCdnBaseUrl: "https://example.com",
@@ -55,7 +48,7 @@ func TestListDogs_ReturnsMaxDogsByDefault(t *testing.T) {
 }
 
 func TestListDogs_ReturnsErrorWhenLimitTooHigh(t *testing.T) {
-	dogRepository := new(mocks.DogRepository)
+	dogRepository := NewFakeDogRepository()
 	config := DogHandlerConfig{
 		ImagesCdnBaseUrl: "https://example.com",
 	}
@@ -77,7 +70,7 @@ func TestListDogs_ReturnsErrorWhenLimitTooHigh(t *testing.T) {
 }
 
 func TestListDogs_ReturnsErrorWhenLimitTooLow(t *testing.T) {
-	dogRepository := new(mocks.DogRepository)
+	dogRepository := NewFakeDogRepository()
 	config := DogHandlerConfig{
 		ImagesCdnBaseUrl: "https://example.com",
 	}
@@ -99,15 +92,15 @@ func TestListDogs_ReturnsErrorWhenLimitTooLow(t *testing.T) {
 }
 
 func TestListDogs_ReturnsPhotoUrlForDogsWithPhoto(t *testing.T) {
-	dogRepository := new(mocks.DogRepository)
-	dogRepository.EXPECT().List(25, "", "").Return(&domain.DogList{
-		Dogs: []domain.Dog{
-			{ID: "1", Name: "Dog 1", PhotoHash: "1234567890"},
-			{ID: "2", Name: "Dog 2", PhotoHash: "0987654321"},
-		},
-		NextToken: "",
-	}, nil)
-
+	dogRepository := NewFakeDogRepository()
+	dog1, _ := dogRepository.Create(domain.Dog{
+		Name:      "Dog 1",
+		PhotoHash: "1234567890",
+	})
+	dog2, _ := dogRepository.Create(domain.Dog{
+		Name:      "Dog 2",
+		PhotoHash: "0987654321",
+	})
 	config := DogHandlerConfig{
 		ImagesCdnBaseUrl: "https://example.com",
 	}
@@ -122,6 +115,6 @@ func TestListDogs_ReturnsPhotoUrlForDogsWithPhoto(t *testing.T) {
 	err := json.Unmarshal(resp.Body.Bytes(), &dogs)
 	require.NoError(t, err)
 	require.Equal(t, 2, len(dogs.Dogs))
-	require.Equal(t, "https://example.com/1?h=1234567890", dogs.Dogs[0].PhotoUrl)
-	require.Equal(t, "https://example.com/2?h=0987654321", dogs.Dogs[1].PhotoUrl)
+	require.Equal(t, "https://example.com/"+dog1.ID+"?h=1234567890", dogs.Dogs[0].PhotoUrl)
+	require.Equal(t, "https://example.com/"+dog2.ID+"?h=0987654321", dogs.Dogs[1].PhotoUrl)
 }

@@ -14,18 +14,6 @@ import (
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
-var ErrDogNotFound = errors.New("dog not found")
-
-type DogRepository interface {
-	Create(dog *domain.Dog) error
-	List(limit int, name string, nextToken string) (*domain.DogList, error)
-	Get(id string) (*domain.Dog, error)
-	Update(id string, dog *domain.Dog) error
-	Delete(id string) error
-	UpdatePhotoHash(id string, photoHash string) error
-	UpdatePhotoStatus(id string, photoStatus string) error
-}
-
 type DynamoDBDogRepositoryConfig struct {
 	TableName string
 }
@@ -35,12 +23,12 @@ type dynamoDBDogRepository struct {
 	dynamoDB *dynamodb.DynamoDB
 }
 
-func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig, session *session.Session) DogRepository {
+func NewDynamoDBDogRepository(dynamoDBDogRepositoryConfig DynamoDBDogRepositoryConfig, session *session.Session) domain.DogRepository {
 	dynamoDB := dynamodb.New(session)
 	return &dynamoDBDogRepository{config: &dynamoDBDogRepositoryConfig, dynamoDB: dynamoDB}
 }
 
-func (r *dynamoDBDogRepository) Create(dog *domain.Dog) error {
+func (r *dynamoDBDogRepository) Create(dog domain.Dog) (*domain.Dog, error) {
 	dog.ID = uuid.New().String()
 
 	input := &dynamodb.PutItemInput{
@@ -66,9 +54,9 @@ func (r *dynamoDBDogRepository) Create(dog *domain.Dog) error {
 
 	_, err := r.dynamoDB.PutItem(input)
 	if err != nil {
-		return fmt.Errorf("failed to put dog: %w", err)
+		return nil, fmt.Errorf("failed to put dog: %w", err)
 	}
-	return nil
+	return &dog, nil
 }
 
 func (r *dynamoDBDogRepository) List(limit int, name string, nextToken string) (*domain.DogList, error) {
@@ -155,7 +143,7 @@ func (r *dynamoDBDogRepository) Get(id string) (*domain.Dog, error) {
 	}
 
 	if result.Item == nil {
-		return nil, ErrDogNotFound
+		return nil, domain.ErrDogNotFound
 	}
 
 	var dog domain.Dog
@@ -225,7 +213,7 @@ func (r *dynamoDBDogRepository) Update(id string, dog *domain.Dog) error {
 		var awsErr awserr.Error
 		if errors.As(err, &awsErr) && awsErr.Code() ==
 			dynamodb.ErrCodeConditionalCheckFailedException {
-			return ErrDogNotFound
+			return domain.ErrDogNotFound
 		}
 		return fmt.Errorf("failed to update dog: %w", err)
 	}
@@ -284,7 +272,7 @@ func (r *dynamoDBDogRepository) Delete(id string) error {
 	}
 
 	if result.Attributes == nil {
-		return ErrDogNotFound
+		return domain.ErrDogNotFound
 	}
 
 	return nil

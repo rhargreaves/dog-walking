@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 )
 
 type DogPhotoHandler interface {
@@ -12,11 +13,11 @@ type DogPhotoHandler interface {
 }
 
 type dogPhotoHandler struct {
-	dogRepository    DogRepository
+	dogRepository    domain.DogRepository
 	dogPhotoUploader DogPhotoUploader
 }
 
-func NewDogPhotoHandler(dogRepository DogRepository, dogPhotoUploader DogPhotoUploader) DogPhotoHandler {
+func NewDogPhotoHandler(dogRepository domain.DogRepository, dogPhotoUploader DogPhotoUploader) DogPhotoHandler {
 	return &dogPhotoHandler{
 		dogRepository:    dogRepository,
 		dogPhotoUploader: dogPhotoUploader,

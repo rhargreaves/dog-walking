@@ -7,6 +7,7 @@ import (
 	"github.com/creasty/defaults"
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
+	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/model"
 )
 
@@ -20,14 +21,14 @@ type DogHandler interface {
 
 type dogHandler struct {
 	config        *DogHandlerConfig
-	dogRepository DogRepository
+	dogRepository domain.DogRepository
 }
 
 type DogHandlerConfig struct {
 	ImagesCdnBaseUrl string
 }
 
-func NewDogHandler(dogHandlerConfig DogHandlerConfig, dogRepository DogRepository) DogHandler {
+func NewDogHandler(dogHandlerConfig DogHandlerConfig, dogRepository domain.DogRepository) DogHandler {
 	return &dogHandler{config: &dogHandlerConfig, dogRepository: dogRepository}
 }
 
@@ -50,12 +51,13 @@ func (h *dogHandler) CreateDog(c *gin.Context) {
 	}
 
 	dog := *model.FromCreateOrUpdateDogRequest(&request)
-	if err := h.dogRepository.Create(&dog); err != nil {
+	createdDog, err := h.dogRepository.Create(dog)
+	if err != nil {
 		handleError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, model.ToDogResponse(&dog, h.config.ImagesCdnBaseUrl))
+	c.JSON(http.StatusCreated, model.ToDogResponse(createdDog, h.config.ImagesCdnBaseUrl))
 }
 
 // ListDogs godoc
@@ -158,7 +160,7 @@ func (h *dogHandler) DeleteDog(c *gin.Context) {
 }
 
 func handleError(c *gin.Context, err error) {
-	if errors.Is(err, ErrDogNotFound) {
+	if errors.Is(err, domain.ErrDogNotFound) {
 		c.Error(common.APIError{
 			Code:    http.StatusNotFound,
 			Message: err.Error(),

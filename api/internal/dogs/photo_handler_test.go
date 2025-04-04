@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
-	"github.com/rhargreaves/dog-walking/api/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -26,18 +25,16 @@ func requireAPIError(t *testing.T, c *gin.Context, expectedCode int, expectedMes
 }
 
 func TestUploadPhoto_ReturnsBadRequest_WhenFileIsNotAnImage(t *testing.T) {
-	const dogId = "123"
-
-	dogRepository := new(mocks.DogRepository)
-	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
+	dogRepository := NewFakeDogRepository()
+	dog, _ := dogRepository.Create(domain.Dog{})
 	handler := NewDogPhotoHandler(dogRepository, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Params = []gin.Param{{Key: "id", Value: dogId}}
+	c.Params = []gin.Param{{Key: "id", Value: dog.ID}}
 
 	c.Request = httptest.NewRequest(http.MethodPut,
-		fmt.Sprintf("/dogs/%s/photo", dogId), strings.NewReader("not an image"))
+		fmt.Sprintf("/dogs/%s/photo", dog.ID), strings.NewReader("not an image"))
 	c.Request.Header.Set("Content-Type", "text/plain")
 
 	handler.UploadDogPhoto(c)
