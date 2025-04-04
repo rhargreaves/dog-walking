@@ -57,7 +57,7 @@ func TestModeratePhoto_RejectsPhotoWhenContentScreenerReturnsUnsafe(t *testing.T
 	contentScreener := mockContentScreenerReturningUnsafeViolence()
 	var dbPhotoStatus string
 	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(&dbPhotoStatus)
-	s3Client := mockS3ClientReturningHash("123")
+	s3Client := mockS3ClientReturningHash(hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, nil, dynamodbClient, s3Client, contentScreener)
 	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
