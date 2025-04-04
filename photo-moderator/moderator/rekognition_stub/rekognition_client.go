@@ -8,7 +8,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -16,16 +15,15 @@ import (
 
 type stubRekognitionClient struct {
 	rekognitioniface.RekognitionAPI
-	session *session.Session
+	s3Svc *s3.S3
 }
 
-func NewStubRekognitionClient(session *session.Session) rekognitioniface.RekognitionAPI {
-	return &stubRekognitionClient{session: session}
+func NewStubRekognitionClient(s3Svc *s3.S3) rekognitioniface.RekognitionAPI {
+	return &stubRekognitionClient{s3Svc: s3Svc}
 }
 
 func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
-	s3client := s3.New(m.session)
-	image, err := s3client.GetObject(&s3.GetObjectInput{
+	image, err := m.s3Svc.GetObject(&s3.GetObjectInput{
 		Bucket: input.Image.S3Object.Bucket,
 		Key:    input.Image.S3Object.Name,
 	})

@@ -8,8 +8,10 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/rhargreaves/dog-walking/photo-moderator/common"
 	"github.com/rhargreaves/dog-walking/photo-moderator/moderator"
 	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/rekognition_stub"
@@ -19,9 +21,9 @@ func main() {
 	lambda.Start(handler)
 }
 
-func newRekognitionClient(isLocal bool, session *session.Session, s3session *session.Session) rekognitioniface.RekognitionAPI {
+func newRekognitionClient(isLocal bool, s3Svc *s3.S3, session *session.Session) rekognitioniface.RekognitionAPI {
 	if isLocal {
-		return rekognition_stub.NewStubRekognitionClient(s3session)
+		return rekognition_stub.NewStubRekognitionClient(s3Svc)
 	}
 	return rekognition.New(session)
 }
@@ -35,15 +37,16 @@ func handler(ctx context.Context, req events.S3Event) error {
 		approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
 		dogTableName := os.Getenv("DOGS_TABLE_NAME")
 
-		dbSession := session.Must(common.CreateSession())
 		s3session := session.Must(common.CreateS3Session())
+		dbSvc := dynamodb.New(session.Must(common.CreateSession()))
+		s3Svc := s3.New(s3session)
+		rekClient := newRekognitionClient(common.IsLocal(), s3Svc, s3session)
 
-		rekClient := newRekognitionClient(common.IsLocal(), dbSession, s3session)
 		breedDetector := moderator.NewBreedDetector(moderator.BreedDetectorConfig{
 			BucketName: sourceBucket,
 		}, rekClient)
 
-		moderator := moderator.NewModerator(dogTableName, approvedDogPhotosBucket, breedDetector, dbSession, s3session)
+		moderator := moderator.NewModerator(dogTableName, approvedDogPhotosBucket, breedDetector, dbSvc, s3Svc)
 		err := moderator.ModeratePhoto(sourceBucket, sourceKey)
 		if err != nil {
 			fmt.Printf("Error approving photo: %s\n", err)
