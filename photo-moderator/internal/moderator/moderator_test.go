@@ -15,21 +15,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	dogTableName         = "dog-table"
+	approvedPhotosBucket = "approved-photos-bucket"
+	pendingPhotosBucket  = "pending-photos-bucket"
+	dogId                = "1"
+	hash                 = "123"
+)
+
 func TestModeratePhoto_ApprovesLabradorDog(t *testing.T) {
-	dogTableName := "dog-table"
-	approvedPhotosBucket := "approved-photos-bucket"
-	pendingPhotosBucket := "pending-photos-bucket"
-	dogId := "1"
-
-	contentScreener := &content_screener_mocks.MockContentScreener{}
-	contentScreener.ScreenImageFunc = func(id string) (*content_screener.ContentScreenerResult, error) {
-		return &content_screener.ContentScreenerResult{IsSafe: true}, nil
-	}
-
+	contentScreener := mockContentScreenerReturningSafe()
 	breedDetector := mockBreedDetectorReturningLabrador()
 	var dbPhotoStatus string
 	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(&dbPhotoStatus)
-	s3Client := mockS3ClientReturningHash("123")
+	s3Client := mockS3ClientReturningHash(hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client, contentScreener)
 	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
@@ -39,32 +38,12 @@ func TestModeratePhoto_ApprovesLabradorDog(t *testing.T) {
 }
 
 func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
-	dogTableName := "dog-table"
-	approvedPhotosBucket := "approved-photos-bucket"
-	pendingPhotosBucket := "pending-photos-bucket"
-	dogId := "1"
-	hash := "123"
-
-	contentScreener := &content_screener_mocks.MockContentScreener{}
-	contentScreener.ScreenImageFunc = func(id string) (*content_screener.ContentScreenerResult, error) {
-		return &content_screener.ContentScreenerResult{IsSafe: true}, nil
-	}
-
-	breedDetector := &breed_detector_mocks.MockBreedDetector{}
-	breedDetector.DetectBreedFunc = func(id string) (*domain.BreedDetectionResult, error) {
-		return nil, breed_detector.ErrNoSpecificBreedDetected
-	}
+	contentScreener := mockContentScreenerReturningSafe()
+	breedDetector := mockBreedDetectorReturningNoSpecificBreed()
 
 	var photoStatus string
 	var breed string = "existing-value"
-	dynamodbClient := &aws_mocks.MockDynamoDB{}
-	dynamodbClient.UpdateItemFunc = func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
-		photoStatus = *input.ExpressionAttributeValues[":photoStatus"].S
-		if breedAttrValue := input.ExpressionAttributeValues[":breed"]; breedAttrValue != nil {
-			breed = *breedAttrValue.S
-		}
-		return &dynamodb.UpdateItemOutput{}, nil
-	}
+	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecordsWithBreed(&photoStatus, &breed)
 	s3Client := mockS3ClientReturningHash(hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client, contentScreener)
@@ -75,19 +54,7 @@ func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
 }
 
 func TestModeratePhoto_RejectsPhotoWhenContentScreenerReturnsUnsafe(t *testing.T) {
-	dogTableName := "dog-table"
-	approvedPhotosBucket := "approved-photos-bucket"
-	pendingPhotosBucket := "pending-photos-bucket"
-	dogId := "1"
-
-	contentScreener := &content_screener_mocks.MockContentScreener{}
-	contentScreener.ScreenImageFunc = func(id string) (*content_screener.ContentScreenerResult, error) {
-		return &content_screener.ContentScreenerResult{
-			IsSafe: false,
-			Reason: "violence",
-		}, nil
-	}
-
+	contentScreener := mockContentScreenerReturningUnsafeViolence()
 	var dbPhotoStatus string
 	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(&dbPhotoStatus)
 	s3Client := mockS3ClientReturningHash("123")
@@ -99,10 +66,34 @@ func TestModeratePhoto_RejectsPhotoWhenContentScreenerReturnsUnsafe(t *testing.T
 
 }
 
+func mockContentScreenerReturningUnsafeViolence() *content_screener_mocks.MockContentScreener {
+	return &content_screener_mocks.MockContentScreener{
+		ScreenImageFunc: func(id string) (*content_screener.ContentScreenerResult, error) {
+			return &content_screener.ContentScreenerResult{IsSafe: false, Reason: "violence"}, nil
+		},
+	}
+}
+
+func mockContentScreenerReturningSafe() *content_screener_mocks.MockContentScreener {
+	return &content_screener_mocks.MockContentScreener{
+		ScreenImageFunc: func(id string) (*content_screener.ContentScreenerResult, error) {
+			return &content_screener.ContentScreenerResult{IsSafe: true}, nil
+		},
+	}
+}
+
 func mockBreedDetectorReturningLabrador() *breed_detector_mocks.MockBreedDetector {
 	return &breed_detector_mocks.MockBreedDetector{
 		DetectBreedFunc: func(id string) (*domain.BreedDetectionResult, error) {
 			return &domain.BreedDetectionResult{Breed: "Labrador", Confidence: 0.95}, nil
+		},
+	}
+}
+
+func mockBreedDetectorReturningNoSpecificBreed() *breed_detector_mocks.MockBreedDetector {
+	return &breed_detector_mocks.MockBreedDetector{
+		DetectBreedFunc: func(id string) (*domain.BreedDetectionResult, error) {
+			return nil, breed_detector.ErrNoSpecificBreedDetected
 		},
 	}
 }
@@ -114,6 +105,18 @@ func mockDynamoDBClientUpdatingPhotoRecords(photoStatus *string) *aws_mocks.Mock
 			return &dynamodb.UpdateItemOutput{}, nil
 		},
 	}
+}
+
+func mockDynamoDBClientUpdatingPhotoRecordsWithBreed(photoStatus *string, breed *string) *aws_mocks.MockDynamoDB {
+	dynamodbClient := &aws_mocks.MockDynamoDB{}
+	dynamodbClient.UpdateItemFunc = func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
+		*photoStatus = *input.ExpressionAttributeValues[":photoStatus"].S
+		if breedAttrValue := input.ExpressionAttributeValues[":breed"]; breedAttrValue != nil {
+			*breed = *breedAttrValue.S
+		}
+		return &dynamodb.UpdateItemOutput{}, nil
+	}
+	return dynamodbClient
 }
 
 func mockS3ClientReturningHash(hash string) *aws_mocks.MockS3 {
