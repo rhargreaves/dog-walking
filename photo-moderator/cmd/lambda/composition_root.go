@@ -8,10 +8,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/photo-moderator/common"
-	"github.com/rhargreaves/dog-walking/photo-moderator/moderator"
-	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/breed_detector"
-	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/rekognition_stub"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/common"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/rekognition_stub"
 )
 
 func rekognitionClient(isLocal bool, s3Svc *s3.S3, session *session.Session) rekognitioniface.RekognitionAPI {

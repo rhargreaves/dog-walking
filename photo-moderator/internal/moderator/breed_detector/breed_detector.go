@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
-	"github.com/rhargreaves/dog-walking/photo-moderator/domain"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/domain"
 )
 
 type BreedDetectionResult struct {

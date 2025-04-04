@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
-	aws_clients "github.com/rhargreaves/dog-walking/photo-moderator/moderator/aws"
-	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/breed_detector"
+	aws_clients "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws"
+	breed_detector "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
 )
 
 const (

@@ -6,9 +6,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/photo-moderator/domain"
-	aws_mocks "github.com/rhargreaves/dog-walking/photo-moderator/moderator/aws/mocks"
-	breed_detector_mocks "github.com/rhargreaves/dog-walking/photo-moderator/moderator/breed_detector/mocks"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/domain"
+	aws_mocks "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws/mocks"
+	breed_detector_mocks "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector/mocks"
 	"github.com/stretchr/testify/require"
 )
 

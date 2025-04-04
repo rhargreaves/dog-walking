@@ -3,7 +3,7 @@ package mocks
 import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/aws"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws"
 )
 
 type MockDynamoDB struct {
