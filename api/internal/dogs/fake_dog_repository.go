@@ -14,21 +14,21 @@ func NewFakeDogRepository() *FakeDogRepository {
 	return &FakeDogRepository{}
 }
 
-func (f *FakeDogRepository) Create(dog domain.Dog) (*domain.Dog, error) {
+func (r *FakeDogRepository) Create(dog domain.Dog) (*domain.Dog, error) {
 	dog.ID = uuid.New().String()
-	f.dogs = append(f.dogs, dog)
+	r.dogs = append(r.dogs, dog)
 	return &dog, nil
 }
 
-func (f *FakeDogRepository) List(limit int, name string, nextToken string) (*domain.DogList, error) {
+func (r *FakeDogRepository) List(limit int, name string, nextToken string) (*domain.DogList, error) {
 	return &domain.DogList{
-		Dogs:      f.dogs,
+		Dogs:      r.dogs,
 		NextToken: "",
 	}, nil
 }
 
-func (f *FakeDogRepository) Get(id string) (*domain.Dog, error) {
-	for _, dog := range f.dogs {
+func (r *FakeDogRepository) Get(id string) (*domain.Dog, error) {
+	for _, dog := range r.dogs {
 		if dog.ID == id {
 			return &dog, nil
 		}
@@ -36,40 +36,40 @@ func (f *FakeDogRepository) Get(id string) (*domain.Dog, error) {
 	return nil, domain.ErrDogNotFound
 }
 
-func (f *FakeDogRepository) Update(id string, dog *domain.Dog) error {
-	for i, d := range f.dogs {
+func (r *FakeDogRepository) Update(id string, dog *domain.Dog) error {
+	for i, d := range r.dogs {
 		if d.ID == id {
-			f.dogs[i] = *dog
+			r.dogs[i] = *dog
 			return nil
 		}
 	}
 	return domain.ErrDogNotFound
 }
 
-func (f *FakeDogRepository) Delete(id string) error {
-	for i, d := range f.dogs {
+func (r *FakeDogRepository) Delete(id string) error {
+	for i, d := range r.dogs {
 		if d.ID == id {
-			f.dogs = append(f.dogs[:i], f.dogs[i+1:]...)
+			r.dogs = append(r.dogs[:i], r.dogs[i+1:]...)
 			return nil
 		}
 	}
 	return domain.ErrDogNotFound
 }
 
-func (f *FakeDogRepository) UpdatePhotoHash(id string, photoHash string) error {
-	for i, d := range f.dogs {
+func (r *FakeDogRepository) UpdatePhotoHash(id string, photoHash string) error {
+	for i, d := range r.dogs {
 		if d.ID == id {
-			f.dogs[i].PhotoHash = photoHash
+			r.dogs[i].PhotoHash = photoHash
 			return nil
 		}
 	}
 	return domain.ErrDogNotFound
 }
 
-func (f *FakeDogRepository) UpdatePhotoStatus(id string, photoStatus string) error {
-	for i, d := range f.dogs {
+func (r *FakeDogRepository) UpdatePhotoStatus(id string, photoStatus string) error {
+	for i, d := range r.dogs {
 		if d.ID == id {
-			f.dogs[i].PhotoStatus = photoStatus
+			r.dogs[i].PhotoStatus = photoStatus
 			return nil
 		}
 	}

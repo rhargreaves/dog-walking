@@ -26,10 +26,10 @@ func NewDogPhotoUploader(s3PhotoUploaderConfig S3PhotoUploaderConfig, session *s
 	return &s3DogPhotoUploader{config: &s3PhotoUploaderConfig, session: session}
 }
 
-func (r *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) (string, error) {
-	uploader := s3manager.NewUploader(r.session)
+func (u *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType string) (string, error) {
+	uploader := s3manager.NewUploader(u.session)
 	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket:      aws.String(r.config.BucketName),
+		Bucket:      aws.String(u.config.BucketName),
 		Key:         aws.String(id),
 		Body:        fileData,
 		ContentType: aws.String(contentType),

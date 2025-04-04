@@ -22,8 +22,8 @@ func NewStubRekognitionClient(s3Svc *s3.S3) rekognitioniface.RekognitionAPI {
 	return &stubRekognitionClient{s3Svc: s3Svc}
 }
 
-func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
-	imageClassification, err := m.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
+func (r *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
+	imageClassification, err := r.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -34,12 +34,12 @@ func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInpu
 	}, nil
 }
 
-func (m *stubRekognitionClient) DetectLabelsWithContext(ctx aws.Context, input *rekognition.DetectLabelsInput, opts ...request.Option) (*rekognition.DetectLabelsOutput, error) {
-	return m.DetectLabels(input)
+func (r *stubRekognitionClient) DetectLabelsWithContext(ctx aws.Context, input *rekognition.DetectLabelsInput, opts ...request.Option) (*rekognition.DetectLabelsOutput, error) {
+	return r.DetectLabels(input)
 }
 
-func (m *stubRekognitionClient) DetectModerationLabels(input *rekognition.DetectModerationLabelsInput) (*rekognition.DetectModerationLabelsOutput, error) {
-	imageClassification, err := m.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
+func (r *stubRekognitionClient) DetectModerationLabels(input *rekognition.DetectModerationLabelsInput) (*rekognition.DetectModerationLabelsOutput, error) {
+	imageClassification, err := r.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -51,12 +51,12 @@ func (m *stubRekognitionClient) DetectModerationLabels(input *rekognition.Detect
 	}, nil
 }
 
-func (m *stubRekognitionClient) DetectModerationLabelsWithContext(ctx aws.Context, input *rekognition.DetectModerationLabelsInput, opts ...request.Option) (*rekognition.DetectModerationLabelsOutput, error) {
-	return m.DetectModerationLabels(input)
+func (r *stubRekognitionClient) DetectModerationLabelsWithContext(ctx aws.Context, input *rekognition.DetectModerationLabelsInput, opts ...request.Option) (*rekognition.DetectModerationLabelsOutput, error) {
+	return r.DetectModerationLabels(input)
 }
 
-func (m *stubRekognitionClient) getImageClassification(bucket string, key string) (*ImageClassification, error) {
-	image, err := m.s3Svc.GetObject(&s3.GetObjectInput{
+func (r *stubRekognitionClient) getImageClassification(bucket string, key string) (*ImageClassification, error) {
+	image, err := r.s3Svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
