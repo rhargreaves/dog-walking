@@ -41,39 +41,51 @@ func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetecto
 
 func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) error {
 	breedDetectionResult, err := m.breedDetector.DetectBreed(dogId)
-	if err != nil {
+	if err == nil {
+		return m.approveDogPhoto(dogId, &breedDetectionResult.Breed, pendingPhotosBucket)
+	}
 
-		if err == breed_detector.ErrNoDogDetected || err == breed_detector.ErrNoSpecificBreedDetected {
-			err = m.updateDogRecordToRejected(dogId)
-			if err != nil {
-				fmt.Printf("Error updating dog record: %s\n", err)
-				return err
-			}
-			return nil
+	switch err {
+	case breed_detector.ErrNoDogDetected:
+		err = m.rejectDogPhoto(dogId)
+		if err != nil {
+			fmt.Printf("Error rejecting dog photo: %s\n", err)
+			return err
 		}
+		return nil
+	case breed_detector.ErrNoSpecificBreedDetected:
+		err = m.approveDogPhoto(dogId, nil, pendingPhotosBucket)
+		if err != nil {
+			fmt.Printf("Error approving dog photo: %s\n", err)
+			return err
+		}
+		return nil
+	default:
+		fmt.Printf("Error moderating photo: %s\n", err)
+		return err
+	}
+}
 
-		fmt.Printf("Error detecting breed: %s\n", err)
+func (m *moderator) approveDogPhoto(dogId string, breed *string, pendingPhotosBucket string) error {
+	photoHash, err := m.moveS3Object(pendingPhotosBucket, dogId, m.approvedPhotosBucket)
+	if err != nil {
+		fmt.Printf("Error moving object to approved bucket: %s\n", err)
 		return err
 	}
 
-	if breedDetectionResult.Breed != "" {
-		photoHash, err := m.moveS3Object(pendingPhotosBucket, dogId, m.approvedPhotosBucket)
-		if err != nil {
-			fmt.Printf("Error moving object to approved bucket: %s\n", err)
-			return err
-		}
-
-		err = m.updateDogRecord(dogId, photoHash, m.dogTableName, breedDetectionResult.Breed)
-		if err != nil {
-			fmt.Printf("Error updating dog record: %s\n", err)
-			return err
-		}
+	if breed != nil {
+		err = m.updateDogRecord(dogId, photoHash, *breed)
+	} else {
+		err = m.updateDogRecordWithoutBreed(dogId, photoHash)
 	}
-
+	if err != nil {
+		fmt.Printf("Error updating dog record: %s\n", err)
+		return err
+	}
 	return nil
 }
 
-func (m *moderator) updateDogRecordToRejected(dogId string) error {
+func (m *moderator) rejectDogPhoto(dogId string) error {
 	_, err := m.dynamodbClient.UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: aws.String(m.dogTableName),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -91,9 +103,9 @@ func (m *moderator) updateDogRecordToRejected(dogId string) error {
 	return err
 }
 
-func (m *moderator) updateDogRecord(dogId string, photoHash string, dogTableName string, breed string) error {
+func (m *moderator) updateDogRecord(dogId string, photoHash string, breed string) error {
 	_, err := m.dynamodbClient.UpdateItem(&dynamodb.UpdateItemInput{
-		TableName: aws.String(dogTableName),
+		TableName: aws.String(m.dogTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(dogId),
@@ -109,6 +121,27 @@ func (m *moderator) updateDogRecord(dogId string, photoHash string, dogTableName
 			},
 			":breed": {
 				S: aws.String(breed),
+			},
+		},
+	})
+	return err
+}
+
+func (m *moderator) updateDogRecordWithoutBreed(dogId string, photoHash string) error {
+	_, err := m.dynamodbClient.UpdateItem(&dynamodb.UpdateItemInput{
+		TableName: aws.String(m.dogTableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(dogId),
+			},
+		},
+		UpdateExpression: aws.String("SET photoStatus = :photoStatus, photoHash = :photoHash"),
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":photoStatus": {
+				S: aws.String(PhotoStatusApproved),
+			},
+			":photoHash": {
+				S: aws.String(photoHash),
 			},
 		},
 	})
