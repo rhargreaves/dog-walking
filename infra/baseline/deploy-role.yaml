@@ -60,6 +60,9 @@ Resources:
               - iam:ListInstanceProfilesForRole
               - iam:ListPolicyVersions
               - iam:PassRole
+              - iam:CreatePolicyVersion
+              - iam:DeletePolicyVersion
+              - iam:SetDefaultPolicyVersion
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/*-dog-walking-*
               - !Sub arn:aws:iam::${AWS::AccountId}:policy/*-dog-walking-*
