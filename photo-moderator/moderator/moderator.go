@@ -22,18 +22,18 @@ type moderator struct {
 	dogTableName         string
 	approvedPhotosBucket string
 	breedDetector        BreedDetector
-	dynamodbSvc          *dynamodb.DynamoDB
-	s3Svc                *s3.S3
+	dynamodbClient       DynamoDBClient
+	s3Client             S3Client
 }
 
 func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector BreedDetector,
-	dynamodbSvc *dynamodb.DynamoDB, s3Svc *s3.S3) Moderator {
+	dynamodbClient DynamoDBClient, s3Client S3Client) Moderator {
 	return &moderator{
 		dogTableName:         dogTableName,
 		approvedPhotosBucket: approvedPhotosBucket,
 		breedDetector:        breedDetector,
-		dynamodbSvc:          dynamodbSvc,
-		s3Svc:                s3Svc,
+		dynamodbClient:       dynamodbClient,
+		s3Client:             s3Client,
 	}
 }
 
@@ -72,7 +72,7 @@ func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) erro
 }
 
 func (m *moderator) updateDogRecordToRejected(dogId string) error {
-	_, err := m.dynamodbSvc.UpdateItem(&dynamodb.UpdateItemInput{
+	_, err := m.dynamodbClient.UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: aws.String(m.dogTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -90,7 +90,7 @@ func (m *moderator) updateDogRecordToRejected(dogId string) error {
 }
 
 func (m *moderator) updateDogRecord(dogId string, photoHash string, dogTableName string, breed string) error {
-	_, err := m.dynamodbSvc.UpdateItem(&dynamodb.UpdateItemInput{
+	_, err := m.dynamodbClient.UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: aws.String(dogTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -129,7 +129,7 @@ func (m *moderator) moveS3Object(sourceBucket string, sourceKey string, destinat
 }
 
 func (m *moderator) copyS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
-	res, err := m.s3Svc.CopyObject(&s3.CopyObjectInput{
+	res, err := m.s3Client.CopyObject(&s3.CopyObjectInput{
 		Bucket:     aws.String(destinationBucket),
 		CopySource: aws.String(fmt.Sprintf("%s/%s", sourceBucket, sourceKey)),
 		Key:        aws.String(sourceKey),
@@ -143,7 +143,7 @@ func (m *moderator) copyS3Object(sourceBucket string, sourceKey string, destinat
 }
 
 func (m *moderator) deleteS3Object(bucket string, key string) error {
-	_, err := m.s3Svc.DeleteObject(&s3.DeleteObjectInput{
+	_, err := m.s3Client.DeleteObject(&s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
