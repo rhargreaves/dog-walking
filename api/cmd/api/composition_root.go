@@ -7,10 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/rekognition"
-	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
 	"github.com/rhargreaves/dog-walking/api/internal/dogs"
-	"github.com/rhargreaves/dog-walking/api/internal/rekognition_stub"
 )
 
 func createHandlers(isLocal bool) (dogs.DogHandler, dogs.DogPhotoHandler) {
@@ -33,20 +30,9 @@ func createHandlers(isLocal bool) (dogs.DogHandler, dogs.DogPhotoHandler) {
 	dogPhotoUploader := dogs.NewDogPhotoUploader(dogs.S3PhotoUploaderConfig{
 		BucketName: dogImagesBucket,
 	}, s3session)
-	rekognitionClient := newRekognitionClient(isLocal, session, s3session)
-	breedDetector := dogs.NewBreedDetector(dogs.BreedDetectorConfig{
-		BucketName: dogImagesBucket,
-	}, rekognitionClient)
-	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoUploader, breedDetector)
+	dogPhotoHandler := dogs.NewDogPhotoHandler(dogRepository, dogPhotoUploader)
 
 	return dogHandler, dogPhotoHandler
-}
-
-func newRekognitionClient(isLocal bool, session *session.Session, s3session *session.Session) rekognitioniface.RekognitionAPI {
-	if isLocal {
-		return rekognition_stub.NewStubRekognitionClient(s3session)
-	}
-	return rekognition.New(session)
 }
 
 func createSession(isLocal bool, forS3 bool) (*session.Session, error) {

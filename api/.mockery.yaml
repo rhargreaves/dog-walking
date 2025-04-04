@@ -9,7 +9,5 @@ packages:
       mockname: "{{.InterfaceName }}"
       outpkg: "mocks"
     interfaces:
-      BreedDetector:
-        config:
       DogRepository:
         config:

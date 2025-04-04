@@ -51,7 +51,6 @@ compile-photo-moderator:
 	$(GO_CMD) "cd photo-moderator; \
 		rm -rf build; \
 		mkdir build; \
-		go mod download; \
 		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
 .PHONY: compile-photo-moderator
 
@@ -65,14 +64,24 @@ lint:
 	$(GO_CMD) "cd api && go fmt ./... && go mod tidy"
 .PHONY: lint
 
-test-unit: create-go-cache
+test-unit: test-unit-api test-unit-photo-moderator
+.PHONY: test-unit
+
+test-unit-api: create-go-cache
 	$(GO_CMD) "cd api; \
 		go mod download; \
 		go install github.com/vektra/mockery/v2@latest; \
 		mockery; \
 		go install gotest.tools/gotestsum@latest; \
 		gotestsum --format testname ./..."
-.PHONY: test-unit
+.PHONY: test-unit-api
+
+test-unit-photo-moderator: create-go-cache
+	$(GO_CMD) "cd photo-moderator; \
+		go mod download; \
+		go install gotest.tools/gotestsum@latest; \
+		gotestsum --format testname ./..."
+.PHONY: test-unit-photo-moderator
 
 test-local: build compile-local-auth
 	docker compose build

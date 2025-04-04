@@ -1,13 +1,9 @@
 package dogs
 
 import (
-	"bytes"
-	"fmt"
-	"net/http"
 	"os"
 	"testing"
 
-	"github.com/rhargreaves/dog-walking/test/e2e/common"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,20 +23,13 @@ const testToyImagePath = "../resources/toy.jpg"
 const testCatImagePath = "../resources/cat.jpg"
 const testHuskyImagePath = "../resources/husky.jpg"
 
-func uploadImageAndDetectBreed(t *testing.T, dogID string, imagePath string) *http.Response {
+func uploadImageAndGetDog(t *testing.T, dogID string, imagePath string) *DogResponse {
 	image, err := os.ReadFile(imagePath)
 	require.NoError(t, err)
 
-	req := common.ApiRequest(t, http.MethodPut, fmt.Sprintf("/dogs/%s/photo", dogID),
-		true, bytes.NewReader(image))
-	req.Header.Set("Content-Type", "image/jpeg")
-	resp := common.GetResponse(t, req)
-	defer resp.Body.Close()
-	common.RequireStatus(t, resp, http.StatusOK)
+	uploadImage(t, dogID, image)
 
-	return common.PostJson(t,
-		fmt.Sprintf("/dogs/%s/photo/detect-breed", dogID),
-		DetectBreedRequest{}, true)
+	return getDogWaitingForPhotoModeration(t, dogID)
 }
 
 func TestDetectBreed_SuccessfulCases(t *testing.T) {
@@ -60,21 +49,8 @@ func TestDetectBreed_SuccessfulCases(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.dogName, func(t *testing.T) {
 			dog := createDog(t, CreateOrUpdateDogRequest{Name: tc.dogName})
-			resp := uploadImageAndDetectBreed(t, dog.ID, tc.imagePath)
-			defer resp.Body.Close()
-			common.RequireStatus(t, resp, http.StatusOK)
+			fetchedDog := uploadImageAndGetDog(t, dog.ID, tc.imagePath)
 
-			var response DetectBreedResponse
-			common.DecodeJSON(t, resp, &response)
-			require.Equal(t, tc.expectedBreed, response.Breed)
-			require.Greater(t, response.Confidence, 55.0)
-
-			resp = common.Get(t, "/dogs/"+dog.ID, true)
-			defer resp.Body.Close()
-			common.RequireStatus(t, resp, http.StatusOK)
-
-			var fetchedDog DogResponse
-			common.DecodeJSON(t, resp, &fetchedDog)
 			require.Equal(t, tc.expectedBreed, fetchedDog.Breed)
 		})
 	}
@@ -95,13 +71,8 @@ func TestDetectBreed_ErrorCases(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.dogName, func(t *testing.T) {
 			dog := createDog(t, CreateOrUpdateDogRequest{Name: tc.dogName})
-			resp := uploadImageAndDetectBreed(t, dog.ID, tc.imagePath)
-			defer resp.Body.Close()
-			common.RequireStatus(t, resp, http.StatusBadRequest)
-
-			var response common.ApiErrorResponse
-			common.DecodeJSON(t, resp, &response)
-			require.Equal(t, "no dog detected", response.Error.Message)
+			fetchedDog := uploadImageAndGetDog(t, dog.ID, tc.imagePath)
+			require.Equal(t, "rejected", fetchedDog.PhotoStatus)
 		})
 	}
 }

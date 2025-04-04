@@ -284,54 +284,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/dogs/{id}/photo/detect-breed": {
-            "post": {
-                "description": "Analyzes a previously uploaded photo to detect the dog's breed",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "dogs",
-                    "photos"
-                ],
-                "summary": "Detect a dog's breed from its photo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Dog ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Returns id, breed, and confidence",
-                        "schema": {
-                            "$ref": "#/definitions/model.BreedDetectionResultResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "No dog detected or no specific breed detected",
-                        "schema": {
-                            "$ref": "#/definitions/common.APIError"
-                        }
-                    },
-                    "404": {
-                        "description": "Dog not found",
-                        "schema": {
-                            "$ref": "#/definitions/common.APIError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/common.APIError"
-                        }
-                    }
-                }
-            }
-        },
         "/ping": {
             "get": {
                 "description": "Returns OK if the API is running",
@@ -370,20 +322,6 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "$ref": "#/definitions/common.APIError"
-                }
-            }
-        },
-        "model.BreedDetectionResultResponse": {
-            "type": "object",
-            "properties": {
-                "breed": {
-                    "type": "string"
-                },
-                "confidence": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "string"
                 }
             }
         },

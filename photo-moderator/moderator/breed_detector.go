@@ -1,4 +1,4 @@
-package dogs
+package moderator
 
 import (
 	"errors"
@@ -8,8 +8,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
-	"github.com/rhargreaves/dog-walking/api/internal/dogs/domain"
+	"github.com/rhargreaves/dog-walking/photo-moderator/domain"
 )
+
+type BreedDetectionResult struct {
+	Breed      string
+	Confidence float64
+}
 
 var ErrNoDogDetected = errors.New("no dog detected")
 var ErrNoSpecificBreedDetected = errors.New("no specific breed detected")

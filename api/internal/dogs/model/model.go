@@ -52,12 +52,6 @@ type DogListResponse struct {
 	NextToken string        `json:"nextToken"`
 }
 
-type BreedDetectionResultResponse struct {
-	ID         string  `json:"id"`
-	Breed      string  `json:"breed"`
-	Confidence float64 `json:"confidence"`
-}
-
 func ToDogResponse(dog *domain.Dog, imagesCdnBaseUrl string) *DogResponse {
 	photoUrl := ""
 	if dog.PhotoHash != "" {
@@ -93,14 +87,6 @@ func ToDogListResponse(dogs *domain.DogList, imagesCdnBaseUrl string) *DogListRe
 	return &DogListResponse{
 		Dogs:      dogResponses,
 		NextToken: dogs.NextToken,
-	}
-}
-
-func ToBreedDetectionResultResponse(id string, breedResult *domain.BreedDetectionResult) *BreedDetectionResultResponse {
-	return &BreedDetectionResultResponse{
-		ID:         id,
-		Breed:      breedResult.Breed,
-		Confidence: breedResult.Confidence,
 	}
 }
 

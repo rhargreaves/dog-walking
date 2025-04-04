@@ -12,15 +12,6 @@ definitions:
       error:
         $ref: '#/definitions/common.APIError'
     type: object
-  model.BreedDetectionResultResponse:
-    properties:
-      breed:
-        type: string
-      confidence:
-        type: number
-      id:
-        type: string
-    type: object
   model.CreateOrUpdateDogRequest:
     properties:
       breed:
@@ -295,38 +286,6 @@ paths:
           schema:
             $ref: '#/definitions/common.APIError'
       summary: Upload a dog's photo
-      tags:
-      - dogs
-      - photos
-  /dogs/{id}/photo/detect-breed:
-    post:
-      description: Analyzes a previously uploaded photo to detect the dog's breed
-      parameters:
-      - description: Dog ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Returns id, breed, and confidence
-          schema:
-            $ref: '#/definitions/model.BreedDetectionResultResponse'
-        "400":
-          description: No dog detected or no specific breed detected
-          schema:
-            $ref: '#/definitions/common.APIError'
-        "404":
-          description: Dog not found
-          schema:
-            $ref: '#/definitions/common.APIError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/common.APIError'
-      summary: Detect a dog's breed from its photo
       tags:
       - dogs
       - photos

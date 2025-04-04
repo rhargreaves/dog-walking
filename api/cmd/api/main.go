@@ -42,7 +42,6 @@ func init() {
 	r.PUT("/dogs/:id", dogHandler.UpdateDog)
 	r.DELETE("/dogs/:id", dogHandler.DeleteDog)
 	r.PUT("/dogs/:id/photo", dogPhotoHandler.UploadDogPhoto)
-	r.POST("/dogs/:id/photo/detect-breed", dogPhotoHandler.DetectBreed)
 	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/api-docs", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/api-docs/index.html")

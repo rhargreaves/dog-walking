@@ -30,7 +30,7 @@ func TestUploadPhoto_ReturnsBadRequest_WhenFileIsNotAnImage(t *testing.T) {
 
 	dogRepository := new(mocks.DogRepository)
 	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
-	handler := NewDogPhotoHandler(dogRepository, nil, nil)
+	handler := NewDogPhotoHandler(dogRepository, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -43,48 +43,4 @@ func TestUploadPhoto_ReturnsBadRequest_WhenFileIsNotAnImage(t *testing.T) {
 	handler.UploadDogPhoto(c)
 
 	requireAPIError(t, c, http.StatusBadRequest, "invalid image content type")
-}
-
-func TestUploadPhoto_ReturnsBadRequest_WhenImageIsNotADog(t *testing.T) {
-	const dogId = "123"
-
-	dogRepository := new(mocks.DogRepository)
-	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
-	breedDetector := new(mocks.BreedDetector)
-	breedDetector.EXPECT().DetectBreed(dogId).Return(nil, ErrNoDogDetected)
-	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Params = []gin.Param{{Key: "id", Value: dogId}}
-
-	c.Request = httptest.NewRequest(http.MethodPost,
-		fmt.Sprintf("/dogs/%s/photo/detect-breed", dogId), strings.NewReader("dummy"))
-	c.Request.Header.Set("Content-Type", "application/json")
-
-	handler.DetectBreed(c)
-
-	requireAPIError(t, c, http.StatusBadRequest, "no dog detected")
-}
-
-func TestUploadPhoto_ReturnsBadRequest_WhenNoSpecificBreedOfDogIsDetected(t *testing.T) {
-	const dogId = "123"
-
-	dogRepository := new(mocks.DogRepository)
-	dogRepository.EXPECT().Get(dogId).Return(&domain.Dog{ID: dogId}, nil)
-	breedDetector := new(mocks.BreedDetector)
-	breedDetector.EXPECT().DetectBreed(dogId).Return(nil, ErrNoSpecificBreedDetected)
-	handler := NewDogPhotoHandler(dogRepository, nil, breedDetector)
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Params = []gin.Param{{Key: "id", Value: dogId}}
-
-	c.Request = httptest.NewRequest(http.MethodPost,
-		fmt.Sprintf("/dogs/%s/photo/detect-breed", dogId), strings.NewReader("dummy"))
-	c.Request.Header.Set("Content-Type", "application/json")
-
-	handler.DetectBreed(c)
-
-	requireAPIError(t, c, http.StatusBadRequest, "no specific breed detected")
 }
