@@ -44,7 +44,6 @@ func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetecto
 }
 
 func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) (string, error) {
-
 	contentScreenerResult, err := m.contentScreener.ScreenImage(dogId)
 	if err != nil {
 		fmt.Printf("Error screening image: %s\n", err)
