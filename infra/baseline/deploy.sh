@@ -2,7 +2,7 @@
 set -euo pipefail
 
 AWS_REGION="eu-west-1"
-AWS_PROFILE="${AWS_PROFILE:-default}"
+AWS_PROFILE="${AWS_PROFILE:-}"
 ROLE_NAME="$1"
 
 deploy_stack() {
