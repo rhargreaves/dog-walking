@@ -2,12 +2,11 @@
 [![Deploy UAT and Run Tests](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-uat.yaml/badge.svg)](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-uat.yaml)
 [![Deploy PROD & Test](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-prod.yaml/badge.svg)](https://github.com/rhargreaves/dog-walking/actions/workflows/deploy-prod.yaml)
 
-A service for helping dog owners find dog walkers
+A service for helping dog owners find dog walkers.
 
 ## Architecture
 
 <img src="docs/arch.png" alt="architecture diagram" />
-
 
 ## API & Photo Moderator S3 Trigger
 
@@ -60,6 +59,10 @@ Ensure you've set up an `.env` file! (see [.example.env](.example.env))
 ## API Documentation
 
 Docs and OpenAPI specs are provided online via Swagger (`/api-docs`)
+
+### Photo Moderation
+
+Uploaded photos are verified using *AWS Rekognition* for any inappropriate/unwanted content (for example nudity, guns/violence). If the image is deemed safe, then the image is checked for a dog. If a dog is found, the image is approved and made available via the CDN. The dog breed (if also detected) is updated on the dog's profile.
 
 ## CI/CD
 
