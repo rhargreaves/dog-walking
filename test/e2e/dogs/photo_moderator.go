@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createS3Event(t *testing.T, bucketName string, objectKey string) []byte {
+func s3Event(t *testing.T, bucketName string, objectKey string) []byte {
 	now := time.Now()
 	event := events.S3Event{
 		Records: []events.S3EventRecord{
@@ -49,8 +49,8 @@ func createS3Event(t *testing.T, bucketName string, objectKey string) []byte {
 	return eventJsonBytes
 }
 
-func invokePhotoModeratorFunction(t *testing.T, dogID string) {
-	event := createS3Event(t, os.Getenv("PENDING_DOG_IMAGES_BUCKET"), dogID)
+func invokePhotoModerator(t *testing.T, dogID string) {
+	event := s3Event(t, os.Getenv("PENDING_DOG_IMAGES_BUCKET"), dogID)
 	dockerCompose := exec.Command("docker", "compose",
 		"-f", "/proj/docker-compose.yml",
 		"exec", "sam", "sam", "local", "invoke",
