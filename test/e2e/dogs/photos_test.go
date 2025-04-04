@@ -3,6 +3,7 @@ package dogs
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -19,6 +20,17 @@ func uploadImage(t *testing.T, dogID string, image []byte) {
 	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
+}
+
+func downloadImage(t *testing.T, url string) []byte {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	require.NoError(t, err)
+	resp := common.GetResponse(t, req)
+	defer resp.Body.Close()
+	common.RequireStatus(t, resp, http.StatusOK)
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+	return body
 }
 
 func TestUploadImage_ReturnsNotFoundWhenDogDoesNotExist(t *testing.T) {
@@ -45,6 +57,26 @@ func TestUploadImage_AccessibleViaCDN(t *testing.T) {
 	resp := common.GetResponse(t, req)
 	defer resp.Body.Close()
 	common.RequireStatus(t, resp, http.StatusOK)
+}
+
+func TestUploadImage_ReplacesExistingPhoto(t *testing.T) {
+	dog := createDog(t, CreateOrUpdateDogRequest{Name: "Mr. Peanutbutter"})
+
+	image, err := os.ReadFile(testCartoonDogImagePath)
+	require.NoError(t, err)
+	uploadImage(t, dog.ID, image)
+	dog = getDogWaitingForPhotoModeration(t, dog.ID)
+
+	photo := downloadImage(t, dog.PhotoUrl)
+	require.Equal(t, image, photo)
+
+	image, err = os.ReadFile(testHuskyImagePath)
+	require.NoError(t, err)
+	uploadImage(t, dog.ID, image)
+	dog = getDogWaitingForPhotoModeration(t, dog.ID)
+
+	photo = downloadImage(t, dog.PhotoUrl)
+	require.Equal(t, image, photo)
 }
 
 func TestUploadImage_ImageStatusIsPendingInDogResponse(t *testing.T) {

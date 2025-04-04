@@ -106,7 +106,9 @@ resource "aws_cloudfront_distribution" "dog_images" {
     target_origin_id = aws_s3_bucket.dog_images.id
 
     forwarded_values {
-      query_string = false
+      query_string            = true
+      query_string_cache_keys = ["h"]
+
       cookies {
         forward = "none"
       }
