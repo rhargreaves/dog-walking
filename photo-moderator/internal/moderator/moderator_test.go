@@ -28,8 +28,8 @@ func TestModeratePhoto_ApprovesLabradorDog(t *testing.T) {
 
 	breedDetector := mockBreedDetectorReturningLabrador()
 	var dbPhotoStatus string
-	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(t, &dbPhotoStatus)
-	s3Client := mockS3ClientReturningHash(t, "123")
+	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(&dbPhotoStatus)
+	s3Client := mockS3ClientReturningHash("123")
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client, contentScreener)
 	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
@@ -65,7 +65,7 @@ func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
 		}
 		return &dynamodb.UpdateItemOutput{}, nil
 	}
-	s3Client := mockS3ClientReturningHash(t, hash)
+	s3Client := mockS3ClientReturningHash(hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client, contentScreener)
 	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
@@ -89,8 +89,8 @@ func TestModeratePhoto_RejectsPhotoWhenContentScreenerReturnsUnsafe(t *testing.T
 	}
 
 	var dbPhotoStatus string
-	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(t, &dbPhotoStatus)
-	s3Client := mockS3ClientReturningHash(t, "123")
+	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(&dbPhotoStatus)
+	s3Client := mockS3ClientReturningHash("123")
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, nil, dynamodbClient, s3Client, contentScreener)
 	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
@@ -107,7 +107,7 @@ func mockBreedDetectorReturningLabrador() *breed_detector_mocks.MockBreedDetecto
 	}
 }
 
-func mockDynamoDBClientUpdatingPhotoRecords(t *testing.T, photoStatus *string) *aws_mocks.MockDynamoDB {
+func mockDynamoDBClientUpdatingPhotoRecords(photoStatus *string) *aws_mocks.MockDynamoDB {
 	return &aws_mocks.MockDynamoDB{
 		UpdateItemFunc: func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
 			*photoStatus = *input.ExpressionAttributeValues[":photoStatus"].S
@@ -116,7 +116,7 @@ func mockDynamoDBClientUpdatingPhotoRecords(t *testing.T, photoStatus *string) *
 	}
 }
 
-func mockS3ClientReturningHash(t *testing.T, hash string) *aws_mocks.MockS3 {
+func mockS3ClientReturningHash(hash string) *aws_mocks.MockS3 {
 	return &aws_mocks.MockS3{
 		CopyObjectFunc: func(input *s3.CopyObjectInput) (*s3.CopyObjectOutput, error) {
 			result := &s3.CopyObjectResult{ETag: aws.String(hash)}
