@@ -6,8 +6,9 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/s3"
-	aws_clients "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	breed_detector "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/content_screener"
 )
@@ -25,13 +26,13 @@ type moderator struct {
 	dogTableName         string
 	approvedPhotosBucket string
 	breedDetector        breed_detector.BreedDetector
-	dynamodbClient       aws_clients.DynamoDBClient
-	s3Client             aws_clients.S3Client
+	dynamodbClient       dynamodbiface.DynamoDBAPI
+	s3Client             s3iface.S3API
 	contentScreener      content_screener.ContentScreener
 }
 
 func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector breed_detector.BreedDetector,
-	dynamodbClient aws_clients.DynamoDBClient, s3Client aws_clients.S3Client,
+	dynamodbClient dynamodbiface.DynamoDBAPI, s3Client s3iface.S3API,
 	contentScreener content_screener.ContentScreener) Moderator {
 	return &moderator{
 		dogTableName:         dogTableName,

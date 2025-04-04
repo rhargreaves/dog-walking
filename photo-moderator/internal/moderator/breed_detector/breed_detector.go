@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/aws/aws-sdk-go/service/rekognition/rekognitioniface"
-	"github.com/rhargreaves/dog-walking/photo-moderator/internal/domain"
 )
 
 type BreedDetectionResult struct {
@@ -20,7 +19,7 @@ var ErrNoDogDetected = errors.New("no dog detected")
 var ErrNoSpecificBreedDetected = errors.New("no specific breed detected")
 
 type BreedDetector interface {
-	DetectBreed(id string) (*domain.BreedDetectionResult, error)
+	DetectBreed(id string) (*BreedDetectionResult, error)
 }
 
 type BreedDetectorConfig struct {
@@ -39,7 +38,7 @@ func NewBreedDetector(breedDetectorConfig BreedDetectorConfig, rekClient rekogni
 	}
 }
 
-func (d *breedDetector) DetectBreed(id string) (*domain.BreedDetectionResult, error) {
+func (d *breedDetector) DetectBreed(id string) (*BreedDetectionResult, error) {
 	input := &rekognition.DetectLabelsInput{
 		Image: &rekognition.Image{
 			S3Object: &rekognition.S3Object{
@@ -103,7 +102,7 @@ func (d *breedDetector) DetectBreed(id string) (*domain.BreedDetectionResult, er
 	})
 
 	// Return the highest confidence breed
-	return &domain.BreedDetectionResult{
+	return &BreedDetectionResult{
 		Breed:      *breedLabels[0].Name,
 		Confidence: *breedLabels[0].Confidence,
 	}, nil

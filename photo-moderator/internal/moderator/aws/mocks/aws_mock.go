@@ -2,12 +2,13 @@ package mocks
 
 import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 )
 
 type MockDynamoDB struct {
-	aws.DynamoDBClient
+	dynamodbiface.DynamoDBAPI
 	UpdateItemFunc func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error)
 }
 
@@ -16,7 +17,7 @@ func (t *MockDynamoDB) UpdateItem(input *dynamodb.UpdateItemInput) (*dynamodb.Up
 }
 
 type MockS3 struct {
-	aws.S3Client
+	s3iface.S3API
 	PutObjectFunc    func(input *s3.PutObjectInput) (*s3.PutObjectOutput, error)
 	DeleteObjectFunc func(input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error)
 	CopyObjectFunc   func(input *s3.CopyObjectInput) (*s3.CopyObjectOutput, error)

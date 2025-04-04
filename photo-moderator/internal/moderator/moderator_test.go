@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/rhargreaves/dog-walking/photo-moderator/internal/domain"
 	aws_mocks "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws/mocks"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
 	breed_detector_mocks "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector/mocks"
@@ -84,15 +83,15 @@ func mockContentScreenerReturningSafe() *content_screener_mocks.MockContentScree
 
 func mockBreedDetectorReturningLabrador() *breed_detector_mocks.MockBreedDetector {
 	return &breed_detector_mocks.MockBreedDetector{
-		DetectBreedFunc: func(id string) (*domain.BreedDetectionResult, error) {
-			return &domain.BreedDetectionResult{Breed: "Labrador", Confidence: 0.95}, nil
+		DetectBreedFunc: func(id string) (*breed_detector.BreedDetectionResult, error) {
+			return &breed_detector.BreedDetectionResult{Breed: "Labrador", Confidence: 0.95}, nil
 		},
 	}
 }
 
 func mockBreedDetectorReturningNoSpecificBreed() *breed_detector_mocks.MockBreedDetector {
 	return &breed_detector_mocks.MockBreedDetector{
-		DetectBreedFunc: func(id string) (*domain.BreedDetectionResult, error) {
+		DetectBreedFunc: func(id string) (*breed_detector.BreedDetectionResult, error) {
 			return nil, breed_detector.ErrNoSpecificBreedDetected
 		},
 	}
