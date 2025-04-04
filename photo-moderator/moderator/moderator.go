@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
+	aws_clients "github.com/rhargreaves/dog-walking/photo-moderator/moderator/aws"
+	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/breed_detector"
 )
 
 const (
@@ -21,13 +23,13 @@ type Moderator interface {
 type moderator struct {
 	dogTableName         string
 	approvedPhotosBucket string
-	breedDetector        BreedDetector
-	dynamodbClient       DynamoDBClient
-	s3Client             S3Client
+	breedDetector        breed_detector.BreedDetector
+	dynamodbClient       aws_clients.DynamoDBClient
+	s3Client             aws_clients.S3Client
 }
 
-func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector BreedDetector,
-	dynamodbClient DynamoDBClient, s3Client S3Client) Moderator {
+func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector breed_detector.BreedDetector,
+	dynamodbClient aws_clients.DynamoDBClient, s3Client aws_clients.S3Client) Moderator {
 	return &moderator{
 		dogTableName:         dogTableName,
 		approvedPhotosBucket: approvedPhotosBucket,
@@ -41,7 +43,7 @@ func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) erro
 	breedDetectionResult, err := m.breedDetector.DetectBreed(dogId)
 	if err != nil {
 
-		if err == ErrNoDogDetected || err == ErrNoSpecificBreedDetected {
+		if err == breed_detector.ErrNoDogDetected || err == breed_detector.ErrNoSpecificBreedDetected {
 			err = m.updateDogRecordToRejected(dogId)
 			if err != nil {
 				fmt.Printf("Error updating dog record: %s\n", err)

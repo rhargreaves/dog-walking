@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/rhargreaves/dog-walking/photo-moderator/common"
 	"github.com/rhargreaves/dog-walking/photo-moderator/moderator"
+	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/breed_detector"
 	"github.com/rhargreaves/dog-walking/photo-moderator/moderator/rekognition_stub"
 )
 
@@ -29,7 +30,7 @@ func createModerator(sourceBucket string) moderator.Moderator {
 	s3Svc := s3.New(s3session)
 	rekClient := rekognitionClient(common.IsLocal(), s3Svc, s3session)
 
-	breedDetector := moderator.NewBreedDetector(moderator.BreedDetectorConfig{
+	breedDetector := breed_detector.NewBreedDetector(breed_detector.BreedDetectorConfig{
 		BucketName: sourceBucket,
 	}, rekClient)
 

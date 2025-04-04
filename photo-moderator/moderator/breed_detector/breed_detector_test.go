@@ -1,4 +1,4 @@
-package moderator
+package breed_detector
 
 import (
 	"testing"
