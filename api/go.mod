@@ -9,6 +9,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
+	github.com/rhargreaves/dog-walking/shared v0.0.0
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
@@ -54,3 +55,5 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/rhargreaves/dog-walking/shared => ../shared

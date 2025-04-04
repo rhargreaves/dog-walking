@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/rekognition"
@@ -12,6 +10,7 @@ import (
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/rekognition_stub"
+	"github.com/rhargreaves/dog-walking/shared/env"
 )
 
 func rekognitionClient(isLocal bool, s3Svc *s3.S3, session *session.Session) rekognitioniface.RekognitionAPI {
@@ -22,8 +21,8 @@ func rekognitionClient(isLocal bool, s3Svc *s3.S3, session *session.Session) rek
 }
 
 func createModerator(sourceBucket string) moderator.Moderator {
-	approvedDogPhotosBucket := os.Getenv("DOG_IMAGES_BUCKET")
-	dogTableName := os.Getenv("DOGS_TABLE_NAME")
+	approvedDogPhotosBucket := env.MustGetenv("DOG_IMAGES_BUCKET")
+	dogTableName := env.MustGetenv("DOGS_TABLE_NAME")
 
 	s3session := session.Must(common.CreateS3Session())
 	dbSvc := dynamodb.New(session.Must(common.CreateSession()))
