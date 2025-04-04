@@ -18,36 +18,16 @@ func TestModeratePhoto_ApprovesLabradorDog(t *testing.T) {
 	approvedPhotosBucket := "approved-photos-bucket"
 	pendingPhotosBucket := "pending-photos-bucket"
 	dogId := "1"
-	hash := "123"
 
-	breedDetector := &breed_detector_mocks.MockBreedDetector{}
-	breedDetector.DetectBreedFunc = func(id string) (*domain.BreedDetectionResult, error) {
-		return &domain.BreedDetectionResult{Breed: "Labrador", Confidence: 0.95}, nil
-	}
-
-	var photoStatus string
-	dynamodbClient := &aws_mocks.MockDynamoDB{}
-	dynamodbClient.UpdateItemFunc = func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
-		photoStatus = *input.ExpressionAttributeValues[":photoStatus"].S
-		return &dynamodb.UpdateItemOutput{}, nil
-	}
-
-	s3Client := &aws_mocks.MockS3{}
-	s3Client.PutObjectFunc = func(input *s3.PutObjectInput) (*s3.PutObjectOutput, error) {
-		return &s3.PutObjectOutput{}, nil
-	}
-	s3Client.CopyObjectFunc = func(input *s3.CopyObjectInput) (*s3.CopyObjectOutput, error) {
-		result := &s3.CopyObjectResult{ETag: aws.String(hash)}
-		return &s3.CopyObjectOutput{CopyObjectResult: result}, nil
-	}
-	s3Client.DeleteObjectFunc = func(input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error) {
-		return &s3.DeleteObjectOutput{}, nil
-	}
+	breedDetector := mockBreedDetectorReturningLabrador()
+	var newPhotoStatus string
+	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(t, &newPhotoStatus)
+	s3Client := mockS3ClientReturningHash(t, "123")
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client)
 	err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
 	require.NoError(t, err)
-	require.Equal(t, "approved", photoStatus)
+	require.Equal(t, "approved", newPhotoStatus)
 }
 
 func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
@@ -72,22 +52,43 @@ func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
 		}
 		return &dynamodb.UpdateItemOutput{}, nil
 	}
-
-	s3Client := &aws_mocks.MockS3{}
-	s3Client.PutObjectFunc = func(input *s3.PutObjectInput) (*s3.PutObjectOutput, error) {
-		return &s3.PutObjectOutput{}, nil
-	}
-	s3Client.CopyObjectFunc = func(input *s3.CopyObjectInput) (*s3.CopyObjectOutput, error) {
-		result := &s3.CopyObjectResult{ETag: aws.String(hash)}
-		return &s3.CopyObjectOutput{CopyObjectResult: result}, nil
-	}
-	s3Client.DeleteObjectFunc = func(input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error) {
-		return &s3.DeleteObjectOutput{}, nil
-	}
+	s3Client := mockS3ClientReturningHash(t, hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client)
 	err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
 	require.NoError(t, err)
 	require.Equal(t, "approved", photoStatus)
 	require.Equal(t, breed, "existing-value")
+}
+
+func mockBreedDetectorReturningLabrador() *breed_detector_mocks.MockBreedDetector {
+	return &breed_detector_mocks.MockBreedDetector{
+		DetectBreedFunc: func(id string) (*domain.BreedDetectionResult, error) {
+			return &domain.BreedDetectionResult{Breed: "Labrador", Confidence: 0.95}, nil
+		},
+	}
+}
+
+func mockDynamoDBClientUpdatingPhotoRecords(t *testing.T, photoStatus *string) *aws_mocks.MockDynamoDB {
+	return &aws_mocks.MockDynamoDB{
+		UpdateItemFunc: func(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
+			*photoStatus = *input.ExpressionAttributeValues[":photoStatus"].S
+			return &dynamodb.UpdateItemOutput{}, nil
+		},
+	}
+}
+
+func mockS3ClientReturningHash(t *testing.T, hash string) *aws_mocks.MockS3 {
+	return &aws_mocks.MockS3{
+		CopyObjectFunc: func(input *s3.CopyObjectInput) (*s3.CopyObjectOutput, error) {
+			result := &s3.CopyObjectResult{ETag: aws.String(hash)}
+			return &s3.CopyObjectOutput{CopyObjectResult: result}, nil
+		},
+		DeleteObjectFunc: func(input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error) {
+			return &s3.DeleteObjectOutput{}, nil
+		},
+		PutObjectFunc: func(input *s3.PutObjectInput) (*s3.PutObjectOutput, error) {
+			return &s3.PutObjectOutput{}, nil
+		},
+	}
 }
