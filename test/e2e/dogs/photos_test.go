@@ -109,9 +109,24 @@ func TestUploadImage_ImageUrlInDogResponse(t *testing.T) {
 
 func waitForPhotoToBeApproved(t *testing.T, dogID string) {
 	if common.IsLocal() {
-		// locally we have to manually invoke the trigger function
-		invokePhotoModeratorFunction(t, dogID)
+		invokePhotoModerator(t, dogID)
 	} else {
-		time.Sleep(5 * time.Second)
+		pollForPhotoToBeApproved(t, dogID)
+	}
+}
+
+func pollForPhotoToBeApproved(t *testing.T, dogID string) {
+	for range 5 {
+		resp := common.Get(t, fmt.Sprintf("/dogs/%s", dogID), true)
+		defer resp.Body.Close()
+		common.RequireStatus(t, resp, http.StatusOK)
+
+		var fetchedDog DogResponse
+		common.DecodeJSON(t, resp, &fetchedDog)
+		if fetchedDog.PhotoStatus == "approved" {
+			break
+		}
+
+		time.Sleep(1 * time.Second)
 	}
 }
