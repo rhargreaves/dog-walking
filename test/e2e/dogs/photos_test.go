@@ -118,3 +118,16 @@ func TestUploadImage_ImageUrlInDogResponse(t *testing.T) {
 		fetchedDog.PhotoUrl, "Expected photo URL to be returned")
 	assert.Equal(t, expectedHash, fetchedDog.PhotoHash, "Expected photo hash to be returned")
 }
+
+func TestUploadImage_ImageWithDogWithGunIsRejected(t *testing.T) {
+	dog := createDog(t, CreateOrUpdateDogRequest{Name: "Bullet"})
+
+	image, err := os.ReadFile(testDogWithGunImagePath)
+	require.NoError(t, err)
+	uploadImage(t, dog.ID, image)
+
+	dog = getDogWaitingForPhotoModeration(t, dog.ID)
+	assert.Equal(t, "rejected", dog.PhotoStatus, "Expected photo status to be rejected")
+	assert.Empty(t, dog.PhotoUrl, "Expected photo URL to be empty")
+	assert.Empty(t, dog.PhotoHash, "Expected photo hash to be empty")
+}

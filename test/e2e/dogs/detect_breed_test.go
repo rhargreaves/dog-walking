@@ -22,6 +22,7 @@ const testCartoonDogImagePath = "../resources/mr_peanutbutter.jpg"
 const testToyImagePath = "../resources/toy.jpg"
 const testCatImagePath = "../resources/cat.jpg"
 const testHuskyImagePath = "../resources/husky.jpg"
+const testDogWithGunImagePath = "../resources/dog_with_gun.jpg"
 
 func uploadImageAndGetDog(t *testing.T, dogID string, imagePath string) *DogResponse {
 	image, err := os.ReadFile(imagePath)

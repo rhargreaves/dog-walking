@@ -22,22 +22,29 @@ func NewStubRekognitionClient(s3Svc *s3.S3) rekognitioniface.RekognitionAPI {
 	return &stubRekognitionClient{s3Svc: s3Svc}
 }
 
-func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
+func (m *stubRekognitionClient) getImageHash(bucket string, key string) (string, error) {
 	image, err := m.s3Svc.GetObject(&s3.GetObjectInput{
-		Bucket: input.Image.S3Object.Bucket,
-		Key:    input.Image.S3Object.Name,
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
 	imageBytes, err := io.ReadAll(image.Body)
+	if err != nil {
+		return "", err
+	}
+	hash := md5.Sum(imageBytes)
+	hashString := hex.EncodeToString(hash[:])
+	return hashString, nil
+}
+
+func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
+	hashString, err := m.getImageHash(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	hash := md5.Sum(imageBytes)
-	hashString := hex.EncodeToString(hash[:])
 	labels, ok := ImageHashes[hashString]
 	if !ok {
 		return nil, errors.New("Stub Rekognition client: image hash (" + hashString + ") not found")
@@ -51,4 +58,26 @@ func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInpu
 
 func (m *stubRekognitionClient) DetectLabelsWithContext(ctx aws.Context, input *rekognition.DetectLabelsInput, opts ...request.Option) (*rekognition.DetectLabelsOutput, error) {
 	return m.DetectLabels(input)
+}
+
+func (m *stubRekognitionClient) DetectModerationLabels(input *rekognition.DetectModerationLabelsInput) (*rekognition.DetectModerationLabelsOutput, error) {
+	hashString, err := m.getImageHash(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	moderationLabels, ok := ImageHashToModerationLabels[hashString]
+	if !ok {
+		return nil, errors.New("Stub Rekognition client: moderation labels hash (" + hashString + ") not found")
+	}
+
+	return &rekognition.DetectModerationLabelsOutput{
+		ModerationLabels:       *moderationLabels,
+		ModerationModelVersion: aws.String("7.0"),
+		ContentTypes:           []*rekognition.ContentType{},
+	}, nil
+}
+
+func (m *stubRekognitionClient) DetectModerationLabelsWithContext(ctx aws.Context, input *rekognition.DetectModerationLabelsInput, opts ...request.Option) (*rekognition.DetectModerationLabelsOutput, error) {
+	return m.DetectModerationLabels(input)
 }

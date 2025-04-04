@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	aws_clients "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/aws"
 	breed_detector "github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/content_screener"
 )
 
 const (
@@ -26,20 +27,39 @@ type moderator struct {
 	breedDetector        breed_detector.BreedDetector
 	dynamodbClient       aws_clients.DynamoDBClient
 	s3Client             aws_clients.S3Client
+	contentScreener      content_screener.ContentScreener
 }
 
 func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector breed_detector.BreedDetector,
-	dynamodbClient aws_clients.DynamoDBClient, s3Client aws_clients.S3Client) Moderator {
+	dynamodbClient aws_clients.DynamoDBClient, s3Client aws_clients.S3Client,
+	contentScreener content_screener.ContentScreener) Moderator {
 	return &moderator{
 		dogTableName:         dogTableName,
 		approvedPhotosBucket: approvedPhotosBucket,
 		breedDetector:        breedDetector,
 		dynamodbClient:       dynamodbClient,
 		s3Client:             s3Client,
+		contentScreener:      contentScreener,
 	}
 }
 
 func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) (string, error) {
+
+	contentScreenerResult, err := m.contentScreener.ScreenImage(dogId)
+	if err != nil {
+		fmt.Printf("Error screening image: %s\n", err)
+		return "", err
+	}
+	if !contentScreenerResult.IsSafe {
+		err = m.rejectDogPhoto(dogId)
+		if err != nil {
+			fmt.Printf("Error rejecting dog photo: %s\n", err)
+			return "", err
+		}
+		fmt.Printf("Dog photo rejected: %s\n", contentScreenerResult.Reason)
+		return PhotoStatusRejected, nil
+	}
+
 	breedDetectionResult, err := m.breedDetector.DetectBreed(dogId)
 	if err == nil {
 		return PhotoStatusApproved, m.approveDogPhoto(dogId, &breedDetectionResult.Breed, pendingPhotosBucket)

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/breed_detector"
+	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/content_screener"
 	"github.com/rhargreaves/dog-walking/photo-moderator/internal/moderator/rekognition_stub"
 	"github.com/rhargreaves/dog-walking/shared/aws_session"
 	"github.com/rhargreaves/dog-walking/shared/env"
@@ -33,5 +34,9 @@ func createModerator(sourceBucket string) moderator.Moderator {
 		BucketName: sourceBucket,
 	}, rekClient)
 
-	return moderator.NewModerator(dogTableName, approvedDogPhotosBucket, breedDetector, dbSvc, s3Svc)
+	contentScreener := content_screener.NewContentScreener(content_screener.ContentScreenerConfig{
+		BucketName: sourceBucket,
+	}, rekClient)
+
+	return moderator.NewModerator(dogTableName, approvedDogPhotosBucket, breedDetector, dbSvc, s3Svc, contentScreener)
 }
