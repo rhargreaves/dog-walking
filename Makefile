@@ -34,7 +34,7 @@ compile-api: create-go-cache lint swagger-docs test-unit
 	$(GO_CMD) "cd api; \
 		rm -rf build; \
 		mkdir build; \
-		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/api"
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/lambda"
 .PHONY: compile-api
 
 compile-local-auth:
@@ -51,13 +51,13 @@ compile-photo-moderator:
 	$(GO_CMD) "cd photo-moderator; \
 		rm -rf build; \
 		mkdir build; \
-		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ."
+		GOOS=linux GOARCH=arm64 go build -o build/bootstrap ./cmd/lambda"
 .PHONY: compile-photo-moderator
 
 swagger-docs:
 	$(GO_CMD) "cd api; \
 		go install github.com/swaggo/swag/cmd/swag@latest; \
-		swag init -g cmd/api/main.go --output docs"
+		swag init -g cmd/lambda/main.go --output docs"
 .PHONY: swagger-docs
 
 lint:

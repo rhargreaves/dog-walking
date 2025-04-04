@@ -15,8 +15,7 @@ const (
 )
 
 type Moderator interface {
-	ModeratePhoto(pendingPhotosBucket string, dogId string, approvedPhotosBucket string,
-		dogTableName string) error
+	ModeratePhoto(pendingPhotosBucket string, dogId string) error
 }
 
 type moderator struct {
@@ -28,7 +27,7 @@ type moderator struct {
 }
 
 func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetector BreedDetector,
-	dynamodbSvc *dynamodb.DynamoDB, s3Svc *s3.S3) *moderator {
+	dynamodbSvc *dynamodb.DynamoDB, s3Svc *s3.S3) Moderator {
 	return &moderator{
 		dogTableName:         dogTableName,
 		approvedPhotosBucket: approvedPhotosBucket,
