@@ -29,7 +29,7 @@ func (m *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInpu
 	}
 
 	return &rekognition.DetectLabelsOutput{
-		Labels:            *imageClassification.Labels,
+		Labels:            imageClassification.Labels,
 		LabelModelVersion: aws.String("3.0"),
 	}, nil
 }
@@ -45,7 +45,7 @@ func (m *stubRekognitionClient) DetectModerationLabels(input *rekognition.Detect
 	}
 
 	return &rekognition.DetectModerationLabelsOutput{
-		ModerationLabels:       *imageClassification.ModerationLabels,
+		ModerationLabels:       imageClassification.ModerationLabels,
 		ModerationModelVersion: aws.String("7.0"),
 		ContentTypes:           []*rekognition.ContentType{},
 	}, nil

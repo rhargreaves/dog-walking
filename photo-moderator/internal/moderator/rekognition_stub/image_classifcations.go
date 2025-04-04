@@ -6,30 +6,30 @@ import (
 )
 
 type ImageClassification struct {
-	Labels           *[]*rekognition.Label
-	ModerationLabels *[]*rekognition.ModerationLabel
+	Labels           []*rekognition.Label
+	ModerationLabels []*rekognition.ModerationLabel
 }
 
 var ImageClassifications = map[string]*ImageClassification{
 	"443d6817146340599232418cfe7ef31b": {
-		Labels:           &mrPeanutbutterLabels,
-		ModerationLabels: &noModerationLabels,
+		Labels:           mrPeanutbutterLabels,
+		ModerationLabels: noModerationLabels,
 	},
 	"444514da01e4cd14434f4ede60d7998c": {
-		Labels:           &huskyLabels,
-		ModerationLabels: &noModerationLabels,
+		Labels:           huskyLabels,
+		ModerationLabels: noModerationLabels,
 	},
 	"f1334bbc42d8894d475ccdcb154c8829": {
-		Labels:           &notAnAnimalLabels,
-		ModerationLabels: &noModerationLabels,
+		Labels:           notAnAnimalLabels,
+		ModerationLabels: noModerationLabels,
 	},
 	"1a4d14f8b9b8233cadf7d24034a716fd": {
-		Labels:           &catLabels,
-		ModerationLabels: &noModerationLabels,
+		Labels:           catLabels,
+		ModerationLabels: noModerationLabels,
 	},
 	"b1d862b24c5fe5ee2a06a650667a81a9": {
-		Labels:           &dogWithGunLabels,
-		ModerationLabels: &dogWithGunModerationLabels,
+		Labels:           dogWithGunLabels,
+		ModerationLabels: dogWithGunModerationLabels,
 	},
 }
 
