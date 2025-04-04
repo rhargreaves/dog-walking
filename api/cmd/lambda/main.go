@@ -9,7 +9,6 @@ package main
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,6 +17,7 @@ import (
 	_ "github.com/rhargreaves/dog-walking/api/docs"
 	"github.com/rhargreaves/dog-walking/api/internal/common"
 	"github.com/rhargreaves/dog-walking/api/internal/health"
+	"github.com/rhargreaves/dog-walking/shared/aws_session"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -25,10 +25,9 @@ import (
 var ginLambda *ginadapter.GinLambdaV2
 
 func init() {
-	isLocal := os.Getenv("USE_LOCALSTACK") == "true"
-	dogHandler, dogPhotoHandler := createHandlers(isLocal)
+	dogHandler, dogPhotoHandler := createHandlers()
 
-	if !isLocal {
+	if !aws_session.IsLocal() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
