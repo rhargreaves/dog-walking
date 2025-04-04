@@ -27,7 +27,8 @@ resource "aws_iam_policy" "rekognition_access" {
     Statement = [
       {
         Action = [
-          "rekognition:DetectLabels"
+          "rekognition:DetectLabels",
+          "rekognition:DetectModerationLabels"
         ]
         Effect   = "Allow"
         Resource = "*"
