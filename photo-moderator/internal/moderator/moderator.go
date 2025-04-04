@@ -17,7 +17,7 @@ const (
 )
 
 type Moderator interface {
-	ModeratePhoto(pendingPhotosBucket string, dogId string) error
+	ModeratePhoto(pendingPhotosBucket string, dogId string) (string, error)
 }
 
 type moderator struct {
@@ -39,10 +39,10 @@ func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetecto
 	}
 }
 
-func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) error {
+func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) (string, error) {
 	breedDetectionResult, err := m.breedDetector.DetectBreed(dogId)
 	if err == nil {
-		return m.approveDogPhoto(dogId, &breedDetectionResult.Breed, pendingPhotosBucket)
+		return PhotoStatusApproved, m.approveDogPhoto(dogId, &breedDetectionResult.Breed, pendingPhotosBucket)
 	}
 
 	switch err {
@@ -50,19 +50,19 @@ func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) erro
 		err = m.rejectDogPhoto(dogId)
 		if err != nil {
 			fmt.Printf("Error rejecting dog photo: %s\n", err)
-			return err
+			return "", err
 		}
-		return nil
+		return PhotoStatusRejected, nil
 	case breed_detector.ErrNoSpecificBreedDetected:
 		err = m.approveDogPhoto(dogId, nil, pendingPhotosBucket)
 		if err != nil {
 			fmt.Printf("Error approving dog photo: %s\n", err)
-			return err
+			return "", err
 		}
-		return nil
+		return PhotoStatusApproved, nil
 	default:
 		fmt.Printf("Error moderating photo: %s\n", err)
-		return err
+		return "", err
 	}
 }
 

@@ -20,14 +20,15 @@ func TestModeratePhoto_ApprovesLabradorDog(t *testing.T) {
 	dogId := "1"
 
 	breedDetector := mockBreedDetectorReturningLabrador()
-	var newPhotoStatus string
-	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(t, &newPhotoStatus)
+	var dbPhotoStatus string
+	dynamodbClient := mockDynamoDBClientUpdatingPhotoRecords(t, &dbPhotoStatus)
 	s3Client := mockS3ClientReturningHash(t, "123")
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client)
-	err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
+	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
 	require.NoError(t, err)
-	require.Equal(t, "approved", newPhotoStatus)
+	require.Equal(t, PhotoStatusApproved, photoStatus)
+	require.Equal(t, photoStatus, dbPhotoStatus)
 }
 
 func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
@@ -55,9 +56,9 @@ func TestModeratePhoto_ApprovesDogWhenBreedIsNonSpecific(t *testing.T) {
 	s3Client := mockS3ClientReturningHash(t, hash)
 
 	moderator := NewModerator(dogTableName, approvedPhotosBucket, breedDetector, dynamodbClient, s3Client)
-	err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
+	photoStatus, err := moderator.ModeratePhoto(pendingPhotosBucket, dogId)
 	require.NoError(t, err)
-	require.Equal(t, "approved", photoStatus)
+	require.Equal(t, PhotoStatusApproved, photoStatus)
 	require.Equal(t, breed, "existing-value")
 }
 
