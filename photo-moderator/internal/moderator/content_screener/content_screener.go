@@ -1,7 +1,7 @@
 package content_screener
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
@@ -45,8 +45,7 @@ func (c *contentScreener) ScreenImage(id string) (*ContentScreenerResult, error)
 		},
 	})
 	if err != nil {
-		log.Printf("error detecting moderation labels: %s\n", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to screen image for inappropriate content: %w", err)
 	}
 
 	if len(resp.ModerationLabels) == 0 {

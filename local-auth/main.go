@@ -47,7 +47,7 @@ func authorise(authorisationToken string, jwtSecret string) (AuthorisedClaims, e
 		return []byte(jwtSecret), nil
 	})
 	if err != nil {
-		return AuthorisedClaims{}, err
+		return AuthorisedClaims{}, fmt.Errorf("failed to parse JWT token: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -77,7 +77,6 @@ func authorise(authorisationToken string, jwtSecret string) (AuthorisedClaims, e
 		Email:  email,
 		Groups: convertToStringSlice(groups),
 	}, nil
-
 }
 
 func convertToStringSlice(slice []any) []string {

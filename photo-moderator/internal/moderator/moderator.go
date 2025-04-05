@@ -47,16 +47,13 @@ func NewModerator(dogTableName string, approvedPhotosBucket string, breedDetecto
 func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) (string, error) {
 	contentScreenerResult, err := m.contentScreener.ScreenImage(dogId)
 	if err != nil {
-		fmt.Printf("Error screening image: %s\n", err)
-		return "", err
+		return "", fmt.Errorf("failed to screen image for inappropriate content: %w", err)
 	}
 	if !contentScreenerResult.IsSafe {
 		err = m.rejectDogPhoto(dogId)
 		if err != nil {
-			fmt.Printf("Error rejecting dog photo: %s\n", err)
-			return "", err
+			return "", fmt.Errorf("failed to reject dog photo after content screening: %w", err)
 		}
-		fmt.Printf("Dog photo rejected: %s\n", contentScreenerResult.Reason)
 		return PhotoStatusRejected, nil
 	}
 
@@ -69,28 +66,24 @@ func (m *moderator) ModeratePhoto(pendingPhotosBucket string, dogId string) (str
 	case breed_detector.ErrNoDogDetected:
 		err = m.rejectDogPhoto(dogId)
 		if err != nil {
-			fmt.Printf("Error rejecting dog photo: %s\n", err)
-			return "", err
+			return "", fmt.Errorf("failed to reject dog photo after no dog detected: %w", err)
 		}
 		return PhotoStatusRejected, nil
 	case breed_detector.ErrNoSpecificBreedDetected:
 		err = m.approveDogPhoto(dogId, nil, pendingPhotosBucket)
 		if err != nil {
-			fmt.Printf("Error approving dog photo: %s\n", err)
-			return "", err
+			return "", fmt.Errorf("failed to approve dog photo with no specific breed: %w", err)
 		}
 		return PhotoStatusApproved, nil
 	default:
-		fmt.Printf("Error moderating photo: %s\n", err)
-		return "", err
+		return "", fmt.Errorf("failed to moderate photo: %w", err)
 	}
 }
 
 func (m *moderator) approveDogPhoto(dogId string, breed *string, pendingPhotosBucket string) error {
 	photoHash, err := m.moveS3Object(pendingPhotosBucket, dogId, m.approvedPhotosBucket)
 	if err != nil {
-		fmt.Printf("Error moving object to approved bucket: %s\n", err)
-		return err
+		return fmt.Errorf("failed to move photo to approved bucket: %w", err)
 	}
 
 	if breed != nil {
@@ -99,8 +92,7 @@ func (m *moderator) approveDogPhoto(dogId string, breed *string, pendingPhotosBu
 		err = m.updateDogRecordWithoutBreed(dogId, photoHash)
 	}
 	if err != nil {
-		fmt.Printf("Error updating dog record: %s\n", err)
-		return err
+		return fmt.Errorf("failed to update dog record after approval: %w", err)
 	}
 	return nil
 }
@@ -120,7 +112,10 @@ func (m *moderator) rejectDogPhoto(dogId string) error {
 			},
 		},
 	})
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to update dog record with rejected status: %w", err)
+	}
+	return nil
 }
 
 func (m *moderator) updateDogRecord(dogId string, photoHash string, breed string) error {
@@ -144,7 +139,10 @@ func (m *moderator) updateDogRecord(dogId string, photoHash string, breed string
 			},
 		},
 	})
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to update dog record: %w", err)
+	}
+	return nil
 }
 
 func (m *moderator) updateDogRecordWithoutBreed(dogId string, photoHash string) error {
@@ -165,20 +163,21 @@ func (m *moderator) updateDogRecordWithoutBreed(dogId string, photoHash string) 
 			},
 		},
 	})
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to update dog record: %w", err)
+	}
+	return nil
 }
 
 func (m *moderator) moveS3Object(sourceBucket string, sourceKey string, destinationBucket string) (string, error) {
 	hash, err := m.copyS3Object(sourceBucket, sourceKey, destinationBucket)
 	if err != nil {
-		fmt.Printf("Error copying object to destination bucket: %s\n", err)
-		return "", err
+		return "", fmt.Errorf("failed to copy photo to destination bucket: %w", err)
 	}
 
 	err = m.deleteS3Object(sourceBucket, sourceKey)
 	if err != nil {
-		fmt.Printf("Error deleting object from source bucket: %s\n", err)
-		return "", err
+		return "", fmt.Errorf("failed to delete photo from source bucket: %w", err)
 	}
 	return hash, nil
 }
@@ -190,8 +189,7 @@ func (m *moderator) copyS3Object(sourceBucket string, sourceKey string, destinat
 		Key:        aws.String(sourceKey),
 	})
 	if err != nil {
-		fmt.Printf("Error copying object to destination bucket: %s\n", err)
-		return "", err
+		return "", fmt.Errorf("failed to copy photo to approved bucket: %w", err)
 	}
 	hash := strings.Trim(*res.CopyObjectResult.ETag, "\"")
 	return hash, nil
@@ -202,5 +200,8 @@ func (m *moderator) deleteS3Object(bucket string, key string) error {
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to delete photo from bucket: %w", err)
+	}
+	return nil
 }

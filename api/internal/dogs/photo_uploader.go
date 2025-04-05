@@ -1,6 +1,7 @@
 package dogs
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -35,7 +36,7 @@ func (u *s3DogPhotoUploader) Upload(id string, fileData io.Reader, contentType s
 		ContentType: aws.String(contentType),
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to upload photo to S3: %w", err)
 	}
 
 	return strings.Replace(*result.ETag, "\"", "", 2), nil

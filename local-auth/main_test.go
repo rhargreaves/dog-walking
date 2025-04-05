@@ -65,7 +65,7 @@ func TestHandleRequest_InvalidJWT(t *testing.T) {
 
 	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
-	assert.Equal(t, "token is malformed: token contains an invalid number of segments", response.Context["error"])
+	assert.Equal(t, "failed to parse JWT token: token is malformed: token contains an invalid number of segments", response.Context["error"])
 }
 
 func TestHandleRequest_TokenHasExpired(t *testing.T) {
@@ -85,7 +85,7 @@ func TestHandleRequest_TokenHasExpired(t *testing.T) {
 
 	assert.Equal(t, "", response.PrincipalID)
 	assert.Equal(t, "Deny", response.PolicyDocument.Statement[0].Effect)
-	assert.Equal(t, "token has invalid claims: token is expired", response.Context["error"])
+	assert.Equal(t, "failed to parse JWT token: token has invalid claims: token is expired", response.Context["error"])
 }
 
 func createTestJWT(t *testing.T) string {

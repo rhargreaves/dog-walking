@@ -21,8 +21,7 @@ func handler(ctx context.Context, req events.S3Event) error {
 		moderator := createModerator(sourceBucket)
 		photoStatus, err := moderator.ModeratePhoto(sourceBucket, sourceKey)
 		if err != nil {
-			fmt.Printf("Error moderating photo: %s\n", err)
-			return err
+			return fmt.Errorf("failed to moderate photo %s: %w", sourceKey, err)
 		}
 		fmt.Printf("Photo status: %s\n", photoStatus)
 	}

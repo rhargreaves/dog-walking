@@ -3,7 +3,7 @@ package rekognition_stub
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"errors"
+	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -25,7 +25,7 @@ func NewStubRekognitionClient(s3Svc *s3.S3) rekognitioniface.RekognitionAPI {
 func (r *stubRekognitionClient) DetectLabels(input *rekognition.DetectLabelsInput) (*rekognition.DetectLabelsOutput, error) {
 	imageClassification, err := r.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to detect labels: %w", err)
 	}
 
 	return &rekognition.DetectLabelsOutput{
@@ -41,7 +41,7 @@ func (r *stubRekognitionClient) DetectLabelsWithContext(ctx aws.Context, input *
 func (r *stubRekognitionClient) DetectModerationLabels(input *rekognition.DetectModerationLabelsInput) (*rekognition.DetectModerationLabelsOutput, error) {
 	imageClassification, err := r.getImageClassification(*input.Image.S3Object.Bucket, *input.Image.S3Object.Name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to detect moderation labels: %w", err)
 	}
 
 	return &rekognition.DetectModerationLabelsOutput{
@@ -61,18 +61,18 @@ func (r *stubRekognitionClient) getImageClassification(bucket string, key string
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get image from S3: %w", err)
 	}
 
 	imageBytes, err := io.ReadAll(image.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read image bytes: %w", err)
 	}
 	hash := md5.Sum(imageBytes)
 	hashString := hex.EncodeToString(hash[:])
 	imageClassification, ok := ImageClassifications[hashString]
 	if !ok {
-		return nil, errors.New("stubRekognitionClient: image classification for hash (" + hashString + ") not found")
+		return nil, fmt.Errorf("stubRekognitionClient: image classification for hash (%s) not found", hashString)
 	}
 	return imageClassification, nil
 }
